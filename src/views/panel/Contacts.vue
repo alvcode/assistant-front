@@ -4,7 +4,7 @@
     <template v-slot:page-content>
       <div class="contacts--container">
         <div class="contacts--actions">
-          <div class="btn btn-sm btn-success">Добавить компанию</div>
+          <div @click="showNewCompanyPopup" class="btn btn-sm btn-success">Добавить компанию</div>
         </div>
         <div class="contacts--companies-container">
           <div
@@ -55,6 +55,24 @@
         </template>
       </popup>
 
+      <popup
+          :closeButton="newCompanyPopup.closeButton"
+          :actionButton="newCompanyPopup.actionButton"
+          :action-class="newCompanyPopup.actionClass"
+          :show="newCompanyPopup.show"
+          @closePopup="closeNewCompanyPopup"
+          @actionPopup="submitNewCompanyPopup"
+      >
+        <template v-slot:header>Добавление компании</template>
+        <template v-slot:body>
+          <company-fields
+              :show="newCompanyPopup.show"
+              @update:data="handleUpdateNewCompanyData"
+              @update:validate="handleUpdateNewCompanyValidate"
+          ></company-fields>
+        </template>
+      </popup>
+
     </template>
   </panel-main-template>
 </template>
@@ -66,11 +84,13 @@ import PanelMainTemplate from "@/components/MainTemplate.vue";
 import companyRepository from "@/repositories/company/index.js";
 import contactRepository from "@/repositories/contact/index.js";
 import Popup from "@/components/Popup.vue";
+import CompanyFields from "@/components/Companies/CompanyFields.vue";
 
 
 export default {
-  name: "Drive",
+  name: "Contacts",
   components: {
+    CompanyFields,
     Popup,
     PanelMainTemplate
   },
@@ -86,6 +106,15 @@ export default {
         show: false,
         closeButton: 'Отмена',
         actionButton: 'Продолжить',
+        actionClass: 'btn-success',
+      },
+
+      newCompanyData: {name: '', address: '', site_link: ''},
+      newCompanyValidate: false,
+      newCompanyPopup: {
+        show: false,
+        closeButton: 'Отмена',
+        actionButton: 'Добавить',
         actionClass: 'btn-success',
       },
     };
@@ -115,14 +144,14 @@ export default {
     }
   },
   methods: {
-    expandCompanyToggle(companyId) {
+    async expandCompanyToggle(companyId) {
       for (let key in this.companies) {
         if (this.companies[key].id === companyId) {
           if (
               !this.companies[key].isShowList &&
               !this.loadContactsByCompanyIds.includes(this.companies[key].id)
           ) {
-            this.loadContacts(companyId);
+            await this.loadContacts(companyId);
           }
           if (this.companies[key].isShowList) {
             let index = this.expandedCompaniesIds.indexOf(this.companies[key].id);
@@ -140,7 +169,6 @@ export default {
       await contactRepository.index(companyId).then(resp => {
         this.contacts = this.contacts.concat(resp.data);
         this.loadContactsByCompanyIds[this.loadContactsByCompanyIds.length] = companyId;
-        //this.contacts = resp.data;
         this.$store.dispatch("stopPreloader");
       }).catch(err => {
         this.$store.dispatch("addNotification", {
@@ -175,6 +203,42 @@ export default {
 
         this.closeDeleteCompanyPopup();
 
+        this.$store.dispatch("addNotification", {
+          text: 'Успешно',
+          time: 3,
+          color: "success"
+        });
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
+
+    handleUpdateNewCompanyData(data) {
+      this.newCompanyData = data;
+    },
+    handleUpdateNewCompanyValidate(val) {
+      this.newCompanyValidate = val;
+    },
+    closeNewCompanyPopup() {
+      this.newCompanyPopup.show = false;
+    },
+    showNewCompanyPopup() {
+      this.newCompanyPopup.show = true;
+    },
+    submitNewCompanyPopup() {
+      if (!this.newCompanyValidate) {
+        return false;
+      }
+      this.$store.dispatch("startPreloader");
+      companyRepository.create(this.newCompanyData).then(resp => {
+        this.companies.push(resp.data);
+        this.closeNewCompanyPopup();
         this.$store.dispatch("addNotification", {
           text: 'Успешно',
           time: 3,

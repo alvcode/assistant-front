@@ -14,12 +14,12 @@
           >
             <div class="contacts-company-item-company">
               <div class="left">
-                <div>Компания: <span class="text-bold">{{item.name}} {{item.id}}</span></div>
+                <div>Компания: <span class="text-bold">{{item.name}}</span></div>
                 <div v-show="item.address">Адрес: <span class="text-bold">{{item.address}}</span></div>
                 <div v-show="item.site_link">Сайт: <span class="text-bold">{{item.site_link}}</span></div>
               </div>
               <div class="right">
-                <div class="btn btn-sm btn-info">Изменить</div>
+                <div @click="showEditCompanyPopup(item.id)" class="btn btn-sm btn-info">Изменить</div>
                 <div @click="deleteCompany(item.id)" class="btn btn-sm btn-danger">Удалить</div>
                 <div @click="expandCompanyToggle(item.id)" class="btn-sm-circle btn-outline-info mrg-l-15">
                   <span v-if="!item.isShowList"><f-awesome :icon="['fas', 'caret-up']" /></span>
@@ -31,8 +31,54 @@
             <div v-show="item.isShowList" class="contacts-company-item-contacts">
               <div
                   class="contacts-company-item-contacts-item shadow-card"
+                  v-for="contact in item.contacts"
+                  :key="contact.id"
               >
-                {{item.contacts}}
+                <div class="contacts--item-table">
+                  <div class="table--container">
+                    <div class="table--header">
+                      <div>Фото</div>
+                      <div>ФИО</div>
+                      <div>Номер 1</div>
+                      <div>Номер 2</div>
+                      <div>E-mail</div>
+                      <div>Создано</div>
+                      <div>Действия</div>
+                    </div>
+                    <div class="table--rows">
+                      <div
+                          class="table--row"
+                          v-for="contact in item.contacts"
+                          :key="contact.id"
+                      >
+                        <div><img width="70" :src="contact.upload_file.upload_file_url" alt=""></div>
+                        <div>{{contact.surname}} {{contact.name}} {{contact.lastname}}</div>
+                        <div>
+                          <span v-show="contact.phone_number_one">
+                            {{phoneNumberToMask(contact.phone_number_one)}}
+                          </span>
+                        </div>
+                        <div>
+                          <span v-show="contact.phone_number_two">
+                            {{phoneNumberToMask(contact.phone_number_two)}}
+                          </span>
+                        </div>
+                        <div>
+                          <span v-show="contact.email">{{contact.email}}</span>
+                        </div>
+                        <div>{{contact.created_at}}</div>
+                        <div>
+                          <div class="btn btn-sm btn-info"><f-awesome :icon="['fas', 'edit']" /></div>
+                          <div class="btn btn-sm btn-danger"><f-awesome :icon="['fas', 'times']" /></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="contacts--item-data">
+
+                </div>
               </div>
             </div>
 
@@ -73,6 +119,25 @@
         </template>
       </popup>
 
+      <popup
+          :closeButton="editCompanyPopup.closeButton"
+          :actionButton="editCompanyPopup.actionButton"
+          :action-class="editCompanyPopup.actionClass"
+          :show="editCompanyPopup.show"
+          @closePopup="closeEditCompanyPopup"
+          @actionPopup="submitEditCompanyPopup"
+      >
+        <template v-slot:header>Добавление компании</template>
+        <template v-slot:body>
+          <company-fields
+              :show="editCompanyPopup.show"
+              :defaul-values="editCompanyDataProps"
+              @update:data="handleUpdateEditCompanyData"
+              @update:validate="handleUpdateEditCompanyValidate"
+          ></company-fields>
+        </template>
+      </popup>
+
     </template>
   </panel-main-template>
 </template>
@@ -85,6 +150,9 @@ import companyRepository from "@/repositories/company/index.js";
 import contactRepository from "@/repositories/contact/index.js";
 import Popup from "@/components/Popup.vue";
 import CompanyFields from "@/components/Companies/CompanyFields.vue";
+import Formatter from "@/components/libraries/Formatter.js";
+
+const formatter = new Formatter();
 
 
 export default {
@@ -97,6 +165,7 @@ export default {
   data() {
     return {
       expandedCompaniesIds: [],
+      expandedContactsIds: [],
       loadContactsByCompanyIds: [],
       companies: [],
       contacts: [],
@@ -112,6 +181,17 @@ export default {
       newCompanyData: {name: '', address: '', site_link: ''},
       newCompanyValidate: false,
       newCompanyPopup: {
+        show: false,
+        closeButton: 'Отмена',
+        actionButton: 'Добавить',
+        actionClass: 'btn-success',
+      },
+
+      editCompanyData: {name: '', address: '', site_link: ''},
+      editCompanyDataProps: {name: '', address: '', site_link: ''},
+      editCompanyValidate: false,
+      editCompanyId: 0,
+      editCompanyPopup: {
         show: false,
         closeButton: 'Отмена',
         actionButton: 'Добавить',
@@ -133,7 +213,9 @@ export default {
         const contacts = [];
         for (let keyContact in this.contacts) {
           if (this.contacts[keyContact].company_id === item.id) {
-            contacts.push(this.contacts[keyContact]);
+            const contact = this.contacts[keyContact];
+            contact.isShowList = this.expandedContactsIds.includes(this.contacts[keyContact].id);
+            contacts.push(contact);
           }
         }
         item.contacts = contacts;
@@ -144,6 +226,9 @@ export default {
     }
   },
   methods: {
+    phoneNumberToMask(number) {
+      return formatter.phoneNumberToMask(number);
+    },
     async expandCompanyToggle(companyId) {
       for (let key in this.companies) {
         if (this.companies[key].id === companyId) {
@@ -254,6 +339,56 @@ export default {
         this.$store.dispatch("stopPreloader");
       });
     },
+
+    closeEditCompanyPopup() {
+      this.editCompanyPopup.show = false;
+    },
+    showEditCompanyPopup(companyId) {
+      this.editCompanyPopup.show = true;
+      for (let key in this.companies) {
+        if (this.companies[key].id === companyId) {
+          this.editCompanyDataProps = {
+            name: this.companies[key].name,
+            address: this.companies[key].address,
+            site_link: this.companies[key].site_link,
+          };
+          this.editCompanyId = companyId;
+        }
+      }
+    },
+    submitEditCompanyPopup() {
+      if (!this.editCompanyValidate) {
+        return false;
+      }
+      this.$store.dispatch("startPreloader");
+      companyRepository.update(this.editCompanyData, this.editCompanyId).then(resp => {
+        for (let key in this.companies) {
+          if (this.companies[key].id === resp.data.id) {
+            this.companies[key] = resp.data;
+          }
+        }
+        this.closeEditCompanyPopup();
+        this.$store.dispatch("addNotification", {
+          text: 'Успешно',
+          time: 3,
+          color: "success"
+        });
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
+    handleUpdateEditCompanyValidate(val) {
+      this.editCompanyValidate = val;
+    },
+    handleUpdateEditCompanyData(data) {
+      this.editCompanyData = data;
+    }
   },
   created() {
     this.$store.dispatch("startPreloader");
@@ -282,10 +417,10 @@ export default {
     justify-content: space-between;
     flex-direction: row;
 
-    .left{
+    &>.left{
       width: 50%;
     }
-    .right{
+    &>.right{
       text-align: right;
       width: 50%;
     }

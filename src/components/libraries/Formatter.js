@@ -334,7 +334,8 @@ class Formatter {
       90: '(###)###-####'
     };
     let result = '';
-    let phone = number.replace(/^\+/, '');
+    //let phone = number.replace(/^\+/, '');
+    let phone = ''+number+'';
     let existsMask = false;
     for(let key in maskObject){
       let regexp = new RegExp(`^${key}`);

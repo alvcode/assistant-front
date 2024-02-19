@@ -51,6 +51,7 @@ export default {
   },
   props: {
     show: Boolean,
+    defaulValues: Object,
   },
   watch: {
     show: function(val) {
@@ -58,6 +59,14 @@ export default {
         this.name = '';
         this.address = '';
         this.site_link = '';
+        this.updateData();
+      }
+    },
+    defaulValues: function(val) {
+      if (val.name) {
+        this.name = val.name;
+        this.address = val.address;
+        this.site_link = val.site_link;
         this.updateData();
       }
     }

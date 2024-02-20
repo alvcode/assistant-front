@@ -19,6 +19,9 @@
                 <div v-show="item.site_link">Сайт: <span class="text-bold">{{item.site_link}}</span></div>
               </div>
               <div class="right">
+                <div @click="showAddContactPopup(item.id)" class="btn btn-sm btn-success">
+                  <f-awesome :icon="['fas', 'plus']" /> Контакт
+                </div>
                 <div @click="showEditCompanyPopup(item.id)" class="btn btn-sm btn-info">Изменить</div>
                 <div @click="deleteCompany(item.id)" class="btn btn-sm btn-danger">Удалить</div>
                 <div @click="expandCompanyToggle(item.id)" class="btn-sm-circle btn-outline-info mrg-l-15">
@@ -76,7 +79,7 @@
                   </div>
                 </div>
 
-                <div class="contacts--item-data">
+                <div class="contacts--item-more">
 
                 </div>
               </div>
@@ -138,6 +141,22 @@
         </template>
       </popup>
 
+      <popup
+          :closeButton="addContactPopup.closeButton"
+          :actionButton="addContactPopup.actionButton"
+          :action-class="addContactPopup.actionClass"
+          :show="addContactPopup.show"
+          @closePopup="closeAddContactPopup"
+          @actionPopup="submitAddContactPopup"
+      >
+        <template v-slot:header>Добавление контакта</template>
+        <template v-slot:body>
+          <contact-fields
+              :show="addContactPopup.show"
+          ></contact-fields>
+        </template>
+      </popup>
+
     </template>
   </panel-main-template>
 </template>
@@ -151,6 +170,7 @@ import contactRepository from "@/repositories/contact/index.js";
 import Popup from "@/components/Popup.vue";
 import CompanyFields from "@/components/Companies/CompanyFields.vue";
 import Formatter from "@/components/libraries/Formatter.js";
+import ContactFields from "@/components/Contacts/ContactFields.vue";
 
 const formatter = new Formatter();
 
@@ -158,6 +178,7 @@ const formatter = new Formatter();
 export default {
   name: "Contacts",
   components: {
+    ContactFields,
     CompanyFields,
     Popup,
     PanelMainTemplate
@@ -192,6 +213,18 @@ export default {
       editCompanyValidate: false,
       editCompanyId: 0,
       editCompanyPopup: {
+        show: false,
+        closeButton: 'Отмена',
+        actionButton: 'Добавить',
+        actionClass: 'btn-success',
+      },
+
+      addContactData: {
+        company_id: 0, upload_file_id: 0, company_name: '', company_address: '', site_link: '',
+        surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
+        email: '', vk_link: '', whatsapp_link: '', telegram_link: '',
+      },
+      addContactPopup: {
         show: false,
         closeButton: 'Отмена',
         actionButton: 'Добавить',
@@ -388,6 +421,17 @@ export default {
     },
     handleUpdateEditCompanyData(data) {
       this.editCompanyData = data;
+    },
+
+    showAddContactPopup(companyId) {
+      this.addContactPopup.show = true;
+      console.log(companyId);
+    },
+    closeAddContactPopup() {
+      this.addContactPopup.show = false;
+    },
+    submitAddContactPopup() {
+      console.log('submit');
     }
   },
   created() {

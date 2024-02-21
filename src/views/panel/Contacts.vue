@@ -3,6 +3,7 @@
     <template v-slot:page-title>Мои контакты</template>
     <template v-slot:page-content>
       <div class="contacts--container">
+        {{newContactData}}
         <div class="contacts--actions">
           <div @click="showNewCompanyPopup" class="btn btn-sm btn-success">Добавить компанию</div>
         </div>
@@ -19,7 +20,7 @@
                 <div v-show="item.site_link">Сайт: <span class="text-bold">{{item.site_link}}</span></div>
               </div>
               <div class="right">
-                <div @click="showAddContactPopup(item.id)" class="btn btn-sm btn-success">
+                <div @click="showNewContactPopup(item.id)" class="btn btn-sm btn-success">
                   <f-awesome :icon="['fas', 'plus']" /> Контакт
                 </div>
                 <div @click="showEditCompanyPopup(item.id)" class="btn btn-sm btn-info">Изменить</div>
@@ -32,11 +33,7 @@
             </div>
 
             <div v-show="item.isShowList" class="contacts-company-item-contacts">
-              <div
-                  class="contacts-company-item-contacts-item shadow-card"
-                  v-for="contact in item.contacts"
-                  :key="contact.id"
-              >
+              <div class="contacts-company-item-contacts-item shadow-card">
                 <div class="contacts--item-table">
                   <div class="table--container">
                     <div class="table--header">
@@ -54,7 +51,11 @@
                           v-for="contact in item.contacts"
                           :key="contact.id"
                       >
-                        <div><img width="70" :src="contact.upload_file.upload_file_url" alt=""></div>
+                        <div>
+                          <span v-if="contact.upload_file_id">
+                            <img width="70" :src="contact.upload_file.upload_file_url" alt="">
+                          </span>
+                        </div>
                         <div>{{contact.surname}} {{contact.name}} {{contact.lastname}}</div>
                         <div>
                           <span v-show="contact.phone_number_one">
@@ -142,17 +143,19 @@
       </popup>
 
       <popup
-          :closeButton="addContactPopup.closeButton"
-          :actionButton="addContactPopup.actionButton"
-          :action-class="addContactPopup.actionClass"
-          :show="addContactPopup.show"
-          @closePopup="closeAddContactPopup"
-          @actionPopup="submitAddContactPopup"
+          :closeButton="newContactPopup.closeButton"
+          :actionButton="newContactPopup.actionButton"
+          :action-class="newContactPopup.actionClass"
+          :show="newContactPopup.show"
+          @closePopup="closeNewContactPopup"
+          @actionPopup="submitNewContactPopup"
       >
         <template v-slot:header>Добавление контакта</template>
         <template v-slot:body>
           <contact-fields
-              :show="addContactPopup.show"
+              :show="newContactPopup.show"
+              @update:data="handleUpdateNewContactData"
+              @update:validate="handleUpdateNewContactValidate"
           ></contact-fields>
         </template>
       </popup>
@@ -219,12 +222,14 @@ export default {
         actionClass: 'btn-success',
       },
 
-      addContactData: {
+      newContactData: {
         company_id: 0, upload_file_id: 0, company_name: '', company_address: '', site_link: '',
         surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
         email: '', vk_link: '', whatsapp_link: '', telegram_link: '',
       },
-      addContactPopup: {
+      newContactValidate: false,
+      newContactCompanyId: 0,
+      newContactPopup: {
         show: false,
         closeButton: 'Отмена',
         actionButton: 'Добавить',
@@ -259,6 +264,17 @@ export default {
     }
   },
   methods: {
+    addContactIfNotExists(contact) {
+      let exists = false;
+      for (let key in this.contacts) {
+        if (this.contacts[key].id === contact.id) {
+          exists = true;
+        }
+      }
+      if (!exists) {
+        this.contacts = this.contacts.concat(contact);
+      }
+    },
     phoneNumberToMask(number) {
       return formatter.phoneNumberToMask(number);
     },
@@ -285,7 +301,9 @@ export default {
     async loadContacts(companyId) {
       this.$store.dispatch("startPreloader");
       await contactRepository.index(companyId).then(resp => {
-        this.contacts = this.contacts.concat(resp.data);
+        for (let key in resp.data) {
+          this.addContactIfNotExists(resp.data[key]);
+        }
         this.loadContactsByCompanyIds[this.loadContactsByCompanyIds.length] = companyId;
         this.$store.dispatch("stopPreloader");
       }).catch(err => {
@@ -423,16 +441,44 @@ export default {
       this.editCompanyData = data;
     },
 
-    showAddContactPopup(companyId) {
-      this.addContactPopup.show = true;
-      console.log(companyId);
+    showNewContactPopup(companyId) {
+      this.newContactPopup.show = true;
+      this.newContactCompanyId = companyId;
     },
-    closeAddContactPopup() {
-      this.addContactPopup.show = false;
+    closeNewContactPopup() {
+      this.newContactPopup.show = false;
     },
-    submitAddContactPopup() {
-      console.log('submit');
-    }
+    handleUpdateNewContactValidate(val) {
+      this.newContactValidate = val;
+    },
+    handleUpdateNewContactData(data) {
+      this.newContactData = data;
+    },
+    submitNewContactPopup() {
+      if (!this.newContactValidate) {
+        return false;
+      }
+      this.newContactData.company_id = this.newContactCompanyId;
+
+      this.$store.dispatch("startPreloader");
+      contactRepository.create(this.newContactData).then(resp => {
+        this.addContactIfNotExists(resp.data);
+        this.closeNewContactPopup();
+        this.$store.dispatch("addNotification", {
+          text: 'Успешно',
+          time: 3,
+          color: "success"
+        });
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
   },
   created() {
     this.$store.dispatch("startPreloader");

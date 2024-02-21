@@ -87,6 +87,50 @@
       >
       <div class="form-error">{{ errors.phone_number_two }}</div>
     </div>
+
+    <div class="input-block">
+      <label for="">E-mail</label>
+      <input
+          type="text"
+          v-model="email"
+          @input="updateData"
+          @blur="vEmail"
+      >
+      <div class="form-error">{{ errors.email }}</div>
+    </div>
+
+    <div class="input-block">
+      <label for="">Ссылка ВК</label>
+      <input
+          type="text"
+          v-model="vk_link"
+          @input="updateData"
+          @blur="vVkLink"
+      >
+      <div class="form-error">{{ errors.vk_link }}</div>
+    </div>
+
+    <div class="input-block">
+      <label for="">Ссылка WhatsApp</label>
+      <input
+          type="text"
+          v-model="whatsapp_link"
+          @input="updateData"
+          @blur="vWhatsappLink"
+      >
+      <div class="form-error">{{ errors.whatsapp_link }}</div>
+    </div>
+
+    <div class="input-block">
+      <label for="">Ссылка Telegram</label>
+      <input
+          type="text"
+          v-model="telegram_link"
+          @input="updateData"
+          @blur="vTelegramLink"
+      >
+      <div class="form-error">{{ errors.telegram_link }}</div>
+    </div>
   </div>
 </template>
 
@@ -109,9 +153,14 @@ export default {
       lastname: '',
       phone_number_one: '',
       phone_number_two: '',
+      email: '',
+      vk_link: '',
+      whatsapp_link: '',
+      telegram_link: '',
       errors: {
         company_name: '', company_address: '', site_link: '', surname: '', name: '', lastname: '',
-        phone_number_one: '', phone_number_two: '',
+        phone_number_one: '', phone_number_two: '', email: '', vk_link: '', whatsapp_link: '',
+        telegram_link: '',
       }
     }
   },
@@ -130,6 +179,10 @@ export default {
         this.lastname = '';
         this.phone_number_one = '';
         this.phone_number_two = '';
+        this.email = '';
+        this.vk_link = '';
+        this.whatsapp_link = '';
+        this.telegram_link = '';
         this.updateData();
       }
     },
@@ -143,6 +196,10 @@ export default {
         this.lastname = val.lastname;
         this.phone_number_one = val.phone_number_one;
         this.phone_number_two = val.phone_number_two;
+        this.email = val.email;
+        this.vk_link = val.vk_link;
+        this.whatsapp_link = val.whatsapp_link;
+        this.telegram_link = val.telegram_link;
         this.updateData();
       }
     }
@@ -158,6 +215,10 @@ export default {
       this.vLastname().result === "error" ? errorCount++ : "";
       this.vPhoneNumberOne().result === "error" ? errorCount++ : "";
       this.vPhoneNumberTwo().result === "error" ? errorCount++ : "";
+      this.vEmail().result === "error" ? errorCount++ : "";
+      this.vVkLink().result === "error" ? errorCount++ : "";
+      this.vWhatsappLink().result === "error" ? errorCount++ : "";
+      this.vTelegramLink().result === "error" ? errorCount++ : "";
       return errorCount;
     }
   },
@@ -219,6 +280,34 @@ export default {
       v.result === "error" ? (this.errors.phone_number_two = v.message) : (this.errors.phone_number_two = "");
       return v;
     },
+    vEmail() {
+      const v = validator.validate([
+        {fieldName: "E-mail", value: this.email, type: "email", length: 100}
+      ]);
+      v.result === "error" ? (this.errors.email = v.message) : (this.errors.email = "");
+      return v;
+    },
+    vVkLink() {
+      const v = validator.validate([
+        {fieldName: "Ссылка ВК", value: this.vk_link, type: "string", length: 100}
+      ]);
+      v.result === "error" ? (this.errors.vk_link = v.message) : (this.errors.vk_link = "");
+      return v;
+    },
+    vWhatsappLink() {
+      const v = validator.validate([
+        {fieldName: "Ссылка WhatsApp", value: this.whatsapp_link, type: "string", length: 100}
+      ]);
+      v.result === "error" ? (this.errors.whatsapp_link = v.message) : (this.errors.whatsapp_link = "");
+      return v;
+    },
+    vTelegramLink() {
+      const v = validator.validate([
+        {fieldName: "Ссылка Telegram", value: this.telegram_link, type: "string", length: 100}
+      ]);
+      v.result === "error" ? (this.errors.telegram_link = v.message) : (this.errors.telegram_link = "");
+      return v;
+    },
     updateData() {
       this.$emit('update:data', {
         company_name: this.company_name,
@@ -229,6 +318,10 @@ export default {
         lastname: this.lastname,
         phone_number_one: this.phone_number_one,
         phone_number_two: this.phone_number_two,
+        email: this.email,
+        vk_link: this.vk_link,
+        whatsapp_link: this.whatsapp_link,
+        telegram_link: this.telegram_link,
       });
       this.updateValidate();
     },

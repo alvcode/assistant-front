@@ -73,7 +73,7 @@
                         <div>{{contact.created_at}}</div>
                         <div>
                           <div class="btn btn-sm btn-info"><f-awesome :icon="['fas', 'edit']" /></div>
-                          <div class="btn btn-sm btn-danger"><f-awesome :icon="['fas', 'times']" /></div>
+                          <div @click="showDeleteContactPopup(contact.id)" class="btn btn-sm btn-danger"><f-awesome :icon="['fas', 'times']" /></div>
                         </div>
                       </div>
                     </div>
@@ -160,6 +160,20 @@
         </template>
       </popup>
 
+      <popup
+          :closeButton="deleteContactPopup.closeButton"
+          :actionButton="deleteContactPopup.actionButton"
+          :action-class="deleteContactPopup.actionClass"
+          :show="deleteContactPopup.show"
+          @closePopup="closeDeleteContactPopup"
+          @actionPopup="submitDeleteContactPopup"
+      >
+        <template v-slot:header>Удалить контакт?</template>
+        <template v-slot:body>
+          Внимание! Контакт будет удален без возможности восстановления. Продолжить?
+        </template>
+      </popup>
+
     </template>
   </panel-main-template>
 </template>
@@ -233,6 +247,14 @@ export default {
         show: false,
         closeButton: 'Отмена',
         actionButton: 'Добавить',
+        actionClass: 'btn-success',
+      },
+
+      deletedContactId: 0,
+      deleteContactPopup: {
+        show: false,
+        closeButton: 'Отмена',
+        actionButton: 'Продолжить',
         actionClass: 'btn-success',
       },
     };
@@ -478,6 +500,38 @@ export default {
         });
         this.$store.dispatch("stopPreloader");
       });
+    },
+
+    submitDeleteContactPopup() {
+      this.$store.dispatch("startPreloader");
+      contactRepository.delete(this.deletedContactId).then(() => {
+        for (let key in this.contacts) {
+          if (this.contacts[key].id === this.deletedContactId) {
+            this.contacts.splice(key, 1);
+          }
+        }
+        this.$store.dispatch("addNotification", {
+          text: 'Успешно',
+          time: 3,
+          color: "success"
+        });
+        this.closeDeleteContactPopup();
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
+    closeDeleteContactPopup() {
+      this.deleteContactPopup.show = false;
+    },
+    showDeleteContactPopup(contactId) {
+      this.deletedContactId = contactId;
+      this.deleteContactPopup.show = true;
     },
   },
   created() {

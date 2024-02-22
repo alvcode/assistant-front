@@ -1,6 +1,9 @@
 <template>
   <div class="company-fields--container">
     <div class="input-block">
+      <croppie-image></croppie-image>
+    </div>
+    <div class="input-block">
       <label for="">Название компании <span class="req">*</span></label>
       <input
           type="text"
@@ -35,12 +38,13 @@
 
 <script>
 import Validator from "@/components/libraries/Validator.js";
+import CroppieImage from "@/components/File/CroppieImage.vue";
 const validator = new Validator();
 
 export default {
   name: "CompanyFields",
   emits: ['update:data', 'update:validate'],
-  components: {},
+  components: {CroppieImage},
   data() {
     return {
       name: '',

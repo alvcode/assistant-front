@@ -57,7 +57,7 @@ export default {
     setUpCroppie() {
       let el = document.getElementById(this.cropieId);
       this.croppie = new Croppie(el, {
-        viewport: { width: 200, height: 200, type: "circle" },
+        viewport: { width: 200, height: 200, type: "square" },
         boundary: { width: 250, height: 250 },
         showZoomer: true,
         enableOrientation: true,
@@ -95,8 +95,8 @@ export default {
         .result({
           type: "canvas",
           size: {
-            width: 200,
-            height: 200
+            width: 350,
+            height: 350
           },
           quality: 0
         })

@@ -1,6 +1,6 @@
 <template>
   <div class="text-center">
-    <div class="staff--avatar-img">
+    <div class="croppie-image--img-container">
       <img :src="image" />
     </div>
     <div class="input-block">
@@ -86,3 +86,11 @@ export default {
   },
 }
 </script>
+
+<style scoped lang="less">
+.croppie-image--img-container{
+  img{
+    width: 200px;
+  }
+}
+</style>

@@ -3,7 +3,6 @@
     <template v-slot:page-title>Мои контакты</template>
     <template v-slot:page-content>
       <div class="contacts--container">
-        {{newContactData}}
         <div class="contacts--actions">
           <div @click="showNewCompanyPopup" class="btn btn-sm btn-success">Добавить компанию</div>
         </div>
@@ -72,8 +71,18 @@
                         </div>
                         <div>{{contact.created_at}}</div>
                         <div>
-                          <div class="btn btn-sm btn-info"><f-awesome :icon="['fas', 'edit']" /></div>
-                          <div @click="showDeleteContactPopup(contact.id)" class="btn btn-sm btn-danger"><f-awesome :icon="['fas', 'times']" /></div>
+                          <div
+                              @click="showEditContactPopup(contact.id)"
+                              class="btn btn-sm btn-info"
+                          >
+                            <f-awesome :icon="['fas', 'edit']" />
+                          </div>
+                          <div
+                              @click="showDeleteContactPopup(contact.id)"
+                              class="btn btn-sm btn-danger"
+                          >
+                            <f-awesome :icon="['fas', 'times']" />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -131,7 +140,7 @@
           @closePopup="closeEditCompanyPopup"
           @actionPopup="submitEditCompanyPopup"
       >
-        <template v-slot:header>Добавление компании</template>
+        <template v-slot:header>Изменение компании</template>
         <template v-slot:body>
           <company-fields
               :show="editCompanyPopup.show"
@@ -161,6 +170,25 @@
       </popup>
 
       <popup
+          :closeButton="editContactPopup.closeButton"
+          :actionButton="editContactPopup.actionButton"
+          :action-class="editContactPopup.actionClass"
+          :show="editContactPopup.show"
+          @closePopup="closeEditContactPopup"
+          @actionPopup="submitEditContactPopup"
+      >
+        <template v-slot:header>Изменение контакта</template>
+        <template v-slot:body>
+          <contact-fields
+              :show="editContactPopup.show"
+              :defaul-values="editContactDataProps"
+              @update:data="handleUpdateEditContactData"
+              @update:validate="handleUpdateEditContactValidate"
+          ></contact-fields>
+        </template>
+      </popup>
+
+      <popup
           :closeButton="deleteContactPopup.closeButton"
           :actionButton="deleteContactPopup.actionButton"
           :action-class="deleteContactPopup.actionClass"
@@ -173,6 +201,8 @@
           Внимание! Контакт будет удален без возможности восстановления. Продолжить?
         </template>
       </popup>
+
+
 
     </template>
   </panel-main-template>
@@ -237,7 +267,7 @@ export default {
       },
 
       newContactData: {
-        company_id: 0, upload_file_id: 0, company_name: '', company_address: '', site_link: '',
+        company_id: 0, upload_file_id: null, company_name: '', company_address: '', site_link: '',
         surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
         email: '', vk_link: '', whatsapp_link: '', telegram_link: '',
       },
@@ -255,6 +285,26 @@ export default {
         show: false,
         closeButton: 'Отмена',
         actionButton: 'Продолжить',
+        actionClass: 'btn-success',
+      },
+
+      editContactData: {
+        company_id: 0, upload_file_id: null, company_name: '', company_address: '', site_link: '',
+        surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
+        email: '', vk_link: '', whatsapp_link: '', telegram_link: '',
+      },
+      editContactDataProps: {
+        company_id: 0, upload_file_id: null, company_name: '', company_address: '', site_link: '',
+        surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
+        email: '', vk_link: '', whatsapp_link: '', telegram_link: '',
+      },
+      editContactValidate: false,
+      editContactCompanyId: 0,
+      editContactId: 0,
+      editContactPopup: {
+        show: false,
+        closeButton: 'Отмена',
+        actionButton: 'Добавить',
         actionClass: 'btn-success',
       },
     };
@@ -532,6 +582,55 @@ export default {
     showDeleteContactPopup(contactId) {
       this.deletedContactId = contactId;
       this.deleteContactPopup.show = true;
+    },
+
+    handleUpdateEditContactValidate(val) {
+      this.editContactValidate = val;
+    },
+    handleUpdateEditContactData(data) {
+      this.editContactData = data;
+    },
+    submitEditContactPopup() {
+      if (!this.editContactValidate) {
+        return false;
+      }
+      this.editContactData.company_id = this.editContactCompanyId;
+
+      this.$store.dispatch("startPreloader");
+      contactRepository.update(this.editContactData, this.editContactId).then(resp => {
+        for (let key in this.contacts) {
+          if (this.contacts[key].id === this.editContactId) {
+            this.contacts[key] = resp.data;
+          }
+        }
+        this.closeEditContactPopup();
+        this.$store.dispatch("addNotification", {
+          text: 'Успешно',
+          time: 3,
+          color: "success"
+        });
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
+    closeEditContactPopup() {
+      this.editContactPopup.show = false;
+    },
+    showEditContactPopup(contactId) {
+      this.editContactPopup.show = true;
+      for (let key in this.contacts) {
+        if (this.contacts[key].id === contactId) {
+          this.editContactDataProps = { ...this.contacts[key] };
+        }
+        this.editContactId = this.contacts[key].id;
+        this.editContactCompanyId = this.contacts[key].company_id;
+      }
     },
   },
   created() {

@@ -51,12 +51,12 @@ class Validator {
         return lengthRes;
       }
     }
-    if (!value.match(/@/) && value !== "") {
+    if (value !== "" && value !== null && !value.match(/@/)) {
       return {
         result: "error",
         message: "Поле '" + fieldName + "' должно быть в формате e-mail"
       };
-    } else if(value.match(/,/) && value !== "") {
+    } else if(value !== "" && value !== null && value.match(/,/)) {
       return {
         result: "error",
         message: "Поле '" + fieldName + "' не может содержать знаки препинания"

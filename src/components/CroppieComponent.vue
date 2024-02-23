@@ -4,14 +4,14 @@
     :show="croppiePopup.show"
     @closePopup="closeCroppiePopup"
   >
-    <div slot="header">Позиционирование</div>
-    <div slot="body">
+    <template v-slot:header>Позиционирование</template>
+    <template v-slot:body>
       <div :id="cropieId"></div>
       <div @click="croppieSubmit" class="btn btn-sm btn-success">Применить</div>
       <div @click="croppieRotate" class="btn btn-sm btn-info">
-        <f-awesome icon="sync"></f-awesome>
+        <f-awesome :icon="['fas', 'sync']" />
       </div>
-    </div>
+    </template>
   </popup>
 </template>
 
@@ -22,13 +22,16 @@ import Popup from "@/components/Popup.vue";
 export default {
   name: "CroppieComponent",
   components: { Popup },
+  emits: ['update:submit'],
   props: {
     fileModel: Event
   },
   watch: {
     fileModel: function(val) {
-      this.readFile(val);
-      this.croppiePopup.show = true;
+      if (val) {
+        this.readFile(val);
+        this.croppiePopup.show = true;
+      }
     }
   },
   mounted() {

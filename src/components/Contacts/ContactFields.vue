@@ -1,5 +1,11 @@
 <template>
   <div class="company-fields--container">
+    <croppie-image
+        :show="show"
+        :default-image="upload_file_url"
+        @update:file-id="updateFileId"
+    ></croppie-image>
+
     <div class="input-block">
       <label for="">Название компании</label>
       <input
@@ -72,7 +78,6 @@
           type="text"
           v-model="phone_number_one"
           @input="updateData"
-          @blur="vPhoneNumberOne"
       >
       <div class="form-error">{{ errors.phone_number_one }}</div>
     </div>
@@ -83,7 +88,6 @@
           type="text"
           v-model="phone_number_two"
           @input="updateData"
-          @blur="vPhoneNumberTwo"
       >
       <div class="form-error">{{ errors.phone_number_two }}</div>
     </div>
@@ -137,14 +141,18 @@
 <script>
 import Validator from "@/components/libraries/Validator.js";
 import PhoneNumber from "@/components/PhoneNumber.vue";
+import CroppieImage from "@/components/File/CroppieImage.vue";
 const validator = new Validator();
 
 export default {
   name: "ContactFields",
-  emits: ['update:data', 'update:validate'],
-  components: {PhoneNumber},
+  emits: ['update:data', 'update:validate', 'update:photo'],
+  components: {CroppieImage, PhoneNumber},
   data() {
     return {
+      upload_file_url: null,
+
+      upload_file_id: '',
       company_name: '',
       company_address: '',
       site_link: '',
@@ -171,7 +179,9 @@ export default {
   watch: {
     show: function(val) {
       if (!val) {
-        this.name = '';
+        this.upload_file_url = null;
+        this.upload_file_id = '';
+        this.company_name = '';
         this.company_address = '';
         this.site_link = '';
         this.surname = '';
@@ -188,6 +198,10 @@ export default {
     },
     defaulValues: function(val) {
       if (val.name) {
+        if (val.upload_file_id && val.upload_file) {
+          this.upload_file_url = val.upload_file.upload_file_url;
+        }
+        this.upload_file_id = val.upload_file_id;
         this.company_name = val.company_name;
         this.company_address = val.company_address;
         this.site_link = val.site_link;
@@ -213,8 +227,8 @@ export default {
       this.vSurname().result === "error" ? errorCount++ : "";
       this.vName().result === "error" ? errorCount++ : "";
       this.vLastname().result === "error" ? errorCount++ : "";
-      this.vPhoneNumberOne().result === "error" ? errorCount++ : "";
-      this.vPhoneNumberTwo().result === "error" ? errorCount++ : "";
+      // this.vPhoneNumberOne().result === "error" ? errorCount++ : "";
+      // this.vPhoneNumberTwo().result === "error" ? errorCount++ : "";
       this.vEmail().result === "error" ? errorCount++ : "";
       this.vVkLink().result === "error" ? errorCount++ : "";
       this.vWhatsappLink().result === "error" ? errorCount++ : "";
@@ -223,6 +237,10 @@ export default {
     }
   },
   methods: {
+    updateFileId(id) {
+      this.upload_file_id = id;
+      this.updateData();
+    },
     vCompanyName() {
       const v = validator.validate([
         {fieldName: "Название компании", value: this.company_name, type: "required"},
@@ -266,20 +284,20 @@ export default {
       v.result === "error" ? (this.errors.lastname = v.message) : (this.errors.lastname = "");
       return v;
     },
-    vPhoneNumberOne() {
-      const v = validator.validate([
-        {fieldName: "Номер телефона 1", value: this.phone_number_one, type: "string", length: 15}
-      ]);
-      v.result === "error" ? (this.errors.phone_number_one = v.message) : (this.errors.phone_number_one = "");
-      return v;
-    },
-    vPhoneNumberTwo() {
-      const v = validator.validate([
-        {fieldName: "Номер телефона 2", value: this.phone_number_two, type: "string", length: 15}
-      ]);
-      v.result === "error" ? (this.errors.phone_number_two = v.message) : (this.errors.phone_number_two = "");
-      return v;
-    },
+    // vPhoneNumberOne() {
+    //   const v = validator.validate([
+    //     {fieldName: "Номер телефона 1", value: this.phone_number_one, type: "string", length: 15}
+    //   ]);
+    //   v.result === "error" ? (this.errors.phone_number_one = v.message) : (this.errors.phone_number_one = "");
+    //   return v;
+    // },
+    // vPhoneNumberTwo() {
+    //   const v = validator.validate([
+    //     {fieldName: "Номер телефона 2", value: this.phone_number_two, type: "string", length: 15}
+    //   ]);
+    //   v.result === "error" ? (this.errors.phone_number_two = v.message) : (this.errors.phone_number_two = "");
+    //   return v;
+    // },
     vEmail() {
       const v = validator.validate([
         {fieldName: "E-mail", value: this.email, type: "email", length: 100}
@@ -310,6 +328,7 @@ export default {
     },
     updateData() {
       this.$emit('update:data', {
+        upload_file_id: this.upload_file_id,
         company_name: this.company_name,
         company_address: this.company_address,
         site_link: this.site_link,

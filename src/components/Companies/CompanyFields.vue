@@ -1,8 +1,6 @@
 <template>
   <div class="company-fields--container">
-    <div class="input-block">
-      <croppie-image></croppie-image>
-    </div>
+
     <div class="input-block">
       <label for="">Название компании <span class="req">*</span></label>
       <input

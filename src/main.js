@@ -6,6 +6,8 @@ import router from './router';
 import store from "./store";
 import config from "@/config.js";
 import "croppie/croppie.css"; // import the croppie css manually
+import VueTheMask from "vue-the-mask";
+
 
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
@@ -15,7 +17,7 @@ library.add(fas);
 
 const app = createApp(App).component("f-awesome", FontAwesomeIcon)
 
-app.use(router).use(store);
+app.use(router).use(store).use(VueTheMask);
 
 // Устанавливаем axios как глобальное свойство
 app.config.globalProperties.$http = axios;

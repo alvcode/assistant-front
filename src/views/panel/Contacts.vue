@@ -34,7 +34,7 @@
             <div v-show="item.isShowList" class="contacts-company-item-contacts">
               <div class="contacts-company-item-contacts-item shadow-card">
                 <div class="contacts--item-table">
-                  <div class="table--container">
+                  <div class="table--container text-center">
                     <div class="table--header">
                       <div>Фото</div>
                       <div>ФИО</div>
@@ -50,9 +50,9 @@
                           v-for="contact in item.contacts"
                           :key="contact.id"
                       >
-                        <div>
+                        <div class="image">
                           <span v-if="contact.upload_file_id">
-                            <img width="70" :src="contact.upload_file.upload_file_url" alt="">
+                            <img width="50" :src="contact.upload_file.upload_file_url" alt="">
                           </span>
                         </div>
                         <div>{{contact.surname}} {{contact.name}} {{contact.lastname}}</div>
@@ -76,6 +76,12 @@
                               class="btn btn-sm btn-info"
                           >
                             <f-awesome :icon="['fas', 'edit']" />
+                          </div>
+                          <div
+                              @click="showContactInfoPopup(contact.id)"
+                              class="btn btn-sm btn-info"
+                          >
+                            <f-awesome :icon="['fas', 'circle-info']" />
                           </div>
                           <div
                               @click="showDeleteContactPopup(contact.id)"
@@ -202,6 +208,17 @@
         </template>
       </popup>
 
+      <popup
+          :closeButton="contactInfoPopup.closeButton"
+          :show="contactInfoPopup.show"
+          @closePopup="closeContactInfoPopup"
+      >
+        <template v-slot:header>Подробные сведения о контакте</template>
+        <template v-slot:body>
+          <contact-info :value="contactDataInfo"></contact-info>
+        </template>
+      </popup>
+
 
 
     </template>
@@ -218,6 +235,7 @@ import Popup from "@/components/Popup.vue";
 import CompanyFields from "@/components/Companies/CompanyFields.vue";
 import Formatter from "@/components/libraries/Formatter.js";
 import ContactFields from "@/components/Contacts/ContactFields.vue";
+import ContactInfo from "@/components/Contacts/ContactInfo.vue";
 
 const formatter = new Formatter();
 
@@ -225,6 +243,7 @@ const formatter = new Formatter();
 export default {
   name: "Contacts",
   components: {
+    ContactInfo,
     ContactFields,
     CompanyFields,
     Popup,
@@ -262,7 +281,7 @@ export default {
       editCompanyPopup: {
         show: false,
         closeButton: 'Отмена',
-        actionButton: 'Добавить',
+        actionButton: 'Сохранить',
         actionClass: 'btn-success',
       },
 
@@ -304,8 +323,14 @@ export default {
       editContactPopup: {
         show: false,
         closeButton: 'Отмена',
-        actionButton: 'Добавить',
+        actionButton: 'Сохранить',
         actionClass: 'btn-success',
+      },
+
+      contactDataInfo: null, // используется для вывода подробной информации о контакте
+      contactInfoPopup: {
+        show: false,
+        closeButton: 'Закрыть',
       },
     };
   },
@@ -626,11 +651,24 @@ export default {
       this.editContactPopup.show = true;
       for (let key in this.contacts) {
         if (this.contacts[key].id === contactId) {
+          this.editContactId = this.contacts[key].id;
+          this.editContactCompanyId = this.contacts[key].company_id;
           this.editContactDataProps = { ...this.contacts[key] };
         }
-        this.editContactId = this.contacts[key].id;
-        this.editContactCompanyId = this.contacts[key].company_id;
       }
+    },
+
+    closeContactInfoPopup() {
+      this.contactInfoPopup.show = false;
+      // this.contactDataInfo
+    },
+    showContactInfoPopup(contactId) {
+      for (let key in this.contacts) {
+        if (this.contacts[key].id === contactId) {
+          this.contactDataInfo = this.contacts[key];
+        }
+      }
+      this.contactInfoPopup.show = true;
     },
   },
   created() {
@@ -673,5 +711,12 @@ export default {
     margin-top: 25px;
   }
 
+}
+.contacts--item-table{
+  .image{
+    img{
+      border-radius: 8px;
+    }
+  }
 }
 </style>

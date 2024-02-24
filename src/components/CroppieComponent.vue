@@ -47,7 +47,7 @@ export default {
       },
       cropieId: Math.random()
         .toString(36)
-        .substring(7)
+        .substring(3)
     };
   },
   methods: {

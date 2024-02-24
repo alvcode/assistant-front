@@ -74,21 +74,23 @@
 
     <div class="input-block">
       <label for="">Номер телефона 1</label>
-      <input
-          type="text"
+      <phone-number
           v-model="phone_number_one"
           @input="updateData"
-      >
+          @update:input="updateData"
+          @update:mask="setPhoneMaskOne"
+      ></phone-number>
       <div class="form-error">{{ errors.phone_number_one }}</div>
     </div>
 
     <div class="input-block">
       <label for="">Номер телефона 2</label>
-      <input
-          type="text"
+      <phone-number
           v-model="phone_number_two"
           @input="updateData"
-      >
+          @update:input="updateData"
+          @update:mask="setPhoneMaskTwo"
+      ></phone-number>
       <div class="form-error">{{ errors.phone_number_two }}</div>
     </div>
 
@@ -151,6 +153,8 @@ export default {
   data() {
     return {
       upload_file_url: null,
+      phoneMaskOne: "",
+      phoneMaskTwo: "",
 
       upload_file_id: '',
       company_name: '',
@@ -227,8 +231,8 @@ export default {
       this.vSurname().result === "error" ? errorCount++ : "";
       this.vName().result === "error" ? errorCount++ : "";
       this.vLastname().result === "error" ? errorCount++ : "";
-      // this.vPhoneNumberOne().result === "error" ? errorCount++ : "";
-      // this.vPhoneNumberTwo().result === "error" ? errorCount++ : "";
+      this.vPhoneNumberOne().result === "error" ? errorCount++ : "";
+      this.vPhoneNumberTwo().result === "error" ? errorCount++ : "";
       this.vEmail().result === "error" ? errorCount++ : "";
       this.vVkLink().result === "error" ? errorCount++ : "";
       this.vWhatsappLink().result === "error" ? errorCount++ : "";
@@ -237,6 +241,12 @@ export default {
     }
   },
   methods: {
+    setPhoneMaskOne(val){
+      this.phoneMaskOne = val;
+    },
+    setPhoneMaskTwo(val){
+      this.phoneMaskTwo = val;
+    },
     updateFileId(id) {
       this.upload_file_id = id;
       this.updateData();
@@ -282,6 +292,26 @@ export default {
         {fieldName: "Отчество", value: this.lastname, type: "string", length: 100}
       ]);
       v.result === "error" ? (this.errors.lastname = v.message) : (this.errors.lastname = "");
+      return v;
+    },
+    vPhoneNumberOne() {
+      if (this.phone_number_one === null) {
+        return 'ok';
+      }
+      let v = validator.validate([
+        {fieldName: "Номер телефона 1", value: this.phone_number_one, type: "mask", mask: this.phoneMaskOne}
+      ]);
+      v.result === "error" ? (this.errors.phone_number_one = v.message) : (this.errors.phone_number_one = "");
+      return v;
+    },
+    vPhoneNumberTwo() {
+      if (this.phone_number_two === null) {
+        return 'ok';
+      }
+      let v = validator.validate([
+        {fieldName: "Номер телефона 1", value: this.phone_number_two, type: "mask", mask: this.phoneMaskOne}
+      ]);
+      v.result === "error" ? (this.errors.phone_number_two = v.message) : (this.errors.phone_number_two = "");
       return v;
     },
     // vPhoneNumberOne() {

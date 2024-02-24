@@ -22,14 +22,18 @@
             type="text"
             inputmode="numeric"
         >
-        <div class="form-error">{{numberError}}</div>
+<!--        <div class="form-error">{{numberError}}</div>-->
+      </div>
+      <div class="input-block times">
+        <div @click="clearNumber" class="btn btn-sm btn-danger">
+          <f-awesome :icon="['fas', 'times']" />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
 import Validator from "./libraries/Validator";
 
 const validator = new Validator();
@@ -48,7 +52,8 @@ const validator = new Validator();
  */
 export default {
   name: "PhoneNumber",
-  components: {},
+  emits: ['update:modelValue', 'update:mask', 'update:input'],
+  //components: {maska},
   data() {
     return {
       maskObject: {
@@ -122,7 +127,7 @@ export default {
     };
   },
   props: {
-    value: String,
+    modelValue: Number|String,
     requestValidate: Number, // Запускает валидацию
     defaultCountryCode: Number, // код страны по умолчанию
   },
@@ -139,41 +144,47 @@ export default {
       this.emitMask(val);
       this.vNumber();
     },
-    value: function(){
-      let phone = this.value.replace(/^\+/, '');
-      let mask = '';
-      let phoneResult = '';
-      let countryCode = 0;
+    modelValue: {
+      immediate: true,
+      handler(newValue) {
+        //if (!newValue) return;
+        // Здесь вы можете установить значение по умолчанию или обработать новое значение
+        let newNewValue = '' +newValue +'';
+        let phone = newNewValue.replace(/^\+/, '');
+        let mask = '';
+        let phoneResult = '';
+        let countryCode = 0;
 
-      let symbolsInMask = 0;
-      let symbolsInNumber = 0;
+        let symbolsInMask = 0;
+        let symbolsInNumber = 0;
 
-      for(let key in this.maskObject){
-        let regexp = new RegExp(`^${key}`);
-        if(phone.match(regexp)){
-          phoneResult = phone.replace(regexp, '');
-          mask = this.maskObject[key];
-          countryCode = key;
+        for(let key in this.maskObject){
+          let regexp = new RegExp(`^${key}`);
+          if(phone.match(regexp)){
+            phoneResult = phone.replace(regexp, '');
+            mask = this.maskObject[key];
+            countryCode = key;
 
-          symbolsInMask = this.maskObject[key].match(/[#]/g).length;
-          if(phoneResult.match(/[0-9]/g)){
-            symbolsInNumber = phoneResult.match(/[0-9]/g).length;
-          }else{
-            symbolsInNumber =0;
-          }
+            symbolsInMask = this.maskObject[key].match(/[#]/g).length;
+            if(phoneResult.match(/[0-9]/g)){
+              symbolsInNumber = phoneResult.match(/[0-9]/g).length;
+            }else{
+              symbolsInNumber =0;
+            }
 
-          if(symbolsInMask === symbolsInNumber){
+            if(symbolsInMask === symbolsInNumber){
               break;
-          }else{
+            }else{
               continue;
+            }
           }
         }
-      }
 
-      this.setCountryCode(countryCode);
-      this.mask = mask;
-      this.inputValue = phoneResult;
-      this.vNumber();
+        this.setCountryCode(countryCode);
+        this.mask = mask;
+        this.inputValue = phoneResult;
+        this.vNumber();
+      }
     }
   },
   computed: {
@@ -188,12 +199,17 @@ export default {
     }
   },
   methods: {
+    clearNumber() {
+      this.inputValue = null;
+      this.$emit('update:modelValue', null);
+      this.$emit('update:input', null);
+    },
     setCountryCode(val){
       this.countryCode = val;
       localStorage.setItem("countryCode", val);
     },
     emitInput(e){
-      this.$emit('input', '+' +this.countryCode + '' +e.target.value);
+      this.$emit('update:modelValue', '+' +this.countryCode + '' +e.target.value);
       this.emitMask();
     },
     emitMask(value){
@@ -205,7 +221,7 @@ export default {
           this.mask = this.maskObject[key];
         }
       }
-      //this.$emit('mask', result);
+      this.$emit('update:mask', result);
     },
     vNumber(){
       let validate = validator.validate([

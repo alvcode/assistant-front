@@ -305,29 +305,15 @@ export default {
       return v;
     },
     vPhoneNumberTwo() {
-      if (this.phone_number_two === null) {
-        return 'ok';
-      }
+      // if (this.phone_number_two === null) {
+      //   return 'ok';
+      // }
       let v = validator.validate([
         {fieldName: "Номер телефона 1", value: this.phone_number_two, type: "mask", mask: this.phoneMaskOne}
       ]);
       v.result === "error" ? (this.errors.phone_number_two = v.message) : (this.errors.phone_number_two = "");
       return v;
     },
-    // vPhoneNumberOne() {
-    //   const v = validator.validate([
-    //     {fieldName: "Номер телефона 1", value: this.phone_number_one, type: "string", length: 15}
-    //   ]);
-    //   v.result === "error" ? (this.errors.phone_number_one = v.message) : (this.errors.phone_number_one = "");
-    //   return v;
-    // },
-    // vPhoneNumberTwo() {
-    //   const v = validator.validate([
-    //     {fieldName: "Номер телефона 2", value: this.phone_number_two, type: "string", length: 15}
-    //   ]);
-    //   v.result === "error" ? (this.errors.phone_number_two = v.message) : (this.errors.phone_number_two = "");
-    //   return v;
-    // },
     vEmail() {
       const v = validator.validate([
         {fieldName: "E-mail", value: this.email, type: "email", length: 100}

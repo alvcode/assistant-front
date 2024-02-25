@@ -90,7 +90,8 @@ export default {
 <style scoped lang="less">
 .croppie-image--img-container{
   img{
-    width: 200px;
+    width: 130px;
+    border-radius: 8px;
   }
 }
 </style>

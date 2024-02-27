@@ -36,7 +36,7 @@ const authorization = {
 
         commit("auth_request");
         axios
-          .post(`/auth/login`, formData)
+          .post(`/v1/auth/login-by-email`, formData)
           .then(resp => {
             const token = resp.data.token;
             const refresh_token = resp.data.refresh_token;
@@ -45,23 +45,10 @@ const authorization = {
             let userData = [{}];
             userData[0].token = token;
             userData[0].refresh_token = refresh_token;
-            userData[0].email = email;
+            userData[0].email = user.email;
             localStorage.setItem("userData", JSON.stringify(userData));
-            localStorage.setItem("permissions", JSON.stringify(perms));
+            // localStorage.setItem("permissions", JSON.stringify(perms));
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-            // Установим browser_id
-            const browserIdStorage = localStorage.getItem('enroller_browser_id');
-            let enrollerBrowserId = false;
-            if(browserIdStorage){
-              enrollerBrowserId = browserIdStorage;
-            }else{
-              let newBrowserId = formatter.generateHash(20);
-              localStorage.setItem('enroller_browser_id', newBrowserId);
-              enrollerBrowserId = newBrowserId;
-            }
-            axios.defaults.headers.common["EnrollerBrowserId"] = enrollerBrowserId;
-            // =================
 
             commit("auth_success", userData);
             resolve(resp);
@@ -77,15 +64,10 @@ const authorization = {
       return new Promise((resolve, reject) => {
         let formData = new FormData();
         formData.append("email", user.email);
-        formData.append("username", user.name);
         formData.append("password", user.password);
-        formData.append("phone_number", user.phone_number);
-        formData.append("iAgree", user.iAgree);
-        formData.append("promocode", user.promocode);
-        formData.append("user_contract", JSON.stringify(user.userContract));
 
         axios
-          .post(`/auth/register`, formData)
+          .post(`/v1/auth/register-by-email`, formData)
           .then(resp => {
             resolve(resp);
           })
@@ -116,7 +98,6 @@ const authorization = {
         commit("logout");
         localStorage.removeItem("userData");
         delete axios.defaults.headers.common["Authorization"];
-        delete axios.defaults.headers.common["EnrollerBrowserId"];
         if (localStorage.getItem("userData")) {
           reject();
         } else {

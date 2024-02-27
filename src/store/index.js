@@ -4,10 +4,11 @@ import { createStore } from "vuex";
 //import authorization from "./modules/authorization";
 import preloader from "./modules/preloader";
 import notificator from "./modules/notificator";
+import authorization from "@/store/modules/authorization.js";
 
 export default createStore({
   modules: {
-    preloader, notificator
+    preloader, notificator, authorization,
   }
 });
 

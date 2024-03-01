@@ -10,5 +10,5 @@ services:
       - '.:/app'
       - '/app/node_modules'
     ports:
-      - '8083:8080'
+      - '8083:5173'
     command: npm run dev

@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  my-tag-lk:
+    container_name: my-tag-lk
+    build:
+      context: .
+      dockerfile: _docker/dev/Dockerfile
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
+    ports:
+      - '8083:5173'

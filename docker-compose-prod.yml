@@ -8,4 +8,4 @@ services:
       dockerfile: _docker/prod/Dockerfile
     volumes:
       - .:/app
-      - dist:/app/dist
+      - ./dist:/app/dist

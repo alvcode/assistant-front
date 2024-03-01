@@ -1,4 +1,4 @@
-FROM node:20.11.1-bookworm-slim as prod_build
+FROM node:20.11.1-bookworm-slim
 
 # Установите рабочий каталог внутри контейнера
 WORKDIR /app
@@ -11,5 +11,3 @@ COPY . .
 
 # Сборка проекта
 RUN npm run build
-
-COPY --from=prod_build dist ./dist

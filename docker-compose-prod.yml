@@ -6,3 +6,5 @@ services:
     build:
       context: .
       dockerfile: _docker/prod/Dockerfile
+    volumes:
+      - ./:/app/dist/

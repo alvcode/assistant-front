@@ -7,4 +7,4 @@ services:
       context: .
       dockerfile: _docker/prod/Dockerfile
     volumes:
-      - ./:/app/dist/
+      - ./:/app

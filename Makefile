@@ -6,4 +6,4 @@ stop:
 
 build:
 	docker-compose -f docker-compose-prod.yml up --build && \
-	docker cp my-tag-lk-prod:/app/dist ./dist
+	docker cp my-tag-lk-prod:/app/dist/ ./dist;

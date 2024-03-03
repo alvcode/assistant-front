@@ -7,6 +7,6 @@ stop:
 build:
 	docker compose -f docker-compose-prod.yml up --build;
 	docker cp my-tag-lk-prod:/app/dist/ ./;
-	chown -R alvcode:www-data ./dist;
+	chown -R www-data:www-data ./;
 	chmod -R ug+w ./dist;
 	docker compose down;

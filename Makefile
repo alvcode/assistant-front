@@ -10,3 +10,7 @@ build:
 	chown -R www-data:www-data ./;
 	chmod -R ug+w ./dist;
 	docker compose down;
+
+deploy:
+	git pull;
+	make build;

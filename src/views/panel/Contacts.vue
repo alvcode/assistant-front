@@ -22,9 +22,9 @@
                 <div @click="showNewContactPopup(item.id)" class="btn btn-sm btn-success">
                   <f-awesome :icon="['fas', 'plus']" /> Контакт
                 </div>
-                <div @click="showEditCompanyPopup(item.id)" class="btn btn-sm btn-info">Изменить</div>
-                <div @click="deleteCompany(item.id)" class="btn btn-sm btn-danger">Удалить</div>
-                <div @click="expandCompanyToggle(item.id)" class="btn-sm-circle btn-outline-info mrg-l-15">
+                <div @click="showEditCompanyPopup(item.id)" class="btn btn-sm btn-info mrg-t-5">Изменить</div>
+                <div @click="deleteCompany(item.id)" class="btn btn-sm btn-danger mrg-t-5">Удалить</div>
+                <div @click="expandCompanyToggle(item.id)" class="btn-sm-circle btn-outline-info mrg-l-15 mrg-t-5">
                   <span v-if="!item.isShowList"><f-awesome :icon="['fas', 'caret-up']" /></span>
                   <span v-if="item.isShowList"><f-awesome :icon="['fas', 'caret-down']" /></span>
                 </div>

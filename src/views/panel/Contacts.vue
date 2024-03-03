@@ -19,7 +19,7 @@
                 <div v-show="item.site_link">Сайт: <span class="text-bold">{{item.site_link}}</span></div>
               </div>
               <div class="right">
-                <div @click="showNewContactPopup(item.id)" class="btn btn-sm btn-success">
+                <div @click="showNewContactPopup(item.id)" class="btn btn-sm btn-success mrg-t-5">
                   <f-awesome :icon="['fas', 'plus']" /> Контакт
                 </div>
                 <div @click="showEditCompanyPopup(item.id)" class="btn btn-sm btn-info mrg-t-5">Изменить</div>

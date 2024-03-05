@@ -69,7 +69,7 @@
                         <div>
                           <span v-show="contact.email">{{contact.email}}</span>
                         </div>
-                        <div>{{contact.created_at}}</div>
+                        <div>{{dateTimeToRus(contact.created_at)}}</div>
                         <div>
                           <div
                               @click="showEditContactPopup(contact.id)"
@@ -361,6 +361,9 @@ export default {
     }
   },
   methods: {
+    dateTimeToRus(dt) {
+      return formatter.phpDateTimeToShortString(dt);
+    },
     addContactIfNotExists(contact) {
       let exists = false;
       for (let key in this.contacts) {

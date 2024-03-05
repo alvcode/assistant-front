@@ -152,11 +152,11 @@ class Formatter {
 
   /**
    * Форматирует датувремя вида '2020-01-01 00:00:00' в '01 янв 2020 - 00:00'
-   * @param string date - YYYY-MM-DD
    * @returns {string} '01 янв 2020'
+   * @param date
    */
   phpDateTimeToShortString(date) {
-    if(date == '') return '';
+    if(date === '') return '';
     let month = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сент", "окт", "ноя", "дек"];
     let dateObj = new Date(date);
     let day = dateObj.getDate() < 10 ? "0" + dateObj.getDate() : dateObj.getDate();

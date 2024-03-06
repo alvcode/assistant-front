@@ -38,14 +38,16 @@
       <div class="main-template--top-sidebar--account no-select">
         <div
           @click="toggleAccountBar"
-          class="noselect main-template--top-sidebar-email"
+          class="no-select main-template--top-sidebar-email"
         >
           <div class="incognito-icon">
             <img width="30" src="@/assets/img/icons/incognito-form.svg">
           </div>
         </div>
-        <f-awesome class="angle-account" v-if="showAccountBar" @click="toggleAccountBar" icon="angle-down"></f-awesome>
-        <f-awesome class="angle-account" v-if="!showAccountBar" @click="toggleAccountBar" icon="angle-up"></f-awesome>
+        <div class="no-select main-template--top-sidebar-angle">
+          <f-awesome class="angle-account" v-if="showAccountBar" @click="toggleAccountBar" :icon="['fas', 'angle-down']" />
+          <f-awesome class="angle-account" v-if="!showAccountBar" @click="toggleAccountBar" :icon="['fas', 'angle-up']" />
+        </div>
 
         <div @click="toggleAccountBar" v-show="showAccountBar" class="backside-account-more"></div>
 
@@ -57,7 +59,14 @@
             <div>{{ userEmail }}</div>
           </div>
           <div class="links">
-
+            <div @click="logout" class="item mrg-t-15">
+              <div>
+                <f-awesome icon="power-off"></f-awesome>
+              </div>
+              <div class="text-underline">
+                Выйти
+              </div>
+            </div>
           </div>
 
         </div>
@@ -112,7 +121,7 @@ export default {
       clientWidth: false,
       showContent: true,
       showAccountBar: false,
-      userEmail: 'email',
+      userEmail: '',
       newUserPopup: {
         show: false,
         closeButton: "Закрыть",
@@ -155,13 +164,13 @@ export default {
     } else {
       this.minSidebar = false;
     }
-    // let userData = JSON.parse(localStorage.getItem("userData"));
-    // if(userData){
-    //   this.userEmail = userData[0].email;
-    // }else{
-    //   this.$router.push('/');
-    //   this.$store.dispatch("stopPreloader");
-    // }
+    let userEmail = localStorage.getItem("confirmEmail");
+    if(userEmail){
+      this.userEmail = userEmail;
+    }else{
+      this.$router.push('/');
+      this.$store.dispatch("stopPreloader");
+    }
   }
 };
 </script>
@@ -266,8 +275,10 @@ export default {
       }
     }
 
-    .angle-account{
-      height: 40px;
+    .main-template--top-sidebar-angle{
+      .angle-account{
+        height: 20px;
+      }
     }
 
     svg {
@@ -305,14 +316,15 @@ export default {
         text-align: left;
         padding: 5px 10px;
         background-color: #fff;
-        line-height: 30px;
+        line-height: 18px;
+        margin-bottom: 12px;
 
         svg{
-          height: 30px;
+          height: 18px;
         }
 
         .item{
-          display: inline-block;
+          //display: inline-block;
           display: flex;
           flex-wrap: nowrap;
           justify-content: space-around;

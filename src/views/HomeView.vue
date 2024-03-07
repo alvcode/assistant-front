@@ -1,5 +1,5 @@
 <template>
-  <div class="home--container shadow-card">
+  <div class="home--container">
     <div class="container">
       <div class="home--form-container shadow-card text-center">
         <div class="auth-title">

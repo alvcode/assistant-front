@@ -80,7 +80,7 @@
         <a :href="value.contact_url" target="_blank">{{value.contact_url}}</a>
       </div>
       <div class="mrg-t-5">
-        <div @click="copyText(value.contact_url)" class="btn btn-sm btn-success">Скопировать ссылку</div>
+        <div @click="copyText(value.contact_url)" class="btn btn-sm btn-info">Скопировать ссылку</div>
       </div>
     </div>
 
@@ -98,9 +98,14 @@
       <div class="mrg-t-5">
         <div
             @click="downloadQRCode('qrCodeUrl', 'QRCode-URL-'+value.surname+'.svg')"
-            class="btn btn-sm btn-success"
+            class="btn btn-sm btn-info"
         >
-          Скачать
+          <f-awesome :icon="['fas', 'download']" />
+          .svg
+        </div>
+        <div @click="downloadQrLinkPng" class="btn btn-sm btn-info">
+          <f-awesome :icon="['fas', 'download']" />
+          .png
         </div>
       </div>
     </div>
@@ -130,6 +135,7 @@
 </template>
 
 <script>
+import contactRepository from "@/repositories/contact/index.js";
 import Formatter from "@/components/libraries/Formatter.js";
 import QrcodeVue from "qrcode.vue";
 
@@ -242,6 +248,26 @@ export default {
         }
       });
     },
+    downloadQrLinkPng() {
+      this.$store.dispatch("startPreloader");
+      contactRepository.qrLinkPngRequest({contact_id: this.value.id}).then(resp => {
+        const url = window.URL.createObjectURL(new Blob([resp.data], { type: 'image/png' }));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'QRCode-URL-'+this.value.surname+'.png'); // Назначаем имя файла
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    }
   },
   created() {
 

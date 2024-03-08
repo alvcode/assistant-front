@@ -6,6 +6,9 @@
     <div class="input-block">
       <label class="btn btn-sm btn-info" :for="cropieId">Выбрать изображение...</label>
       <input :id="cropieId" type="file" @change="changePhoto" />
+      <div @click="removeImage" class="btn btn-sm btn-danger">
+        <f-awesome :icon="['fas', 'times']"></f-awesome>
+      </div>
     </div>
     <croppie-component
         :fileModel="fileModel"
@@ -79,6 +82,10 @@ export default {
         });
         this.$store.dispatch("stopPreloader");
       });
+    },
+    removeImage() {
+      this.image = null;
+      this.emitFileId(null);
     },
     emitFileId(id) {
       this.$emit('update:fileId', id);

@@ -9,7 +9,7 @@ build:
 	docker cp my-tag-lk-prod:/app/dist/ ./;
 	chown -R www-data:www-data ./;
 	chmod -R ug+w ./dist;
-	docker compose down;
+	docker compose -f docker-compose-prod.yml down;
 
 deploy:
 	git pull;

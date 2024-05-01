@@ -7,7 +7,7 @@
     ></croppie-image>
 
     <div class="input-block">
-      <label for="">Название компании</label>
+      <label>Название компании</label>
       <input
           type="text"
           v-model="company_name"
@@ -18,7 +18,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">Адрес</label>
+      <label>Адрес</label>
       <input
           type="text"
           v-model="company_address"
@@ -29,7 +29,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">Сайт компании</label>
+      <label>Сайт компании</label>
       <input
           type="text"
           v-model="site_link"
@@ -40,7 +40,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">Фамилия</label>
+      <label>Фамилия</label>
       <input
           type="text"
           v-model="surname"
@@ -51,7 +51,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">Имя</label>
+      <label>Имя</label>
       <input
           type="text"
           v-model="name"
@@ -62,7 +62,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">Отчество</label>
+      <label>Отчество</label>
       <input
           type="text"
           v-model="lastname"
@@ -73,7 +73,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">Номер телефона 1</label>
+      <label>Номер телефона 1</label>
       <phone-number
           v-model="phone_number_one"
           @input="updateData"
@@ -84,7 +84,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">Номер телефона 2</label>
+      <label>Номер телефона 2</label>
       <phone-number
           v-model="phone_number_two"
           @input="updateData"
@@ -95,7 +95,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">E-mail</label>
+      <label>E-mail</label>
       <input
           type="text"
           v-model="email"
@@ -106,7 +106,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">Ссылка ВК</label>
+      <label>Ссылка ВК</label>
       <input
           type="text"
           v-model="vk_link"
@@ -117,7 +117,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">Ссылка WhatsApp</label>
+      <label>Ссылка WhatsApp</label>
       <input
           type="text"
           v-model="whatsapp_link"
@@ -128,7 +128,7 @@
     </div>
 
     <div class="input-block">
-      <label for="">Ссылка Telegram</label>
+      <label>Ссылка Telegram</label>
       <input
           type="text"
           v-model="telegram_link"
@@ -136,6 +136,15 @@
           @blur="vTelegramLink"
       >
       <div class="form-error">{{ errors.telegram_link }}</div>
+    </div>
+
+    <div class="input-block">
+      <label>Шаблон визитки</label>
+      <select @change="updateData" v-model="template_id">
+        <option value="0">Выберите значение</option>
+        <option v-for="item in templates" :key="item.id" :value="item.id">{{item.name}}</option>
+      </select>
+      <div class="form-error">{{ errors.template_id }}</div>
     </div>
   </div>
 </template>
@@ -169,16 +178,18 @@ export default {
       vk_link: '',
       whatsapp_link: '',
       telegram_link: '',
+      template_id: 0,
       errors: {
         company_name: '', company_address: '', site_link: '', surname: '', name: '', lastname: '',
         phone_number_one: '', phone_number_two: '', email: '', vk_link: '', whatsapp_link: '',
-        telegram_link: '',
+        telegram_link: '', template_id: ''
       }
     }
   },
   props: {
     show: Boolean,
     defaulValues: Object,
+    templates: Array,
   },
   watch: {
     show: function(val) {
@@ -197,6 +208,7 @@ export default {
         this.vk_link = '';
         this.whatsapp_link = '';
         this.telegram_link = '';
+        this.template_id = 0;
         this.updateData();
       }
     },
@@ -218,6 +230,7 @@ export default {
         this.vk_link = val.vk_link;
         this.whatsapp_link = val.whatsapp_link;
         this.telegram_link = val.telegram_link;
+        this.template_id = val.template_id;
         this.updateData();
       }
     }
@@ -237,6 +250,7 @@ export default {
       this.vVkLink().result === "error" ? errorCount++ : "";
       this.vWhatsappLink().result === "error" ? errorCount++ : "";
       this.vTelegramLink().result === "error" ? errorCount++ : "";
+      this.vTemplateId().result === "error" ? errorCount++ : "";
       return errorCount;
     }
   },
@@ -342,6 +356,14 @@ export default {
       v.result === "error" ? (this.errors.telegram_link = v.message) : (this.errors.telegram_link = "");
       return v;
     },
+    vTemplateId() {
+      if (+this.template_id === 0) {
+        this.errors.template_id = 'Необходимо выбрать шаблон';
+        return {result: 'error'};
+      }
+      this.errors.template_id = '';
+      return {result: 'ok'};
+    },
     updateData() {
       this.$emit('update:data', {
         upload_file_id: this.upload_file_id,
@@ -357,6 +379,7 @@ export default {
         vk_link: this.vk_link,
         whatsapp_link: this.whatsapp_link,
         telegram_link: this.telegram_link,
+        template_id: this.template_id,
       });
       this.updateValidate();
     },

@@ -169,6 +169,7 @@
         <template v-slot:body>
           <contact-fields
               :show="newContactPopup.show"
+              :templates="templatesContact"
               @update:data="handleUpdateNewContactData"
               @update:validate="handleUpdateNewContactValidate"
           ></contact-fields>
@@ -188,6 +189,7 @@
           <contact-fields
               :show="editContactPopup.show"
               :defaul-values="editContactDataProps"
+              :templates="templatesContact"
               @update:data="handleUpdateEditContactData"
               @update:validate="handleUpdateEditContactValidate"
           ></contact-fields>
@@ -215,7 +217,10 @@
       >
         <template v-slot:header>Подробные сведения о контакте</template>
         <template v-slot:body>
-          <contact-info :value="contactDataInfo"></contact-info>
+          <contact-info
+              :value="contactDataInfo"
+              :templates="templatesContact"
+          ></contact-info>
         </template>
       </popup>
 
@@ -236,6 +241,7 @@ import CompanyFields from "@/components/Companies/CompanyFields.vue";
 import Formatter from "@/components/libraries/Formatter.js";
 import ContactFields from "@/components/Contacts/ContactFields.vue";
 import ContactInfo from "@/components/Contacts/ContactInfo.vue";
+import templateRepository from "@/repositories/template/index.js";
 
 const formatter = new Formatter();
 
@@ -256,6 +262,7 @@ export default {
       loadContactsByCompanyIds: [],
       companies: [],
       contacts: [],
+      templatesContact: [],
 
       deletedCompanyId: 0,
       deleteCompanyPopup: {
@@ -288,7 +295,7 @@ export default {
       newContactData: {
         company_id: 0, upload_file_id: null, company_name: '', company_address: '', site_link: '',
         surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
-        email: '', vk_link: '', whatsapp_link: '', telegram_link: '',
+        email: '', vk_link: '', whatsapp_link: '', telegram_link: '', template_id: 0,
       },
       newContactValidate: false,
       newContactCompanyId: 0,
@@ -310,12 +317,12 @@ export default {
       editContactData: {
         company_id: 0, upload_file_id: null, company_name: '', company_address: '', site_link: '',
         surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
-        email: '', vk_link: '', whatsapp_link: '', telegram_link: '',
+        email: '', vk_link: '', whatsapp_link: '', telegram_link: '', template_id: 0,
       },
       editContactDataProps: {
         company_id: 0, upload_file_id: null, company_name: '', company_address: '', site_link: '',
         surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
-        email: '', vk_link: '', whatsapp_link: '', telegram_link: '',
+        email: '', vk_link: '', whatsapp_link: '', telegram_link: '', template_id: 0,
       },
       editContactValidate: false,
       editContactCompanyId: 0,
@@ -673,20 +680,36 @@ export default {
       }
       this.contactInfoPopup.show = true;
     },
-  },
-  created() {
-    this.$store.dispatch("startPreloader");
-    companyRepository.index().then(resp => {
-      this.companies = resp.data;
-      this.$store.dispatch("stopPreloader");
-    }).catch(err => {
-      this.$store.dispatch("addNotification", {
-        text: err.response.data.message,
-        time: 5,
-        color: "danger"
+    async loadCompanies() {
+      this.$store.dispatch("startPreloader");
+      await companyRepository.index().then(resp => {
+        this.companies = resp.data;
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
       });
-      this.$store.dispatch("stopPreloader");
-    });
+    },
+    async loadTemplatesContact() {
+      await templateRepository.listContact().then(resp => {
+        this.templatesContact = resp.data;
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
+  },
+  async created() {
+    await this.loadCompanies();
+    await this.loadTemplatesContact();
   }
 };
 </script>

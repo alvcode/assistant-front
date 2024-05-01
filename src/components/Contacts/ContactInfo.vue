@@ -70,6 +70,10 @@
       <span class="text-bold" v-if="!value.telegram_link">-</span>
     </div>
     <div class="mrg-t-10">
+      Шаблон визитки:
+      <span class="text-bold">{{templateName}}</span>
+    </div>
+    <div class="mrg-t-10">
       Контакт создан:
       <span class="text-bold">{{dateTimeToRus(value.created_at)}}</span>
     </div>
@@ -156,6 +160,7 @@ export default {
   },
   props: {
     value: Object,
+    templates: Array,
   },
   watch: {
     value: function(val) {
@@ -163,7 +168,17 @@ export default {
     },
   },
   computed: {
-
+    templateName() {
+      let result = '-';
+      if (this.templates.length > 0) {
+        for (let key in this.templates) {
+          if (+this.templates[key].id === +this.value.template_id) {
+            result = this.templates[key].name;
+          }
+        }
+      }
+      return result;
+    }
   },
   methods: {
     dateTimeToRus(dt) {

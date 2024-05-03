@@ -25,6 +25,11 @@
       <span class="text-bold" v-if="!value.site_link">-</span>
     </div>
     <div class="mrg-t-10">
+      Доп.ссылка на свой внешний ресурс:
+      <span class="text-bold" v-if="value.add_resource_link">{{value.add_resource_link}}</span>
+      <span class="text-bold" v-if="!value.add_resource_link">-</span>
+    </div>
+    <div class="mrg-t-10">
       Фамилия:
       <span class="text-bold" v-if="value.surname">{{value.surname}}</span>
       <span class="text-bold" v-if="!value.surname">-</span>
@@ -38,6 +43,11 @@
       Отчество:
       <span class="text-bold" v-if="value.lastname">{{value.lastname}}</span>
       <span class="text-bold" v-if="!value.lastname">-</span>
+    </div>
+    <div class="mrg-t-10">
+      Должность:
+      <span class="text-bold" v-if="value.profession">{{value.profession}}</span>
+      <span class="text-bold" v-if="!value.profession">-</span>
     </div>
     <div class="mrg-t-10">
       Номер телефона 1:
@@ -68,6 +78,11 @@
       Ссылка Telegram:
       <span class="text-bold" v-if="value.telegram_link">{{value.telegram_link}}</span>
       <span class="text-bold" v-if="!value.telegram_link">-</span>
+    </div>
+    <div class="mrg-t-10">
+      Ссылка на карты:
+      <span class="text-bold" v-if="value.map_link">{{value.map_link}}</span>
+      <span class="text-bold" v-if="!value.map_link">-</span>
     </div>
     <div class="mrg-t-10">
       Шаблон визитки:

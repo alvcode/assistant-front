@@ -295,7 +295,8 @@ export default {
       newContactData: {
         company_id: 0, upload_file_id: null, company_name: '', company_address: '', site_link: '',
         surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
-        email: '', vk_link: '', whatsapp_link: '', telegram_link: '', template_id: 0,
+        email: '', vk_link: '', whatsapp_link: '', telegram_link: '', template_id: 0, profession: '',
+        map_link: '', add_resource_link: '',
       },
       newContactValidate: false,
       newContactCompanyId: 0,
@@ -317,12 +318,14 @@ export default {
       editContactData: {
         company_id: 0, upload_file_id: null, company_name: '', company_address: '', site_link: '',
         surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
-        email: '', vk_link: '', whatsapp_link: '', telegram_link: '', template_id: 0,
+        email: '', vk_link: '', whatsapp_link: '', telegram_link: '', template_id: 0, profession: '',
+        map_link: '', add_resource_link: '',
       },
       editContactDataProps: {
         company_id: 0, upload_file_id: null, company_name: '', company_address: '', site_link: '',
         surname: '', name: '', lastname: '', phone_number_one: '', phone_number_two: '',
-        email: '', vk_link: '', whatsapp_link: '', telegram_link: '', template_id: 0,
+        email: '', vk_link: '', whatsapp_link: '', telegram_link: '', template_id: 0, profession: '',
+        map_link: '', add_resource_link: '',
       },
       editContactValidate: false,
       editContactCompanyId: 0,

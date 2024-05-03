@@ -40,6 +40,17 @@
     </div>
 
     <div class="input-block">
+      <label>Доп.ссылка на свой внешний ресурс</label>
+      <input
+          type="text"
+          v-model="add_resource_link"
+          @input="updateData"
+          @blur="vAddResourceLink"
+      >
+      <div class="form-error">{{ errors.add_resource_link }}</div>
+    </div>
+
+    <div class="input-block">
       <label>Фамилия</label>
       <input
           type="text"
@@ -70,6 +81,17 @@
           @blur="vLastname"
       >
       <div class="form-error">{{ errors.lastname }}</div>
+    </div>
+
+    <div class="input-block">
+      <label>Должность</label>
+      <input
+          type="text"
+          v-model="profession"
+          @input="updateData"
+          @blur="vProfession"
+      >
+      <div class="form-error">{{ errors.profession }}</div>
     </div>
 
     <div class="input-block">
@@ -139,6 +161,17 @@
     </div>
 
     <div class="input-block">
+      <label>Ссылка на карты</label>
+      <input
+          type="text"
+          v-model="map_link"
+          @input="updateData"
+          @blur="vMapLink"
+      >
+      <div class="form-error">{{ errors.map_link }}</div>
+    </div>
+
+    <div class="input-block">
       <label>Шаблон визитки</label>
       <select @change="updateData" v-model="template_id">
         <option value="0">Выберите значение</option>
@@ -179,10 +212,13 @@ export default {
       whatsapp_link: '',
       telegram_link: '',
       template_id: 0,
+      profession: '',
+      map_link: '',
+      add_resource_link: '',
       errors: {
         company_name: '', company_address: '', site_link: '', surname: '', name: '', lastname: '',
         phone_number_one: '', phone_number_two: '', email: '', vk_link: '', whatsapp_link: '',
-        telegram_link: '', template_id: ''
+        telegram_link: '', template_id: '', profession: '', map_link: '', add_resource_link: '',
       }
     }
   },
@@ -209,11 +245,15 @@ export default {
         this.whatsapp_link = '';
         this.telegram_link = '';
         this.template_id = 0;
+        this.profession = '';
+        this.map_link = '';
+        this.add_resource_link = '';
         this.updateData();
       }
     },
     defaulValues: function(val) {
-      if (val.name) {
+      if (val) {
+        console.log(val);
         if (val.upload_file_id && val.upload_file) {
           this.upload_file_url = val.upload_file.upload_file_url;
         }
@@ -231,6 +271,9 @@ export default {
         this.whatsapp_link = val.whatsapp_link;
         this.telegram_link = val.telegram_link;
         this.template_id = val.template_id;
+        this.profession = val.profession;
+        this.map_link = val.map_link;
+        this.add_resource_link = val.add_resource_link;
         this.updateData();
       }
     }
@@ -241,9 +284,11 @@ export default {
       this.vCompanyName().result === "error" ? errorCount++ : "";
       this.vCompanyAddress().result === "error" ? errorCount++ : "";
       this.vLink().result === "error" ? errorCount++ : "";
+      this.vAddResourceLink().result === "error" ? errorCount++ : "";
       this.vSurname().result === "error" ? errorCount++ : "";
       this.vName().result === "error" ? errorCount++ : "";
       this.vLastname().result === "error" ? errorCount++ : "";
+      this.vProfession().result === "error" ? errorCount++ : "";
       this.vPhoneNumberOne().result === "error" ? errorCount++ : "";
       this.vPhoneNumberTwo().result === "error" ? errorCount++ : "";
       this.vEmail().result === "error" ? errorCount++ : "";
@@ -251,6 +296,7 @@ export default {
       this.vWhatsappLink().result === "error" ? errorCount++ : "";
       this.vTelegramLink().result === "error" ? errorCount++ : "";
       this.vTemplateId().result === "error" ? errorCount++ : "";
+      this.vMapLink().result === "error" ? errorCount++ : "";
       return errorCount;
     }
   },
@@ -287,6 +333,13 @@ export default {
       v.result === "error" ? (this.errors.site_link = v.message) : (this.errors.site_link = "");
       return v;
     },
+    vAddResourceLink() {
+      const v = validator.validate([
+        {fieldName: "Доп.ссылка на свой внешний ресурс", value: this.add_resource_link, type: "string", length: 200}
+      ]);
+      v.result === "error" ? (this.errors.add_resource_link = v.message) : (this.errors.add_resource_link = "");
+      return v;
+    },
     vSurname() {
       const v = validator.validate([
         {fieldName: "Фамилия", value: this.surname, type: "string", length: 100}
@@ -306,6 +359,13 @@ export default {
         {fieldName: "Отчество", value: this.lastname, type: "string", length: 100}
       ]);
       v.result === "error" ? (this.errors.lastname = v.message) : (this.errors.lastname = "");
+      return v;
+    },
+    vProfession() {
+      const v = validator.validate([
+        {fieldName: "Должность", value: this.profession, type: "string", length: 100}
+      ]);
+      v.result === "error" ? (this.errors.profession = v.message) : (this.errors.profession = "");
       return v;
     },
     vPhoneNumberOne() {
@@ -364,6 +424,13 @@ export default {
       this.errors.template_id = '';
       return {result: 'ok'};
     },
+    vMapLink() {
+      const v = validator.validate([
+        {fieldName: "Ссылка на карты", value: this.map_link, type: "string", length: 200}
+      ]);
+      v.result === "error" ? (this.errors.map_link = v.message) : (this.errors.map_link = "");
+      return v;
+    },
     updateData() {
       this.$emit('update:data', {
         upload_file_id: this.upload_file_id,
@@ -380,6 +447,9 @@ export default {
         whatsapp_link: this.whatsapp_link,
         telegram_link: this.telegram_link,
         template_id: this.template_id,
+        profession: this.profession,
+        map_link: this.map_link,
+        add_resource_link: this.add_resource_link,
       });
       this.updateValidate();
     },

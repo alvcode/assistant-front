@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-show="show" class="pop-up" v-on:click.self="closePopup">
+    <div v-show="show" class="pop-up">
       <div
         v-bind:class="{
           'pop_up__modal_lg': size == 'lg',

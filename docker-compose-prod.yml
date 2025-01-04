@@ -1,8 +1,8 @@
 version: '3.7'
 
 services:
-  my-tag-lk-prod:
-    container_name: my-tag-lk-prod
+  assistant-lk:
+    container_name: assistant-lk
     build:
       context: .
       dockerfile: _docker/prod/Dockerfile

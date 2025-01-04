@@ -30,13 +30,9 @@ const authorization = {
   actions: {
     login({ commit }, user) {
       return new Promise((resolve, reject) => {
-        let formData = new FormData();
-        formData.append("email", user.email);
-        formData.append("password", user.password);
-
         commit("auth_request");
         axios
-          .post(`/v1/auth/login-by-email`, formData)
+          .post(`/api/auth/login`, {login: user.login, password: user.password})
           .then(resp => {
             const token = resp.data.token;
             const refresh_token = resp.data.refresh_token;
@@ -63,11 +59,11 @@ const authorization = {
     register({ commit }, user) {
       return new Promise((resolve, reject) => {
         let formData = new FormData();
-        formData.append("email", user.email);
+        formData.append("login", user.login);
         formData.append("password", user.password);
 
         axios
-          .post(`/v1/auth/register-by-email`, formData)
+          .post(`/api/auth/register`, formData)
           .then(resp => {
             resolve(resp);
           })

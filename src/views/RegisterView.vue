@@ -9,9 +9,9 @@
           <div class="input-block">
             <label for="login-email">Адрес электронной почты</label>
             <input
-                type="email"
+                type="text"
                 @focus="clearError"
-                v-model="email"
+                v-model="login"
                 id="login-email"
             />
           </div>
@@ -51,7 +51,7 @@ export default {
   name: "LoginView",
   data() {
     return {
-      email: "",
+      login: "",
       password: "",
       errorText: "",
     };
@@ -63,19 +63,19 @@ export default {
   },
   methods: {
     register() {
-      let email = this.email;
+      let login = this.email;
       let password = this.password;
       // this.$store.dispatch("startPreloader");
-      localStorage.setItem("confirmEmail", email);
+      //localStorage.setItem("confirmEmail", email);
 
       this.$store.dispatch("startPreloader");
 
       this.$store
-          .dispatch("register", { email, password })
+          .dispatch("register", { login, password })
           .then(() => {
-            localStorage.setItem("newUser", '1');
+            //localStorage.setItem("newUser", '1');
             this.$store.dispatch("stopPreloader");
-            this.$router.push("/thankyou");
+            this.$router.push("/login");
           })
           .catch(err => {
             this.errorText = err.message;

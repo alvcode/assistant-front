@@ -36,7 +36,7 @@ app.config.globalProperties.$http.interceptors.response.use(undefined, error => 
             formData.append("token", userData[0].token);
 
             axios
-                .post(`/v1/auth/refresh-token`, formData)
+                .post(`/api/auth/refresh`, formData)
                 .then(resp => {
                     const tokenT = resp.data.token;
                     const refresh_token = resp.data.refresh_token;

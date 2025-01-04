@@ -2,7 +2,7 @@
   <div class="thankyou">
     <div class="thankyou--container">
       <div class="container shadow-card">
-        <h3>Спасибо, что выбрали MY-TAG!</h3>
+        <h3>Спасибо, что выбрали Assistant!</h3>
         <h4>
           Пожалуйста, перейдите по ссылке, которая была отправлена вам на почту
           для подтверждения!

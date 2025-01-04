@@ -3,13 +3,13 @@
     <div class="container">
       <div class="home--form-container shadow-card text-center">
         <div class="auth-title">
-          <h3>MY-TAG</h3>
+          <h3>Assistant</h3>
         </div>
 
         <div v-if="userData" class="account-card">
           <div class="email fs-16 text-bold mrg-b-5">{{userData[0].email}}</div>
           <div class="actions">
-            <router-link tag="a" class="btn btn-sm btn-info" :to="`/contacts/`">
+            <router-link tag="a" class="btn btn-sm btn-info" :to="`/notes/`">
               <f-awesome :icon="['fas', 'sign-in-alt']" /> В личный кабинет
             </router-link>
             <div @click="logout" class="btn btn-sm btn-orange">Выйти</div>

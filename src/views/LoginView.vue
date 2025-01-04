@@ -5,14 +5,14 @@
         <div class="auth-title">
           <h3>Войдите</h3>
         </div>
-        <form @submit.prevent="login">
+        <form @submit.prevent="loginSubmit">
           <div class="input-block">
-            <label for="login-email">Адрес электронной почты</label>
+            <label for="login-email">Логин</label>
             <input
-                type="email"
+                type="text"
                 @focus="clearError"
-                v-model="email"
-                id="login-email"
+                v-model="login"
+                id="login-login"
             />
           </div>
           <div class="input-block">
@@ -51,7 +51,7 @@ export default {
   name: "LoginView",
   data() {
     return {
-      email: "",
+      login: "",
       password: "",
       errorText: "",
     };
@@ -62,14 +62,14 @@ export default {
     })
   },
   methods: {
-    login() {
-      let email = this.email;
+    loginSubmit() {
+      let login = this.login;
       let password = this.password;
       // this.$store.dispatch("startPreloader");
       // На всякий случай, для особо одаренных, сохраним это
-      localStorage.setItem("confirmEmail", email);
+      //localStorage.setItem("confirmEmail", email);
       this.$store
-          .dispatch("login", { email, password })
+          .dispatch("login", { login, password })
           .then(() => {
             this.$store.dispatch("stopPreloader");
             this.$router.push("/");

@@ -1,8 +1,8 @@
 version: '3.7'
 
 services:
-  my-tag-lk:
-    container_name: my-tag-lk
+  assistant-lk:
+    container_name: assistant-lk
     build:
       context: .
       dockerfile: _docker/dev/Dockerfile
@@ -10,5 +10,5 @@ services:
       - '.:/app'
       - '/app/node_modules'
     ports:
-      - '8083:5173'
+      - '8025:5173'
     command: npm run dev -- --host

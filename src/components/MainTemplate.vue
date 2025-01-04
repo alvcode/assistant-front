@@ -76,12 +76,12 @@
     <div class="main-template--left-sidebar no-select">
       <ul>
         <li>
-          <router-link tag="a" :to="`/contacts/`">
+          <router-link tag="a" :to="`/notes/`">
             <div>
               <f-awesome :icon="['fas', 'users']" />
             </div>
             <div>
-              Мои контакты
+              Заметки
             </div>
           </router-link>
         </li>
@@ -164,13 +164,13 @@ export default {
     } else {
       this.minSidebar = false;
     }
-    let userEmail = localStorage.getItem("confirmEmail");
-    if(userEmail){
-      this.userEmail = userEmail;
-    }else{
-      this.$router.push('/');
-      this.$store.dispatch("stopPreloader");
-    }
+    // let userEmail = localStorage.getItem("confirmEmail");
+    // if(userEmail){
+    //   this.userEmail = userEmail;
+    // }else{
+    //   this.$router.push('/');
+    //   this.$store.dispatch("stopPreloader");
+    // }
   }
 };
 </script>

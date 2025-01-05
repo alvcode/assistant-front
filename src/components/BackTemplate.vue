@@ -1,38 +1,51 @@
 <template>
   <div class="back-template--container">
     <div class="back-template--content">
-      <div class="left">
-        <div class="logo">
-          <h4>
-            <router-link tag="a" :to="`/`"><b>Assistant</b></router-link>
-          </h4>
-        </div>
-        <div class="menu">
-          <ul>
-            <li>
-              <router-link tag="a" :to="`/notes/`">
-                <div>
-                  <f-awesome :icon="['fas', 'note-sticky']" />
-                </div>
-                <div>
-                  Заметки
-                </div>
-              </router-link>
-            </li>
-          </ul>
+      <div class="left" v-bind:class="{ 'min-sidebar': !isDesktop, 'max-sidebar': isDesktop }">
+        <div class="sidebar-content" v-show="showMainSidebar">
+          <left-sidebar></left-sidebar>
         </div>
       </div>
-      <div class="right">
+      <div class="right" v-bind:class="{ 'min-sidebar': !isDesktop, 'max-sidebar': isDesktop }">
         <div class="right--main-content">
 
           <div class="top-bar">
             <div class="top-bar--left">
+              <div class="hamburger" v-if="!isDesktop">
+                <div class="hamburger-block" @click="toggleMobileSidebar">
+                  <f-awesome
+                      icon="bars"
+                      id="main-template-humburger"
+                  ></f-awesome>
+                </div>
+              </div>
               <div class="page-title">
                 <slot name="page-title"></slot>
               </div>
             </div>
             <div class="top-bar--right">
-              <div class="account shadow-card">
+              <div class="lang shadow-card cursor-pointer" :class="{'active': showLang}" @click.self="toggleLang">
+                <div class="above" @click="toggleLang">
+                  <div class="icon">
+                    <f-awesome class="angle-account" :icon="['fas', 'globe']" />
+                  </div>
+                  <div class="name">RU</div>
+                </div>
+                <div class="inside shadow-card" v-show="showLang">
+                  <div class="item">EN</div>
+                  <div class="item">RU</div>
+                </div>
+              </div>
+              <div class="bell shadow-card cursor-pointer" :class="{'active': showBell}" @click.self="toggleBell">
+                <div class="above" @click="toggleBell">
+                  <f-awesome class="angle-account" :icon="['fas', 'bell']" />
+                </div>
+                <div class="inside shadow-card" v-show="showBell">
+                  <div class="item">Тут текст уведомления ла-ла-ла</div>
+                  <div class="item">Тут еще один текст уведомления ла-ла-ла</div>
+                </div>
+              </div>
+              <div class="account shadow-card cursor-pointer" :class="{'active': showAccountBar}" @click.self="toggleAccountBar">
                 <div class="above no-select" @click="toggleAccountBar">
                   <div class="username">{{ userLogin }}</div>
                   <div class="toggle-account">
@@ -64,7 +77,18 @@
       </div>
     </div>
 
-    <div @click="toggleAccountBar" v-show="showAccountBar" class="backside-account-more"></div>
+    <div @click="toggleAccountBar" v-show="showAccountBar" class="backside-click-background"></div>
+    <div @click="toggleBell" v-show="showBell" class="backside-click-background"></div>
+    <div @click="toggleLang" v-show="showLang" class="backside-click-background"></div>
+
+    <transition name="fade">
+      <div class="floating-left-sidebar" v-show="showMobileSidebar">
+        <div class="left">
+          <left-sidebar></left-sidebar>
+        </div>
+        <div class="right" @click="toggleMobileSidebar"></div>
+      </div>
+    </transition>
 
     <notificator></notificator>
     <preloader></preloader>
@@ -72,41 +96,59 @@
 </template>
 
 <script>
+const MOBILE_WIDTH_STEP = 1100;
 
 import Notificator from "@/components/Notificator.vue";
 import Preloader from "@/components/Preloader.vue";
-
+import LeftSidebar from "@/components/LeftSidebar.vue";
 
 export default {
   name: "BackTemplate",
-  components: {Preloader, Notificator},
+  components: {LeftSidebar, Preloader, Notificator},
   data() {
     return {
-      minSidebar: false,
+      showMainSidebar: true,
+      showMobileSidebar: false,
       clientWidth: false,
-      showContent: true,
       showAccountBar: false,
+      showBell: false,
+      showLang: false,
       userLogin: '',
-      newUserPopup: {
-        show: false,
-        closeButton: "Закрыть",
-      },
+      // newUserPopup: {
+      //   show: false,
+      //   closeButton: "Закрыть",
+      // },
     };
   },
   computed: {
-
+    isDesktop() {
+      let result = true;
+      if (this.clientWidth < MOBILE_WIDTH_STEP) {
+        result = false;
+      }
+      return result;
+    },
   },
   methods: {
-    toggleSidebar() {
-      this.minSidebar = !this.minSidebar;
-      if (this.minSidebar === false && this.clientWidth < 1000) {
-        this.showContent = false;
-      } else {
-        this.showContent = true;
-      }
+    handleResize() {
+      this.clientWidth = document.documentElement.clientWidth;
+      this.initSidebars(this.clientWidth);
+    },
+    initSidebars(clientWidth) {
+      this.showMobileSidebar = false;
+      this.showMainSidebar = clientWidth >= MOBILE_WIDTH_STEP;
+    },
+    toggleMobileSidebar() {
+      this.showMobileSidebar = !this.showMobileSidebar;
     },
     toggleAccountBar() {
       this.showAccountBar = !this.showAccountBar;
+    },
+    toggleBell() {
+      this.showBell = !this.showBell;
+    },
+    toggleLang() {
+      this.showLang = !this.showLang;
     },
     logout() {
       this.$store.dispatch("logout").then(() => {
@@ -116,24 +158,50 @@ export default {
   },
   created() {
     this.clientWidth = document.documentElement.clientWidth;
-    if (this.clientWidth < 1000) {
-      this.minSidebar = true;
-    } else {
-      this.minSidebar = false;
-    }
+    this.initSidebars(this.clientWidth);
 
     let userLogin = localStorage.getItem("userLogin");
-    if(userLogin){
+    if (userLogin) {
       this.userLogin = userLogin;
-    }else{
+    } else {
       this.$router.push('/');
       this.$store.dispatch("stopPreloader");
     }
-  }
+  },
+  mounted() {
+    window.addEventListener("resize", this.handleResize);
+  },
+  beforeUnmount() {
+    window.removeEventListener("resize", this.handleResize);
+  },
 };
 </script>
 
 <style scoped lang="less">
+.floating-left-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  //height: 100vh;
+  //background-color: #1b1c30;
+  z-index: 9999;
+
+  .left {
+    width: 300px;
+    background-color: #1b1c30;
+  }
+  .right {
+    width: 90%;
+    background: rgba(27, 28, 48, 0.4);
+    cursor: pointer;
+  }
+}
 .back-template--container {
   width: 100%;
   height: 100vh;
@@ -145,73 +213,36 @@ export default {
   justify-content: space-between;
 
   .left {
-    width: 300px;
+    //width: 300px;
     height: 100vh;
 
-    .logo {
-      color: #fff;
-      text-align: center;
-      margin-top: 20px;
-      font-size: 26px;
+    &.min-sidebar {
+      width: 0;
     }
-    .menu {
-      margin-top: 10px;
-
-      & > ul {
-        list-style-type: none;
-        padding: 0;
-        margin: 0;
-
-        li {
-          width: 90%;
-          margin: 3px auto 0;
-          padding-top: 6px;
-
-          a {
-            //font-size: 15px;
-            color: #ffffff;
-            display: flex;
-            flex-wrap: nowrap;
-            justify-content: space-around;
-            flex-direction: row;
-            padding: 10px 0;
-            box-sizing: border-box;
-
-            & > div:nth-of-type(1) {
-              width: 25%;
-              font-size: 16px;
-              text-align: center;
-            }
-            & > div:nth-of-type(2) {
-              width: 75%;
-              font-size: 15px;
-            }
-          }
-          a:hover svg {
-            transform: scale(1.1);
-          }
-        }
-        a.router-link-active {
-          border-radius: 10px;
-          background-color: #2a4063;
-          box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.25);
-        }
-      }
+    &.max-sidebar {
+      width: 300px;
     }
   }
   .right {
-    width: 90%;
+    //width: 90%;
     //background-color: #fafefd;
     height: 100vh;
     position: relative;
+
+    &.min-sidebar {
+      width: 100%;
+    }
+    &.max-sidebar {
+      width: 90%;
+    }
 
     .right--main-content {
       position: absolute;
       background-color: #fafefd;
       top: 10px;
       bottom: 10px;
-      right: 0;
-      left: 0;
+      right: 10px;
+      left: 10px;
       margin: auto;
       border-radius: 30px;
 
@@ -222,7 +253,25 @@ export default {
         padding: 14px 30px;
 
         .top-bar--left {
-          width: 49%;
+          width: 50%;
+          display: flex;
+          flex-wrap: nowrap;
+          justify-content: left;
+
+          .hamburger {
+            margin-right: 25px;
+            cursor: pointer;
+
+            .hamburger-block {
+              width: 30px;
+              height: 30px;
+              background-color: #1b1c30;
+              color: #fff;
+              text-align: center;
+              line-height: 30px;
+              border-radius: 20px;
+            }
+          }
 
           .page-title {
             font-size: 22px;
@@ -230,24 +279,37 @@ export default {
           }
         }
         .top-bar--right {
-          width: 49%;
+          width: 50%;
           display: flex;
           flex-wrap: nowrap;
           justify-content: right;
+
+          & > div {
+            margin-left: 10px;
+          }
         }
+      }
+
+      .page-content {
+        padding: 0 20px;
       }
     }
   }
 }
+
+// ================ account ===========
 .account {
   width: 160px;
   position: relative;
+
+  &.active {
+    background-color: #F97979;
+  }
 
   .above {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
-    cursor: pointer;
 
     .username {
       width: 130px;
@@ -259,7 +321,6 @@ export default {
     .toggle-account {
       width: 30px;
       text-align: center;
-      color: #f97979;
     }
   }
   .inside {
@@ -301,7 +362,7 @@ export default {
     }
   }
 }
-.backside-account-more{
+.backside-click-background{
   position: fixed;
   top: 0;
   left: 0;
@@ -309,5 +370,74 @@ export default {
   bottom: 0;
   margin: auto;
   transform: translate3d(0, 0, 0);
+}
+
+// ================ bell ===========
+.bell {
+  position: relative;
+
+  &.active {
+    background-color: #F97979;
+  }
+
+  .inside {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 200px;
+    //text-align: center;
+    z-index: 2;
+    background-color: #fff;
+
+    .item {
+      margin-bottom: 9px;
+    }
+  }
+}
+
+// ================ lang ===========
+.lang {
+  position: relative;
+
+  &.active {
+    background-color: #F97979;
+  }
+
+  .above {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    flex-direction: row;
+
+    .icon {
+      margin-right: 7px;
+    }
+  }
+
+  .inside {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 50px;
+    //text-align: center;
+    z-index: 2;
+    background-color: #fff;
+
+    .item {
+      margin-bottom: 9px;
+      cursor: pointer;
+    }
+  }
+}
+
+.fade-enter-active {
+  transition: all .3s ease;
+}
+.fade-leave-active {
+  transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.fade-enter, .fade-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
 }
 </style>

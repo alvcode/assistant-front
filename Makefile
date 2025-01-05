@@ -14,3 +14,6 @@ build:
 deploy:
 	git pull;
 	make build;
+
+exec: # str=
+	docker exec -it assistant-lk $(str)

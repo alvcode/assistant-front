@@ -36,12 +36,12 @@ const authorization = {
           .then(resp => {
             const token = resp.data.token;
             const refresh_token = resp.data.refresh_token;
-            const email = resp.data.email;
-            const perms = resp.data.permissions;
+            //const email = resp.data.email;
+            //const perms = resp.data.permissions;
             let userData = [{}];
             userData[0].token = token;
             userData[0].refresh_token = refresh_token;
-            userData[0].email = user.email;
+            userData[0].login = user.login;
             localStorage.setItem("userData", JSON.stringify(userData));
             // localStorage.setItem("permissions", JSON.stringify(perms));
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;

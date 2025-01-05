@@ -6,7 +6,7 @@
     <div class="main-template--top-sidebar">
       <div class="main-template--top-sidebar--title">
         <h4>
-          <router-link tag="a" :to="`/`"><b>myTag</b></router-link>
+          <router-link tag="a" :to="`/`"><b>Assistant</b></router-link>
         </h4>
       </div>
       <div class="main-template--top-sidebar--humburger">
@@ -56,7 +56,7 @@
           class="main-template--top-sidebar--account-more"
         >
           <div class="head">
-            <div>{{ userEmail }}</div>
+            <div>{{ userLogin }}</div>
           </div>
           <div class="links">
             <div @click="logout" class="item mrg-t-15">
@@ -78,7 +78,7 @@
         <li>
           <router-link tag="a" :to="`/notes/`">
             <div>
-              <f-awesome :icon="['fas', 'users']" />
+              <f-awesome :icon="['fas', 'note-sticky']" />
             </div>
             <div>
               Заметки
@@ -121,7 +121,7 @@ export default {
       clientWidth: false,
       showContent: true,
       showAccountBar: false,
-      userEmail: '',
+      userLogin: '',
       newUserPopup: {
         show: false,
         closeButton: "Закрыть",
@@ -164,13 +164,14 @@ export default {
     } else {
       this.minSidebar = false;
     }
-    // let userEmail = localStorage.getItem("confirmEmail");
-    // if(userEmail){
-    //   this.userEmail = userEmail;
-    // }else{
-    //   this.$router.push('/');
-    //   this.$store.dispatch("stopPreloader");
-    // }
+
+    let userLogin = localStorage.getItem("userLogin");
+    if(userLogin){
+      this.userLogin = userLogin;
+    }else{
+      this.$router.push('/');
+      this.$store.dispatch("stopPreloader");
+    }
   }
 };
 </script>
@@ -199,7 +200,8 @@ export default {
   height: 40px;
   position: fixed;
   top: 0;
-  background-color: #2b333c;
+  //background-color: #2b333c;
+  background-color: #353755;
   color: #fff;
   line-height: 40px;
   display: flex;
@@ -277,7 +279,7 @@ export default {
 
     .main-template--top-sidebar-angle{
       .angle-account{
-        height: 20px;
+        height: 18px;
       }
     }
 
@@ -402,6 +404,7 @@ export default {
   box-sizing: border-box;
   margin-top: 45px;
   margin-left: 220px;
+  background-color: #fdfffe;
 }
 .main-template--left-sidebar {
   position: fixed;
@@ -409,7 +412,8 @@ export default {
   left: 0;
   bottom: 0;
   width: 210px;
-  background-color: #182b49;
+  //background-color: #182b49;
+  background-color: #1b1c30;
   padding: 35px 0 35px 0;
   overflow: auto;
   -webkit-box-shadow: 2px 1px 12px 0px rgba(50, 50, 50, 0.75);

@@ -65,13 +65,14 @@ export default {
     loginSubmit() {
       let login = this.login;
       let password = this.password;
-      // this.$store.dispatch("startPreloader");
+      this.$store.dispatch("startPreloader");
       // На всякий случай, для особо одаренных, сохраним это
       //localStorage.setItem("confirmEmail", email);
       this.$store
           .dispatch("login", { login, password })
           .then(() => {
             this.$store.dispatch("stopPreloader");
+            localStorage.setItem("userLogin", login);
             this.$router.push("/");
           })
           .catch(err => {

@@ -1,20 +1,21 @@
 <template>
-  <panel-main-template>
+  <back-template>
     <template v-slot:page-title>Заметки</template>
     <template v-slot:page-content>
       <div class="notes--container">
-        // тут должны быть заметки
+        // заметки
       </div>
     </template>
-  </panel-main-template>
+  </back-template>
 </template>
 
 <script>
 // @ is an alias to /src
 
-import PanelMainTemplate from "@/components/MainTemplate.vue";
 import Popup from "@/components/Popup.vue";
 import Formatter from "@/components/libraries/Formatter.js";
+import EditorComponent from "@/components/EditorComponent.vue";
+import BackTemplate from "@/components/BackTemplate.vue";
 
 const formatter = new Formatter();
 
@@ -22,12 +23,24 @@ const formatter = new Formatter();
 export default {
   name: "Notes",
   components: {
+    BackTemplate,
+    EditorComponent,
     Popup,
-    PanelMainTemplate
   },
   data() {
     return {
-
+      editorData: {
+        time: Date.now(),
+        blocks: [
+          {
+            type: "header",
+            data: {
+              text: "Welcome to Editor.js",
+              level: 2,
+            },
+          },
+        ],
+      },
     };
   },
   watch: {
@@ -37,7 +50,9 @@ export default {
 
   },
   methods: {
-
+    handleEditorChange(data) {
+      console.log("Editor Data Updated:", data);
+    },
   },
   async created() {
 

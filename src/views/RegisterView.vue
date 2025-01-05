@@ -66,7 +66,7 @@ export default {
       let login = this.email;
       let password = this.password;
       // this.$store.dispatch("startPreloader");
-      //localStorage.setItem("confirmEmail", email);
+      localStorage.setItem("userLogin", login);
 
       this.$store.dispatch("startPreloader");
 

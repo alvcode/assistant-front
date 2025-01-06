@@ -1,16 +1,20 @@
 <template>
   <div class="thankyou">
     <div class="thankyou--container">
+      <div class="header">
+        <div class="header-lang">
+          <lang-index-component></lang-index-component>
+        </div>
+      </div>
       <div class="container shadow-card">
-        <h3>Спасибо, что выбрали Assistant!</h3>
-        <h4>
-          Пожалуйста, перейдите по ссылке, которая была отправлена вам на почту
-          для подтверждения!
-        </h4>
+        <h3>{{ $t('app_thank_for_choosing') }} {{ getProjectName() }}!</h3>
         <p>
-          Если вы не получили письмо в течение 5 минут (проверьте папку СПАМ),
-          то воспользуйтесь кнопкой повторной отправки
+          {{ $t('app_you_can_login') }}
         </p>
+<!--        <p>-->
+<!--          Если вы не получили письмо в течение 5 минут (проверьте папку СПАМ),-->
+<!--          то воспользуйтесь кнопкой повторной отправки-->
+<!--        </p>-->
 
 <!--        <div-->
 <!--            v-if="sendButton"-->
@@ -24,7 +28,7 @@
             tag="a"
             :to="`/login`"
         >
-          Войти в личный кабинет
+          {{ $t('app_sign_in') }}
         </router-link>
       </div>
     </div>
@@ -34,9 +38,13 @@
 <script>
 // @ is an alias to /src
 
+import LangIndexComponent from "@/components/LangIndexComponent.vue";
+import config from "@/config.js";
+
 export default {
   name: "ThankyouView",
   components: {
+    LangIndexComponent
 
   },
   computed: {},
@@ -45,7 +53,6 @@ export default {
       sendButton: localStorage.getItem("confirmEmail")
     };
   },
-
   methods: {
     sendConfirm() {
       this.$store.dispatch("startPreloader");
@@ -62,6 +69,9 @@ export default {
             // this.errorText = err.message;
             this.$store.dispatch("stopPreloader");
           });
+    },
+    getProjectName() {
+      return config.projectName;
     }
   },
   created() {
@@ -73,9 +83,18 @@ export default {
 </script>
 
 <style scoped lang="less">
+.header {
+  width: 500px;
+  margin: 10px auto;
+  text-align: center;
+
+  .header-lang {
+    display: inline-block;
+  }
+}
 .thankyou--container {
   text-align: center;
-  padding: 55px 0;
+  padding: 15px 0;
   min-height: 75vh;
   box-sizing: border-box;
 }

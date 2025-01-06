@@ -1,6 +1,6 @@
 <template>
   <back-template>
-    <template v-slot:page-title>Заметки</template>
+    <template v-slot:page-title>{{$t('app_notes')}}</template>
     <template v-slot:page-content>
       <div class="notes--container">
         // заметки

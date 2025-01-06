@@ -1,13 +1,18 @@
 <template>
   <div class="login--container">
     <div class="container">
+      <div class="header">
+        <div class="header-lang">
+          <lang-index-component></lang-index-component>
+        </div>
+      </div>
       <div class="login--form-container shadow-card">
         <div class="auth-title">
-          <h3>Войдите</h3>
+          <h3>{{ $t('app_sign_in') }}</h3>
         </div>
         <form @submit.prevent="loginSubmit">
           <div class="input-block">
-            <label for="login-email">Логин</label>
+            <label for="login-email">{{ $t('app_login') }}</label>
             <input
                 type="text"
                 @focus="clearError"
@@ -16,7 +21,7 @@
             />
           </div>
           <div class="input-block">
-            <label for="login-password">Пароль</label>
+            <label for="login-password">{{ $t('app_password') }}</label>
             <input
                 @focus="clearError"
                 type="password"
@@ -29,14 +34,14 @@
             <div class="alert alert-sm alert-danger">{{errorText}}</div>
           </div>
           <div class="input-block">
-            <button type="submit" class="btn btn-sm btn-success">Войти</button>
+            <button type="submit" class="btn btn-sm btn-success">{{ $t('app_sign_in') }}</button>
           </div>
         </form>
 
         <div class="mrg-t-30">
           <hr>
           <div class="mrg-t-20 text-right">
-            <router-link class="btn btn-sm btn-info" tag="a" :to="`/register/`">Регистрация</router-link>
+            <router-link class="btn btn-sm btn-info" tag="a" :to="`/register/`">{{ $t('app_register') }}</router-link>
           </div>
         </div>
       </div>
@@ -46,9 +51,11 @@
 
 <script>
 import { mapState } from "vuex";
+import LangIndexComponent from "@/components/LangIndexComponent.vue";
 
 export default {
   name: "LoginView",
+  components: {LangIndexComponent},
   data() {
     return {
       login: "",
@@ -91,6 +98,15 @@ export default {
 </script>
 
 <style scoped lang="less">
+.header {
+  width: 500px;
+  margin: 10px auto;
+  text-align: center;
+
+  .header-lang {
+    display: inline-block;
+  }
+}
 .login--form-container {
   width: 500px;
   margin: 30px auto 60px auto;

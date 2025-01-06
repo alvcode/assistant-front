@@ -1,0 +1,17 @@
+export default {
+    "error_company_not_found": "Company not found. Please check your link or refer to the source",
+    "error_diagnostic_need_create_services": "The company has no created services",
+    "error_diagnostic_all_services_hidden": "All services are hidden and not available for selection",
+    "error_diagnostic_need_create_staff": "The company has no created employees",
+    "error_diagnostic_all_staff_hidden": "All employees are hidden and not selectable",
+    "error_diagnostic_not_exists_schedule": "The schedule of available employees is not filled out",
+    "error_diagnostic_insufficient_funds": "Unfortunately, it is not possible to create an entry at this time. Please contact the company by phone number",
+    "error_diagnostic_assign_services_to_staff_at_all": "None of the employees assign any services",
+    "error_diagnostic_company_time_close": "Online registration is temporarily unavailable",
+    "error_minimal_enroll_sum": "The minimum amount of selected services must be no less than",
+    "error_services_not_found": "It looks like no services were found. Please make an appointment by telephone number or contact the company in another way",
+    "error_staff_not_found": "No employee was found who could provide this service. Please make an appointment by telephone number or contact the company in another way",
+    "error_need_choice_service": "Please select a service",
+    "error_need_choice_staff": "Please select an employee",
+    "error_need_choice_slot": "Please select a time to book",
+};

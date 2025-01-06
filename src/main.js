@@ -7,6 +7,8 @@ import store from "./store";
 import config from "@/config.js";
 import "croppie/croppie.css"; // import the croppie css manually
 import VueTheMask from "vue-the-mask";
+import {messages} from './locales';
+import {createI18n} from 'vue-i18n';
 
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -17,11 +19,39 @@ library.add(fas);
 
 const app = createApp(App).component("f-awesome", FontAwesomeIcon)
 
-app.use(router).use(store).use(VueTheMask);
+// ========= LOCALE =========
+let chooseLocale = null;
+const langList = [
+    {id: "ru", name: "RU"},
+    {id: "en", name: "EN"},
+];
+
+const storageLang = localStorage.getItem('lang');
+if (storageLang) {
+    chooseLocale = storageLang;
+    localStorage.setItem('lang', chooseLocale);
+} else {
+    const language = navigator.language || navigator.userLanguage;
+    const langCode = language.split('-')[0];
+// Формируем массив поддерживаемых языков из списка `list`
+    const supportedLanguages = langList.map(item => item.id);
+// Возвращаем язык, если он поддерживается, иначе 'ru'
+    chooseLocale = supportedLanguages.includes(langCode) ? langCode : 'ru';
+    localStorage.setItem('lang', chooseLocale);
+}
+
+const i18n = createI18n({
+    legacy: false,
+    locale: chooseLocale, // set current locale
+    fallbackLocale: 'en', // Резервный язык
+    messages
+})
+
+app.use(router).use(store).use(VueTheMask).use(i18n);
 
 // Устанавливаем axios как глобальное свойство
 app.config.globalProperties.$http = axios;
-app.config.globalProperties.$http.defaults.headers.common["locale"] = `ru`;
+app.config.globalProperties.$http.defaults.headers.common["locale"] = chooseLocale;
 // Устанавливаем базовый URL для всех запросов axios в приложении
 app.config.globalProperties.$http.defaults.baseURL = config.api_point;
 

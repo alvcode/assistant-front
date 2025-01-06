@@ -2,7 +2,7 @@
   <div class="left-sidebar no-select">
     <div class="logo">
       <h4>
-        <router-link tag="a" :to="`/`"><b>Assistant</b></router-link>
+        <router-link tag="a" :to="`/`"><b>{{ getProjectName() }}</b></router-link>
       </h4>
     </div>
     <div class="menu">
@@ -13,7 +13,7 @@
               <f-awesome :icon="['fas', 'note-sticky']" />
             </div>
             <div>
-              Заметки
+              {{$t('app_notes')}}
             </div>
           </router-link>
         </li>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import config from "@/config.js";
 
 export default {
   name: "LeftSidebar",
@@ -30,7 +31,9 @@ export default {
 
   },
   methods: {
-
+    getProjectName() {
+      return config.projectName;
+    },
   }
 };
 </script>

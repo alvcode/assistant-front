@@ -29,11 +29,12 @@
                   <div class="icon">
                     <f-awesome class="angle-account" :icon="['fas', 'globe']" />
                   </div>
-                  <div class="name">RU</div>
+                  <div class="name">{{currentLocale.name}}</div>
                 </div>
                 <div class="inside shadow-card" v-show="showLang">
-                  <div class="item">EN</div>
-                  <div class="item">RU</div>
+                  <div @click="clickSelectLang(item.id)" class="item" v-for="item in notSelectedLocales" :key="item.id">
+                    {{item.name}}
+                  </div>
                 </div>
               </div>
               <div class="bell shadow-card cursor-pointer" :class="{'active': showBell}" @click.self="toggleBell">
@@ -55,12 +56,12 @@
                 </div>
                 <div class="inside shadow-card" v-show="showAccountBar">
                   <div class="links">
-                    <div @click="logout" class="item mrg-t-15">
+                    <div @click="logout" class="item">
                       <div>
                         <f-awesome icon="power-off"></f-awesome>
                       </div>
                       <div class="text-underline">
-                        Выйти
+                        {{ $t('app_logout') }}
                       </div>
                     </div>
                   </div>
@@ -113,11 +114,12 @@ export default {
       showAccountBar: false,
       showBell: false,
       showLang: false,
+      selectedLocaleId: "",
+      localeList: [
+        {id: "ru", name: "RU"},
+        {id: "en", name: "EN"},
+      ],
       userLogin: '',
-      // newUserPopup: {
-      //   show: false,
-      //   closeButton: "Закрыть",
-      // },
     };
   },
   computed: {
@@ -128,8 +130,42 @@ export default {
       }
       return result;
     },
+    notSelectedLocales() {
+      let result = [];
+      for (let key in this.localeList) {
+        if (this.localeList[key].id !== this.selectedLocaleId) {
+          result[result.length] = this.localeList[key];
+        }
+      }
+      return result;
+    },
+    currentLocale() {
+      let result = null;
+      if (this.selectedLocaleId !== "") {
+        for (let key in this.localeList) {
+          if (this.localeList[key].id === this.selectedLocaleId) {
+            result = this.localeList[key];
+          }
+        }
+      }
+      return result;
+    },
   },
   methods: {
+    clickSelectLang(langId) {
+      this.selectLanguage(langId);
+      this.toggleShowList();
+    },
+    selectLanguage(langId) {
+      localStorage.setItem('lang', langId);
+      this.reloadPage();
+    },
+    reloadPage() {
+      window.location.reload();
+    },
+    toggleShowList() {
+      this.showList = !this.showList;
+    },
     handleResize() {
       this.clientWidth = document.documentElement.clientWidth;
       this.initSidebars(this.clientWidth);
@@ -167,6 +203,8 @@ export default {
       this.$router.push('/');
       this.$store.dispatch("stopPreloader");
     }
+
+    this.selectedLocaleId = this.$i18n.locale;
   },
   mounted() {
     window.addEventListener("resize", this.handleResize);
@@ -188,8 +226,6 @@ export default {
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
-  //height: 100vh;
-  //background-color: #1b1c30;
   z-index: 9999;
 
   .left {
@@ -213,7 +249,6 @@ export default {
   justify-content: space-between;
 
   .left {
-    //width: 300px;
     height: 100vh;
 
     &.min-sidebar {
@@ -224,8 +259,6 @@ export default {
     }
   }
   .right {
-    //width: 90%;
-    //background-color: #fafefd;
     height: 100vh;
     position: relative;
 
@@ -336,7 +369,6 @@ export default {
       padding: 5px 0;
       background-color: #fff;
       line-height: 17px;
-      margin-bottom: 5px;
 
       svg{
         height: 17px;
@@ -385,7 +417,6 @@ export default {
     top: 50px;
     right: 0;
     width: 200px;
-    //text-align: center;
     z-index: 2;
     background-color: #fff;
 
@@ -419,12 +450,12 @@ export default {
     top: 50px;
     right: 0;
     width: 50px;
-    //text-align: center;
     z-index: 2;
     background-color: #fff;
 
     .item {
-      margin-bottom: 9px;
+      text-align: center;
+      line-height: 20px;
       cursor: pointer;
     }
   }

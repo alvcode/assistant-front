@@ -58,12 +58,8 @@ const authorization = {
     },
     register({ commit }, user) {
       return new Promise((resolve, reject) => {
-        let formData = new FormData();
-        formData.append("login", user.login);
-        formData.append("password", user.password);
-
         axios
-          .post(`/api/auth/register`, formData)
+          .post(`/api/auth/register`, {login: user.login, password: user.password})
           .then(resp => {
             resolve(resp);
           })

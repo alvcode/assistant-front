@@ -6,9 +6,9 @@
         v-bind:key="item.id"
         class="notificator--item"
         v-bind:class="{
-          not_danger: item.color == 'danger',
-          not_success: item.color == 'success',
-          not_warning: item.color == 'warning'
+          not_danger: item.color === 'danger',
+          not_success: item.color === 'success',
+          not_warning: item.color === 'warning'
         }"
       >
         <div @click="removeNotification(item)" class="notificator--close">

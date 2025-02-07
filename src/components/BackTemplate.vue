@@ -255,7 +255,7 @@ export default {
       width: 0;
     }
     &.max-sidebar {
-      width: 300px;
+      width: 280px;
     }
   }
   .right {
@@ -324,7 +324,7 @@ export default {
       }
 
       .page-content {
-        padding: 0 20px;
+        padding: 5px 20px;
       }
     }
   }
@@ -366,7 +366,7 @@ export default {
 
     .links{
       text-align: center;
-      padding: 5px 0;
+      //padding: 5px 0;
       background-color: #fff;
       line-height: 17px;
 
@@ -470,5 +470,40 @@ export default {
 .fade-enter, .fade-leave-to {
   transform: translateX(10px);
   opacity: 0;
+}
+@media (max-width: 550px) {
+  .back-template--content {
+    .right {
+      .right--main-content {
+        .top-bar {
+          flex-wrap: wrap;
+          flex-direction: column-reverse;
+          padding: 10px 15px;
+
+          .top-bar--left {
+            margin-top: 12px;
+            width: 100%;
+          }
+          .top-bar--right {
+            width: 100%;
+            flex-wrap: nowrap;
+
+            & > div {
+              margin-left: 6px;
+            }
+          }
+        }
+        .page-content {
+          padding: 5px 8px;
+        }
+      }
+    }
+  }
+  .bell {
+    .inside {
+      top: 50px;
+      left: 0;
+    }
+  }
 }
 </style>

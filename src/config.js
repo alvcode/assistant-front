@@ -1,4 +1,4 @@
 export default {
 	projectName: "Assistant",
-	api_point: 'http://localhost:8053',
+	api_point: 'http://localhost:8083',
 }

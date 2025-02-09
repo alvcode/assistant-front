@@ -61,12 +61,9 @@ app.config.globalProperties.$http.interceptors.response.use(undefined, error => 
     if (res.status === 401 && res.config && !res.config.__isRetryRequest) {
         return new Promise((resolve, reject) => {
             let userData = JSON.parse(localStorage.getItem("userData"));
-            let formData = new FormData();
-            formData.append("refresh_token", userData[0].refresh_token);
-            formData.append("token", userData[0].token);
 
             axios
-                .post(`/api/auth/refresh-token`, formData)
+                .post(`/api/auth/refresh-token`, {token: userData[0].token, refresh_token: userData[0].refresh_token})
                 .then(resp => {
                     const tokenT = resp.data.token;
                     const refresh_token = resp.data.refresh_token;

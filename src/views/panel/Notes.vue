@@ -4,6 +4,8 @@
     <template v-slot:page-content>
       <div class="notes--container">
         // заметки
+<!--        <EditorComponent :data="editorData"></EditorComponent>-->
+        <notes-main></notes-main>
       </div>
     </template>
   </back-template>
@@ -16,6 +18,8 @@ import Popup from "@/components/Popup.vue";
 import Formatter from "@/components/libraries/Formatter.js";
 import EditorComponent from "@/components/EditorComponent.vue";
 import BackTemplate from "@/components/BackTemplate.vue";
+import Categories from "@/components/note/Categories.vue";
+import NotesMain from "@/components/note/NotesMain.vue";
 
 const formatter = new Formatter();
 
@@ -23,6 +27,8 @@ const formatter = new Formatter();
 export default {
   name: "Notes",
   components: {
+    NotesMain,
+    Categories,
     BackTemplate,
     EditorComponent,
     Popup,

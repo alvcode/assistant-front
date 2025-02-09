@@ -19,4 +19,5 @@ export default {
     "app_password": "Password",
     "app_thank_for_choosing": "Thank you for choosing",
     "app_you_can_login": "You can now log into your personal account",
+    "app_categories": "Categories",
 };

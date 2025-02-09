@@ -19,4 +19,5 @@ export default {
     "app_password": "Пароль",
     "app_thank_for_choosing": "Спасибо, что выбрали",
     "app_you_can_login": "Теперь вы можете войти в личный кабинет",
+    "app_categories": "Категории",
 };

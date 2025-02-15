@@ -3,9 +3,9 @@
     <div v-show="show" class="pop-up">
       <div
         v-bind:class="{
-          'pop_up__modal_lg': size == 'lg',
-          'pop_up__modal_sm': size != 'lg' && size != 'full',
-          'pop_up__modal_full': size == 'full',
+          'pop_up__modal_lg': size === 'lg',
+          'pop_up__modal_sm': size !== 'lg' && size !== 'full',
+          'pop_up__modal_full': size === 'full',
           'pop_up__background-wgray': backgroundColor === 'wgray',
           'pop_up__background-white': backgroundColor !== 'wgray'
         }"

@@ -19,7 +19,12 @@
           </div>
         </div>
       </div>
-      <CategoryTree v-if="category.children && category.children.length > 0" :categories="category.children" />
+      <CategoryTree
+          v-if="category.children && category.children.length > 0"
+          :categories="category.children"
+          @update:selectedCat="selectItem"
+          @action:delete="remove"
+      />
     </li>
   </ul>
 </template>
@@ -28,6 +33,7 @@
 
 export default {
   name: "CategoryTree",
+  emits: ['update:selectedCat', 'action:delete'],
   data() {
     return {
 
@@ -44,7 +50,7 @@ export default {
   },
   methods: {
     selectItem(catId) {
-      console.log(catId);
+      this.$emit('update:selectedCat', catId);
     },
     up(catId) {
       console.log("вверх " +catId);
@@ -53,7 +59,7 @@ export default {
       console.log("edit " +catId);
     },
     remove(catId) {
-      console.log("remove " +catId);
+      this.$emit('action:delete', catId);
     }
   },
   created() {
@@ -116,7 +122,7 @@ export default {
     margin-left: 18px;
   }
   li.active > .name {
-    background-color: #2b70c3;
+    background-color: #2b70c3 !important;
   }
   li {
     margin-top: 5px;

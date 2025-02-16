@@ -6,7 +6,11 @@
       </div>
     </div>
     <div class="list">
-      <category-tree :categories="categoryTree"></category-tree>
+      <category-tree
+          :categories="categoryTree"
+          @update:selectedCat="selectCategory"
+          @action:delete="actionDeleteCategory"
+      ></category-tree>
     </div>
 
     <popup
@@ -27,6 +31,20 @@
       </template>
     </popup>
 
+    <popup
+        :closeButton="deleteCategoryPopup.closeButton"
+        :actionButton="deleteCategoryPopup.actionButton"
+        :action-class="deleteCategoryPopup.actionClass"
+        :show="deleteCategoryPopup.show"
+        @closePopup="closeDeleteCategoryPopup"
+        @actionPopup="submitDeleteCategoryPopup"
+    >
+      <template v-slot:header>Удаление категории</template>
+      <template v-slot:body>
+        Категория будет удалена без возможности восстановления. Продолжить?
+      </template>
+    </popup>
+
   </div>
 </template>
 
@@ -43,7 +61,8 @@ export default {
   data() {
     return {
       list: [],
-      categoryTree: [],
+      selectedCategoryId: 0,
+      //categoryTree: [],
       newCategoryPopup: {
         show: false,
         closeButton: 'Отмена',
@@ -51,12 +70,87 @@ export default {
         actionClass: 'btn-success',
       },
       newCategoryData: {},
+
+      deletedCategoryId: 0,
+      deleteCategoryPopup: {
+        show: false,
+        closeButton: 'Отмена',
+        actionButton: 'Продолжить',
+        actionClass: 'btn-success',
+      },
     }
   },
   computed: {
+    categoryTree() {
+      const categoryMap = new Map();
+      const tree = [];
 
+      const copiedList = JSON.parse(JSON.stringify(this.list));
+
+      copiedList.forEach((category, index) => {
+        if (
+            (this.selectedCategoryId === 0 && index === 0) ||
+            (this.selectedCategoryId > 0 && this.selectedCategoryId === category.id)
+        ) {
+          category.active = true;
+        } else {
+          category.active = false;
+        }
+
+        category.children = [];
+        category.isFirstLevel = false;
+        categoryMap.set(category.id, category);
+      });
+
+      copiedList.forEach(category => {
+        if (category.parent_id) {
+          const parent = categoryMap.get(category.parent_id);
+          if (parent) {
+            parent.children.push(category);
+          }
+        } else {
+          tree.push(category);
+        }
+      });
+
+      tree.forEach((item, index) => {
+        item.isFirstLevel = true;
+      });
+
+      return tree;
+    }
   },
   methods: {
+    submitDeleteCategoryPopup() {
+      this.$store.dispatch("startPreloader");
+      noteCategoryRepository.delete(this.deletedCategoryId).then(() => {
+        this.getAll();
+        this.closeDeleteCategoryPopup();
+
+        if (this.deletedCategoryId === this.selectedCategoryId) {
+          this.selectedCategoryId = 0;
+        }
+
+        this.$store.dispatch("stopPreloader");
+      }).catch(err =>  {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
+    closeDeleteCategoryPopup() {
+      this.deleteCategoryPopup.show = false;
+    },
+    actionDeleteCategory(catId) {
+      this.deletedCategoryId = catId;
+      this.deleteCategoryPopup.show = true;
+    },
+    selectCategory(catId) {
+      this.selectedCategoryId = catId;
+    },
     handleUpdateNewCategoryData(data) {
       this.newCategoryData = data;
       console.log(this.newCategoryData);
@@ -91,7 +185,7 @@ export default {
     getAll() {
       noteCategoryRepository.all().then(resp => {
         this.list = resp.data;
-        this.categoryTree = this.buildTree(this.list);
+        //this.categoryTree = this.buildTree(this.list);
       }).catch(err =>  {
         this.$store.dispatch("addNotification", {
           text: err.response.data.message,
@@ -100,37 +194,37 @@ export default {
         });
       });
     },
-    buildTree(categories) {
-      const categoryMap = new Map();
-      const tree = [];
-
-      categories.forEach(category => {
-        category.children = [];
-        category.isFirstLevel = false;
-        category.active = false;
-        categoryMap.set(category.id, category);
-      });
-
-      categories.forEach(category => {
-        if (category.parent_id) {
-          const parent = categoryMap.get(category.parent_id);
-          if (parent) {
-            parent.children.push(category);
-          }
-        } else {
-          tree.push(category);
-        }
-      });
-
-      tree.forEach(item => {
-        item.isFirstLevel = true;
-        if (item.id === 9) {
-          item.active = true;
-        }
-      });
-
-      return tree;
-    }
+    // buildTree(categories) {
+    //   const categoryMap = new Map();
+    //   const tree = [];
+    //
+    //   categories.forEach(category => {
+    //     category.children = [];
+    //     category.isFirstLevel = false;
+    //     category.active = false;
+    //     categoryMap.set(category.id, category);
+    //   });
+    //
+    //   categories.forEach(category => {
+    //     if (category.parent_id) {
+    //       const parent = categoryMap.get(category.parent_id);
+    //       if (parent) {
+    //         parent.children.push(category);
+    //       }
+    //     } else {
+    //       tree.push(category);
+    //     }
+    //   });
+    //
+    //   tree.forEach(item => {
+    //     item.isFirstLevel = true;
+    //     if (item.id === 9) {
+    //       item.active = true;
+    //     }
+    //   });
+    //
+    //   return tree;
+    // }
   },
   created() {
     this.getAll();

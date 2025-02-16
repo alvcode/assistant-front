@@ -2,7 +2,12 @@
   <div class="notes-main--container">
     <div class="main-content">
       <div class="notes">
-
+        <div class="shadow-card">
+          <div class="card-title">{{$t('app_notes')}}</div>
+          <div class="content mrg-t-10">
+            <notes-component></notes-component>
+          </div>
+        </div>
       </div>
       <div class="categories">
         <div class="shadow-card">
@@ -19,10 +24,11 @@
 <script>
 
 import Categories from "@/components/note/Categories.vue";
+import NotesComponent from "@/components/note/NotesComponent.vue";
 
 export default {
   name: "NotesMain",
-  components: {Categories},
+  components: {NotesComponent, Categories},
   data() {
     return {
       list: []
@@ -51,6 +57,7 @@ export default {
     width: 60%;
   }
   .categories {
+    max-height: 100%;
     width: 38%;
     .shadow-card {
       height: 100%;

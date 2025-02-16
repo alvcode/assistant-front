@@ -2,7 +2,7 @@
   <div class="categories--container">
     <div class="actions text-right">
       <div @click="showNewCategoryPopup" class="btn btn-sm btn-outline-info">
-        <f-awesome icon="plus"></f-awesome> Добавить
+        <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
       </div>
     </div>
     <div class="list">
@@ -21,7 +21,7 @@
         @closePopup="closeNewCategoryPopup"
         @actionPopup="submitNewCategoryPopup"
     >
-      <template v-slot:header>Новая категория</template>
+      <template v-slot:header>{{ $t('app_new_category') }}</template>
       <template v-slot:body>
         <category-fields
           :show="newCategoryPopup.show"
@@ -39,9 +39,9 @@
         @closePopup="closeDeleteCategoryPopup"
         @actionPopup="submitDeleteCategoryPopup"
     >
-      <template v-slot:header>Удаление категории</template>
+      <template v-slot:header>{{ $t('app_delete_category') }}</template>
       <template v-slot:body>
-        Категория будет удалена без возможности восстановления. Продолжить?
+        {{ $t('app_delete_category_text') }}
       </template>
     </popup>
 
@@ -65,8 +65,8 @@ export default {
       //categoryTree: [],
       newCategoryPopup: {
         show: false,
-        closeButton: 'Отмена',
-        actionButton: 'Сохранить',
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_save'),
         actionClass: 'btn-success',
       },
       newCategoryData: {},
@@ -74,8 +74,8 @@ export default {
       deletedCategoryId: 0,
       deleteCategoryPopup: {
         show: false,
-        closeButton: 'Отмена',
-        actionButton: 'Продолжить',
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_continue'),
         actionClass: 'btn-success',
       },
     }
@@ -113,7 +113,7 @@ export default {
         }
       });
 
-      tree.forEach((item, index) => {
+      tree.forEach(item => {
         item.isFirstLevel = true;
       });
 
@@ -185,7 +185,6 @@ export default {
     getAll() {
       noteCategoryRepository.all().then(resp => {
         this.list = resp.data;
-        //this.categoryTree = this.buildTree(this.list);
       }).catch(err =>  {
         this.$store.dispatch("addNotification", {
           text: err.response.data.message,
@@ -194,37 +193,6 @@ export default {
         });
       });
     },
-    // buildTree(categories) {
-    //   const categoryMap = new Map();
-    //   const tree = [];
-    //
-    //   categories.forEach(category => {
-    //     category.children = [];
-    //     category.isFirstLevel = false;
-    //     category.active = false;
-    //     categoryMap.set(category.id, category);
-    //   });
-    //
-    //   categories.forEach(category => {
-    //     if (category.parent_id) {
-    //       const parent = categoryMap.get(category.parent_id);
-    //       if (parent) {
-    //         parent.children.push(category);
-    //       }
-    //     } else {
-    //       tree.push(category);
-    //     }
-    //   });
-    //
-    //   tree.forEach(item => {
-    //     item.isFirstLevel = true;
-    //     if (item.id === 9) {
-    //       item.active = true;
-    //     }
-    //   });
-    //
-    //   return tree;
-    // }
   },
   created() {
     this.getAll();

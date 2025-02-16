@@ -1,6 +1,10 @@
 export default {
+    "app_add": "Add",
     "app_reset": "Reset",
     "app_close": "Close",
+    "app_cancel": "Cancel",
+    "app_save": "Save",
+    "app_continue": "Continue",
     "app_step_back": "Step back",
     "app_next": "Next",
     "app_time_short_min": "min",
@@ -20,4 +24,7 @@ export default {
     "app_thank_for_choosing": "Thank you for choosing",
     "app_you_can_login": "You can now log into your personal account",
     "app_categories": "Categories",
+    "app_new_category": "New category",
+    "app_delete_category": "Delete a category",
+    "app_delete_category_text": "The category will be permanently deleted. Continue?",
 };

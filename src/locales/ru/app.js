@@ -1,6 +1,10 @@
 export default {
+    "app_add": "Добавить",
     "app_reset": "Сбросить",
     "app_close": "Закрыть",
+    "app_cancel": "Отмена",
+    "app_save": "Сохранить",
+    "app_continue": "Продолжить",
     "app_step_back": "Шаг назад",
     "app_next": "Далее",
     "app_time_short_min": "мин.",
@@ -20,4 +24,7 @@ export default {
     "app_thank_for_choosing": "Спасибо, что выбрали",
     "app_you_can_login": "Теперь вы можете войти в личный кабинет",
     "app_categories": "Категории",
+    "app_new_category": "Новая категория",
+    "app_delete_category": "Удаление категории",
+    "app_delete_category_text": "Категория будет удалена без возможности восстановления. Продолжить?",
 };

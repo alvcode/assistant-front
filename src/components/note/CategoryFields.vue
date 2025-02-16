@@ -1,7 +1,7 @@
 <template>
   <div class="category-fields--container">
     <div class="input-block">
-      <label>Название</label>
+      <label>{{ $t('form_name') }}</label>
       <input
           type="text"
           v-model="formData.name"
@@ -9,7 +9,7 @@
       >
     </div>
     <div class="input-block">
-      <label>Родительская категория</label>
+      <label>{{ $t('form_parent_category') }}</label>
       <select @change="updateData" v-model="formData.parent_id">
         <option value="0">-</option>
         <option v-for="item in categories" :key="item.id" :value="item.id">{{item.name}}</option>

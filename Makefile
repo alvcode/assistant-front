@@ -17,3 +17,6 @@ deploy:
 
 exec: # str=
 	docker exec -it assistant-lk $(str)
+
+sh:
+	docker exec -it assistant-lk sh

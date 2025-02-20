@@ -242,6 +242,7 @@ export default {
   width: 100%;
   height: 100vh;
   background-color: #1b1c30;
+  overflow: auto;
 }
 .back-template--content {
   display: flex;
@@ -249,7 +250,7 @@ export default {
   justify-content: space-between;
 
   .left {
-    height: 100vh;
+    //height: 100vh;
 
     &.min-sidebar {
       width: 0;
@@ -270,13 +271,12 @@ export default {
     }
 
     .right--main-content {
-      position: absolute;
+      overflow: auto;
+      box-sizing: border-box;
+      margin: 5px 0;
+      padding-bottom: 20px;
+      height: calc(100vh - 10px);
       background-color: #fafefd;
-      top: 10px;
-      bottom: 10px;
-      right: 10px;
-      left: 10px;
-      margin: auto;
       border-radius: 30px;
 
       .top-bar {

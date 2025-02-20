@@ -58,6 +58,7 @@ import CategoryFields from "@/components/note/CategoryFields.vue";
 export default {
   name: "Categories",
   components: {CategoryFields, Popup, CategoryTree},
+  emits: ['update:categoryId'],
   data() {
     return {
       list: [],
@@ -88,14 +89,22 @@ export default {
       const copiedList = JSON.parse(JSON.stringify(this.list));
 
       copiedList.forEach((category, index) => {
-        if (
-            (this.selectedCategoryId === 0 && index === 0) ||
-            (this.selectedCategoryId > 0 && this.selectedCategoryId === category.id)
-        ) {
+        if (this.selectedCategoryId === 0 && index === 0) {
+          category.active = true;
+          this.selectCategory(category.id);
+        } else if (this.selectedCategoryId > 0 && this.selectedCategoryId === category.id) {
           category.active = true;
         } else {
           category.active = false;
         }
+        // if (
+        //     (this.selectedCategoryId === 0 && index === 0) ||
+        //     (this.selectedCategoryId > 0 && this.selectedCategoryId === category.id)
+        // ) {
+        //   category.active = true;
+        // } else {
+        //   category.active = false;
+        // }
 
         category.children = [];
         category.isFirstLevel = false;
@@ -150,6 +159,7 @@ export default {
     },
     selectCategory(catId) {
       this.selectedCategoryId = catId;
+      this.$emit('update:categoryId', catId);
     },
     handleUpdateNewCategoryData(data) {
       this.newCategoryData = data;

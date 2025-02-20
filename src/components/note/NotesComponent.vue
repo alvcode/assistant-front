@@ -1,6 +1,7 @@
 <template>
   <div class="notes--container">
     <div class="actions">
+      {{categoryId}}
       <div @click="showNewNotePopup" class="btn btn-sm btn-outline-info">
         <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
       </div>
@@ -41,7 +42,7 @@ export default {
           {
             type: "header",
             data: {
-              text: "Welcome to Editor.js",
+              text: "Title",
               level: 2,
             },
           },
@@ -53,6 +54,12 @@ export default {
         actionButton: this.$t('app_save'),
         actionClass: 'btn-success',
       },
+    }
+  },
+  props: {
+    categoryId: {
+      type: Number,
+      required: true
     }
   },
   computed: {

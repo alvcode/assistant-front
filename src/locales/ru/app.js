@@ -27,4 +27,5 @@ export default {
     "app_new_category": "Новая категория",
     "app_delete_category": "Удаление категории",
     "app_delete_category_text": "Категория будет удалена без возможности восстановления. Продолжить?",
+    "app_empty_for_now": "Пока что пусто",
 };

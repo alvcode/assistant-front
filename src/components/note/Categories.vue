@@ -58,7 +58,7 @@ import CategoryFields from "@/components/note/CategoryFields.vue";
 export default {
   name: "Categories",
   components: {CategoryFields, Popup, CategoryTree},
-  emits: ['update:categoryId'],
+  emits: ['update:categoryId', 'update:list'],
   data() {
     return {
       list: [],
@@ -195,6 +195,7 @@ export default {
     getAll() {
       noteCategoryRepository.all().then(resp => {
         this.list = resp.data;
+        this.$emit('update:list', this.list);
       }).catch(err =>  {
         this.$store.dispatch("addNotification", {
           text: err.response.data.message,

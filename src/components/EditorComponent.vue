@@ -32,6 +32,19 @@ export default {
       editor: null,
     };
   },
+  watch: {
+    data: {
+      handler (val) {
+        this.editor.render(val).then(() => {
+          console.log('Editor обновлён!');
+        })
+        .catch((error) => {
+          console.error('Ошибка при обновлении редактора:', error);
+        });
+      },
+      deep: true
+    },
+  },
   mounted() {
     this.initEditor();
   },

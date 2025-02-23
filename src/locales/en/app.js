@@ -27,4 +27,5 @@ export default {
     "app_new_category": "New category",
     "app_delete_category": "Delete a category",
     "app_delete_category_text": "The category will be permanently deleted. Continue?",
+    "app_empty_for_now": "Empty for now",
 };

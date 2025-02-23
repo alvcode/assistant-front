@@ -5,7 +5,7 @@
         <div class="shadow-card">
           <div class="card-title">{{$t('app_notes')}}</div>
           <div class="content mrg-t-10">
-            <notes-component :category-id="categoryId"></notes-component>
+            <notes-component :category-id="categoryId" :categories="list"></notes-component>
           </div>
         </div>
       </div>
@@ -13,7 +13,7 @@
         <div class="shadow-card">
           <div class="card-title">{{$t('app_categories')}}</div>
           <div class="content mrg-t-10">
-            <categories @update:category-id="setCategoryId"></categories>
+            <categories @update:category-id="setCategoryId" @update:list="setList"></categories>
           </div>
         </div>
       </div>
@@ -41,6 +41,9 @@ export default {
   methods: {
     setCategoryId(catId) {
       this.categoryId = catId;
+    },
+    setList(list) {
+      this.list = list;
     },
   },
   created() {

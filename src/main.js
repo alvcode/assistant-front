@@ -9,6 +9,15 @@ import "croppie/croppie.css"; // import the croppie css manually
 import VueTheMask from "vue-the-mask";
 import {messages} from './locales';
 import {createI18n} from 'vue-i18n';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(relativeTime);
+//Vue.prototype.$dayjs = dayjs;
 
 
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -18,6 +27,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 library.add(fas);
 
 const app = createApp(App).component("f-awesome", FontAwesomeIcon)
+app.config.globalProperties.$dayjs = dayjs;
 
 // ========= LOCALE =========
 let chooseLocale = null;

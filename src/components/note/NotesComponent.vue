@@ -28,7 +28,10 @@
         @closePopup="closeNewNotePopup"
         @actionPopup="submitNewNotePopup"
     >
-      <template v-slot:header>Новая заметка</template>
+      <template v-slot:header>
+        <span v-if="isNewEditor">{{ $t('app_new_note') }}</span>
+        <span v-if="!isNewEditor">{{ $t('app_edit_note') }}</span>
+      </template>
       <template v-slot:body>
         <editor-component :data="editorData" @change="handleEditorChange"></editor-component>
       </template>
@@ -51,17 +54,17 @@ export default {
     return {
       editorData: {
         time: Date.now(),
-        blocks: [
-
-        ],
+        blocks: [],
       },
       newNotePopup: {
         show: false,
-        closeButton: this.$t('app_cancel'),
+        closeButton: this.$t('app_close'),
         actionButton: this.$t('app_save'),
         actionClass: 'btn-success',
       },
       notes: [],
+      blocks: [],
+      isNewEditor: false,
     }
   },
   props: {
@@ -111,26 +114,33 @@ export default {
       }
     },
     showNewNotePopup() {
-      this.editorData.blocks = [
-        {
-          type: "header",
-          data: {
-            text: "Title",
-            level: 2,
-          },
-        },
-      ];
+      this.editorData.blocks = [{type: "header", data: {text: "Title", level: 2}}];
+      this.blocks = [{type: "header", data: {text: "Title", level: 2}}];
+      this.isNewEditor = true;
       this.newNotePopup.show = true;
     },
     closeNewNotePopup() {
       this.newNotePopup.show = false;
     },
     submitNewNotePopup() {
-      console.log(this.editorData);
-      console.log('submit');
+      // console.log(this.editorData);
+      // console.log('submit');
+      this.$store.dispatch("startPreloader");
+      noteRepository.create({category_id: this.categoryId, note_blocks: this.blocks}).then(() => {
+        //this.notes = resp.data;
+        this.loadNotes(this.categoryId);
+        this.$store.dispatch("stopPreloader");
+      }).catch(err =>  {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
     },
     handleEditorChange(data) {
-      this.editorData = data;
+      this.blocks = data.blocks;
       console.log("Editor Data Updated:", data);
     },
   },

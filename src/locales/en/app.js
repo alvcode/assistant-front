@@ -28,4 +28,6 @@ export default {
     "app_delete_category": "Delete a category",
     "app_delete_category_text": "The category will be permanently deleted. Continue?",
     "app_empty_for_now": "Empty for now",
+    "app_new_note": "New note",
+    "app_edit_note": "Edit note",
 };

@@ -28,4 +28,6 @@ export default {
     "app_delete_category": "Удаление категории",
     "app_delete_category_text": "Категория будет удалена без возможности восстановления. Продолжить?",
     "app_empty_for_now": "Пока что пусто",
+    "app_new_note": "Новая заметка",
+    "app_edit_note": "Редактирование заметки",
 };

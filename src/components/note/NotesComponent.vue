@@ -25,15 +25,21 @@
         :actionButton="newNotePopup.actionButton"
         :action-class="newNotePopup.actionClass"
         :show="newNotePopup.show"
+        :size="'lg'"
         @closePopup="closeNewNotePopup"
-        @actionPopup="submitNewNotePopup"
+        @actionPopup="submitEditor"
     >
       <template v-slot:header>
         <span v-if="isNewEditor">{{ $t('app_new_note') }}</span>
         <span v-if="!isNewEditor">{{ $t('app_edit_note') }}</span>
       </template>
       <template v-slot:body>
-        <editor-component :data="editorData" @change="handleEditorChange"></editor-component>
+        <div class="notes--editor">
+          <editor-component :data="editorData" @change="handleEditorChange"></editor-component>
+        </div>
+        <div class="notes--updated">
+          Обновлено: {{updatedDatetime}}
+        </div>
       </template>
     </popup>
 
@@ -55,6 +61,11 @@ export default {
       editorData: {
         time: Date.now(),
         blocks: [],
+      },
+      editorOtherData: {
+        categoryId: 0,
+        blocks: [],
+        updatedAt: ''
       },
       newNotePopup: {
         show: false,
@@ -86,7 +97,13 @@ export default {
     }
   },
   computed: {
-
+    updatedDatetime() {
+      let result = '';
+      if (this.editorOtherData.updatedAt !== '') {
+        result = this.$dayjs(this.editorOtherData.updatedAt).format(this.$t('app_datetime_format'));
+      }
+      return result;
+    }
   },
   methods: {
     loadNotes(catId) {
@@ -115,19 +132,31 @@ export default {
     },
     showNewNotePopup() {
       this.editorData.blocks = [{type: "header", data: {text: "Title", level: 2}}];
-      this.blocks = [{type: "header", data: {text: "Title", level: 2}}];
+      this.editorOtherData.blocks = [{type: "header", data: {text: "Title", level: 2}}];
+      this.editorOtherData.categoryId = this.categoryId;
+      this.editorOtherData.updatedAt = '';
       this.isNewEditor = true;
       this.newNotePopup.show = true;
     },
     closeNewNotePopup() {
       this.newNotePopup.show = false;
     },
-    submitNewNotePopup() {
-      // console.log(this.editorData);
-      // console.log('submit');
+    submitEditor() {
+      if (this.isNewEditor) {
+        this.createNote();
+      } else {
+        this.updateNote();
+      }
+    },
+    createNote() {
       this.$store.dispatch("startPreloader");
-      noteRepository.create({category_id: this.categoryId, note_blocks: this.blocks}).then(() => {
-        //this.notes = resp.data;
+      noteRepository.create({
+        category_id: this.editorOtherData.categoryId,
+        note_blocks: this.editorOtherData.blocks
+      }).then((resp) => {
+        this.editorOtherData.updatedAt = resp.data.updated_at;
+        this.editorData.blocks = resp.data.note_blocks;
+        this.isNewEditor = false;
         this.loadNotes(this.categoryId);
         this.$store.dispatch("stopPreloader");
       }).catch(err =>  {
@@ -139,8 +168,11 @@ export default {
         this.$store.dispatch("stopPreloader");
       });
     },
+    updateNote() {
+
+    },
     handleEditorChange(data) {
-      this.blocks = data.blocks;
+      this.editorOtherData.blocks = data.blocks;
       console.log("Editor Data Updated:", data);
     },
   },
@@ -177,5 +209,10 @@ export default {
       }
     }
   }
+}
+.notes--updated {
+  text-align: right;
+  font-size: 13px;
+  color: gray;
 }
 </style>

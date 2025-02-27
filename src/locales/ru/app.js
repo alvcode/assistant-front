@@ -1,4 +1,5 @@
 export default {
+    "app_success": "Успешно",
     "app_add": "Добавить",
     "app_reset": "Сбросить",
     "app_close": "Закрыть",
@@ -30,4 +31,10 @@ export default {
     "app_empty_for_now": "Пока что пусто",
     "app_new_note": "Новая заметка",
     "app_edit_note": "Редактирование заметки",
+    "app_sort": "Сортировка",
+    "app_updated": "Обновлено",
+    "app_sort_updated_descending": "Дата обновления по убыванию",
+    "app_sort_updated_ascending": "Дата обновления по возрастанию",
+    "app_sort_created_descending": "Дата создания по убыванию",
+    "app_sort_created_ascending": "Дата создания по возрастанию",
 };

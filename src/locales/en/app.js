@@ -1,4 +1,5 @@
 export default {
+    "app_success": "Success",
     "app_add": "Add",
     "app_reset": "Reset",
     "app_close": "Close",
@@ -30,4 +31,10 @@ export default {
     "app_empty_for_now": "Empty for now",
     "app_new_note": "New note",
     "app_edit_note": "Edit note",
+    "app_sort": "Sort",
+    "app_updated": "Updated",
+    "app_sort_updated_descending": "Update date descending",
+    "app_sort_updated_ascending": "Update date ascending",
+    "app_sort_created_descending": "Creation date descending",
+    "app_sort_created_ascending": "Creation date ascending",
 };

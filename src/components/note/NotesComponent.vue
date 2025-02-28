@@ -43,8 +43,29 @@
             <f-awesome :icon="['fas', 'list']" />
             {{getCategoryNameById(item.category_id)}}
           </div>
+          <div class="note-menu">
+            <div
+                @click.stop="showNoteSubmenu(item.id)"
+                class="menu-btn"
+            >
+              <f-awesome :icon="['fas', 'ellipsis-vertical']" />
+            </div>
+          </div>
+          <div
+              v-show="item.id === noteIdSubmenu"
+              class="menu-block shadow-card"
+              @click.stop="false"
+          >
+            <div
+                @click.stop="deleteNote(item.id)"
+                class="delete-note menu-block-item no-select"
+            >
+              {{ $t('app_delete') }}
+            </div>
+          </div>
         </div>
       </div>
+      <div v-show="noteIdSubmenu > 0" class="note-background" @click="clearNoteSubmenu"></div>
     </div>
 
     <popup
@@ -112,6 +133,7 @@ export default {
         {id: 4, name: this.$t('app_sort_created_ascending')},
       ],
       selectedSortType: 0,
+      noteIdSubmenu: 0,
     }
   },
   props: {
@@ -167,6 +189,26 @@ export default {
     }
   },
   methods: {
+    deleteNote(noteId) {
+      noteRepository.delete(noteId).then(() => {
+        this.noteIdSubmenu = 0;
+        this.loadNotes(this.categoryId);
+        this.$store.dispatch("stopPreloader");
+      }).catch(err =>  {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
+    showNoteSubmenu(noteId) {
+      this.noteIdSubmenu = noteId;
+    },
+    clearNoteSubmenu() {
+      this.noteIdSubmenu = 0;
+    },
     clearSearch() {
       this.searchQuery = '';
     },
@@ -201,11 +243,6 @@ export default {
       this.editorOtherData.updatedAt = '';
       this.editorOtherData.id = '';
       this.isNewEditor = true;
-      this.newNotePopup.show = true;
-    },
-    openNote(noteId) {
-      this.loadOne(noteId);
-      this.isNewEditor = false;
       this.newNotePopup.show = true;
     },
     closeNewNotePopup() {
@@ -273,6 +310,10 @@ export default {
         this.$store.dispatch("stopPreloader");
       });
     },
+    openNote(noteId) {
+      //this.editorData.blocks = [];
+      this.loadOne(noteId);
+    },
     loadOne(noteId) {
       this.$store.dispatch("startPreloader");
       noteRepository.one(noteId).then((resp) => {
@@ -281,6 +322,8 @@ export default {
         this.editorOtherData.id = resp.data.id;
         this.editorOtherData.blocks = resp.data.note_blocks;
         this.editorData.blocks = resp.data.note_blocks;
+        this.isNewEditor = false;
+        this.newNotePopup.show = true;
         this.$store.dispatch("stopPreloader");
       }).catch(err =>  {
         this.$store.dispatch("addNotification", {
@@ -319,6 +362,31 @@ export default {
     .note {
       margin: 10px 10px;
       width: 290px;
+      position: relative;
+
+      .note-menu {
+        position: absolute;
+        top: 3px;
+        right: 0;
+
+        .menu-btn {
+          width: 30px;
+          height: 30px;
+          text-align: center;
+          line-height: 30px;
+        }
+      }
+      .menu-block {
+        position: absolute;
+        width: 140px;
+        top: -21px;
+        right: 0;
+        z-index: 2;
+
+        .menu-block-item {
+          padding: 5px 0;
+        }
+      }
 
       .title {
 
@@ -334,6 +402,16 @@ export default {
         color: gray;
       }
     }
+  }
+  .note-background {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin: auto;
+    //background-color: rgba(123, 123, 98, 0.4);
+    z-index: 1;
   }
 }
 .notes--updated {

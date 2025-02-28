@@ -1,4 +1,5 @@
 export default {
+    "app_delete": "Удалить",
     "app_success": "Успешно",
     "app_add": "Добавить",
     "app_reset": "Сбросить",
@@ -14,7 +15,7 @@ export default {
     "app_today": "Сегодня",
     "app_tomorrow": "Завтра",
     "app_time_at": "в",
-    "app_datetime_format": "DD.MM.YYYY HH:mm",
+    "app_datetime_format": "DD MMM YYYY - HH:mm",
     "app_notes": "Заметки",
     "app_logout": "Выйти",
     "app_sign_in": "Войти",

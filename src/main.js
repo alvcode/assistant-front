@@ -13,6 +13,8 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/ru';
+import 'dayjs/locale/en';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -49,6 +51,8 @@ if (storageLang) {
     chooseLocale = supportedLanguages.includes(langCode) ? langCode : 'ru';
     localStorage.setItem('lang', chooseLocale);
 }
+
+app.config.globalProperties.$dayjs.locale(chooseLocale)
 
 const i18n = createI18n({
     legacy: false,

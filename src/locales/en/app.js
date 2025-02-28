@@ -1,4 +1,5 @@
 export default {
+    "app_delete": "Delete",
     "app_success": "Success",
     "app_add": "Add",
     "app_reset": "Reset",
@@ -14,7 +15,7 @@ export default {
     "app_today": "Today",
     "app_tomorrow": "Tomorrow",
     "app_time_at": "at",
-    "app_datetime_format": "MM/DD/YYYY HH:mm",
+    "app_datetime_format": "DD MMM YYYY - HH:mm",
     "app_notes": "Notes",
     "app_logout": "Logout",
     "app_sign_in": "Sign In",

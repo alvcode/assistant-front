@@ -70,4 +70,24 @@ export default {
     }
   }
 }
+@media (max-width: 1380px) {
+  .main-content {
+    //display: flex;
+    flex-wrap: wrap;
+    //justify-content: space-between;
+    flex-direction: column-reverse;
+
+    .notes {
+      margin-top: 25px;
+      width: 100%;
+    }
+    .categories {
+      //max-height: 100%;
+      width: 100%;
+      //.shadow-card {
+      //  height: 100%;
+      //}
+    }
+  }
+}
 </style>

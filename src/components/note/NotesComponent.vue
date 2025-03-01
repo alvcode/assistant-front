@@ -21,7 +21,7 @@
       <div class="note-actions">
         <div class="sort">
           <div class="sort-btn">
-            <div class="btn btn-sm">
+            <div class="">
               <f-awesome :icon="['fas', 'arrow-down-wide-short']" />
               {{$t('app_sort')}}:
               <select class="row-min-select" v-model="selectedSortType">
@@ -453,6 +453,26 @@ export default {
   .note-actions {
     width: 45%;
     text-align: right;
+    font-size: 13px;
+  }
+}
+@media (max-width: 1605px) {
+  .search-and-note-actions {
+    flex-wrap: wrap;
+
+    .search {
+      width: 100%;
+    }
+    .note-actions {
+      width: 100%;
+    }
+  }
+}
+@media (max-width: 683px) {
+  .notes {
+    .list {
+      justify-content: center;
+    }
   }
 }
 </style>

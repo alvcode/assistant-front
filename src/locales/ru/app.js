@@ -38,4 +38,6 @@ export default {
     "app_sort_updated_ascending": "Дата обновления по возрастанию",
     "app_sort_created_descending": "Дата создания по убыванию",
     "app_sort_created_ascending": "Дата создания по возрастанию",
+    "app_selected_category": "Выбранная категория",
+    "app_manage": "Управлять",
 };

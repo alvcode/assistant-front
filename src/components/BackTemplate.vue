@@ -481,7 +481,7 @@ export default {
           padding: 10px 15px;
 
           .top-bar--left {
-            margin-top: 12px;
+            margin-top: 15px;
             width: 100%;
           }
           .top-bar--right {

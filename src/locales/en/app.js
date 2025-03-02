@@ -38,4 +38,6 @@ export default {
     "app_sort_updated_ascending": "Update date ascending",
     "app_sort_created_descending": "Creation date descending",
     "app_sort_created_ascending": "Creation date ascending",
+    "app_selected_category": "Selected category",
+    "app_manage": "Manage",
 };

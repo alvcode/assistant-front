@@ -72,22 +72,22 @@ export default {
 .ul {
   li {
     & > .name {
-      background-color: #7FA1CA;
+      //background-color: #7FA1CA;
     }
     .ul {
       li {
         & > .name {
-          background-color: #8aacd5;
+          //background-color: #8aacd5;
         }
         .ul {
           li {
             & > .name {
-              background-color: #92b4dd;
+              //background-color: #92b4dd;
             }
             .ul {
               li {
                 & > .name {
-                  background-color: #9cbee6;
+                  //background-color: #9cbee6;
                 }
                 .ul {
                   li {
@@ -122,19 +122,22 @@ export default {
     margin-left: 18px;
   }
   li.active > .name {
-    background-color: #2b70c3 !important;
+    //background-color: #2b70c3 !important;
+    background-color: #f1f1ff !important;
   }
   li {
     margin-top: 5px;
-    color: #fff;
+    //border: 1px solid red;
+    //color: #fff;
 
     .name {
+      border: .5px solid #ededed;
       height: 39px;
       line-height: 39px;
       padding: 0 8px;
       border-radius: 10px;
       font-size: 15px;
-      font-weight: 700;
+      //font-weight: 700;
       display: flex;
       flex-wrap: nowrap;
       justify-content: space-between;

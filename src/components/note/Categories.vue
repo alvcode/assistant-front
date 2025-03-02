@@ -1,17 +1,52 @@
 <template>
   <div class="categories--container">
-    <div class="actions text-right">
-      <div @click="showNewCategoryPopup" class="btn btn-sm btn-outline-info">
-        <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
+    <div class="full">
+      <div class="actions text-right">
+        <div @click="showNewCategoryPopup" class="btn btn-sm btn-outline-info">
+          <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
+        </div>
+      </div>
+      <div class="list">
+        <category-tree
+            :categories="categoryTree"
+            @update:selectedCat="selectCategory"
+            @action:delete="actionDeleteCategory"
+        ></category-tree>
       </div>
     </div>
-    <div class="list">
-      <category-tree
-          :categories="categoryTree"
-          @update:selectedCat="selectCategory"
-          @action:delete="actionDeleteCategory"
-      ></category-tree>
+    <div class="mobile">
+      <div class="selected">
+        {{ $t('app_selected_category') }}: <b>{{ selectedCategoryName }}</b>
+      </div>
+      <div class="action">
+        <div class="btn btn-sm btn-outline-info" @click="showManageCategoryPopup">{{ $t('app_manage') }}</div>
+      </div>
     </div>
+
+<!--    manage mobile-->
+    <popup
+        :closeButton="manageCategoryPopup.closeButton"
+        :show="manageCategoryPopup.show"
+        @closePopup="closeManageCategoryPopup"
+    >
+      <template v-slot:header>{{ $t('app_categories') }}</template>
+      <template v-slot:body>
+        <div class="">
+          <div class="actions text-right">
+            <div @click="showNewCategoryPopup" class="btn btn-sm btn-outline-info">
+              <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
+            </div>
+          </div>
+          <div class="list">
+            <category-tree
+                :categories="categoryTree"
+                @update:selectedCat="selectCategoryMobile"
+                @action:delete="actionDeleteCategory"
+            ></category-tree>
+          </div>
+        </div>
+      </template>
+    </popup>
 
     <popup
         :closeButton="newCategoryPopup.closeButton"
@@ -79,9 +114,21 @@ export default {
         actionButton: this.$t('app_continue'),
         actionClass: 'btn-success',
       },
+
+      manageCategoryPopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+      },
     }
   },
   computed: {
+    selectedCategoryName() {
+      for (let i = 0; i < this.list.length; i++) {
+        if (+this.list[i].id === +this.selectedCategoryId) {
+          return this.list[i].name;
+        }
+      }
+    },
     categoryTree() {
       const categoryMap = new Map();
       const tree = [];
@@ -130,6 +177,12 @@ export default {
     }
   },
   methods: {
+    closeManageCategoryPopup() {
+      this.manageCategoryPopup.show = false;
+    },
+    showManageCategoryPopup() {
+      this.manageCategoryPopup.show = true;
+    },
     submitDeleteCategoryPopup() {
       this.$store.dispatch("startPreloader");
       noteCategoryRepository.delete(this.deletedCategoryId).then(() => {
@@ -160,6 +213,10 @@ export default {
     selectCategory(catId) {
       this.selectedCategoryId = catId;
       this.$emit('update:categoryId', catId);
+    },
+    selectCategoryMobile(catId) {
+      this.selectCategory(catId);
+      this.closeManageCategoryPopup();
     },
     handleUpdateNewCategoryData(data) {
       this.newCategoryData = data;
@@ -212,5 +269,43 @@ export default {
 </script>
 
 <style scoped lang="less">
+.full {
+  display: block;
+}
+.mobile {
+  display: none;
+}
+@media (max-width: 1380px) {
+  .full {
+    display: none;
+  }
+  .mobile {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    flex-direction: row;
 
+    .selected {
+      width: 70%;
+      line-height: 26px;
+    }
+    .action {
+      width: 30%;
+      text-align: right;
+    }
+  }
+}
+@media (max-width: 420px) {
+  .mobile {
+    flex-wrap: wrap;
+
+    .selected {
+      width: 100%;
+    }
+    .action {
+      margin-top: 15px;
+      width: 100%;
+    }
+  }
+}
 </style>

@@ -72,9 +72,7 @@ export default {
 }
 @media (max-width: 1380px) {
   .main-content {
-    //display: flex;
     flex-wrap: wrap;
-    //justify-content: space-between;
     flex-direction: column-reverse;
 
     .notes {
@@ -82,11 +80,8 @@ export default {
       width: 100%;
     }
     .categories {
-      //max-height: 100%;
+      margin-top: 10px;
       width: 100%;
-      //.shadow-card {
-      //  height: 100%;
-      //}
     }
   }
 }

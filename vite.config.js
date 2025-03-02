@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa';
-import store from "./src/store";
+//import store from "./src/store";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -48,7 +48,8 @@ export default defineConfig({
           for (let name of names) caches.delete(name);
         });
         // Вызов действия в store (если store доступен)
-        store.dispatch('setManualUpdate');
+        alert('Приложение было обновлено. Перезагрузите страницу');
+        //store.dispatch('setManualUpdate');
       },
       onOfflineReady: () => {
         console.log('Приложение готово к работе в оффлайн-режиме.');

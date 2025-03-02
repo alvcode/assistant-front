@@ -85,7 +85,7 @@
         <div class="notes--editor">
           <editor-component :data="editorData" @change="handleEditorChange"></editor-component>
         </div>
-        <div v-show="updatedDatetime !== ''" class="notes--updated">
+        <div v-show="updatedDatetime !== ''" class="notes--updated mrg-t-20">
           {{$t('app_updated')}}: {{updatedDatetime}}
         </div>
       </template>

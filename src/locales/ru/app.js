@@ -40,4 +40,6 @@ export default {
     "app_sort_created_ascending": "Дата создания по возрастанию",
     "app_selected_category": "Выбранная категория",
     "app_manage": "Управлять",
+    "app_for_copy": "Для копирования",
+    "app_text_for_copy": "Текст для копирования",
 };

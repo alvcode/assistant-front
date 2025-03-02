@@ -40,4 +40,6 @@ export default {
     "app_sort_created_ascending": "Creation date ascending",
     "app_selected_category": "Selected category",
     "app_manage": "Manage",
+    "app_for_copy": "For copy",
+    "app_text_for_copy": "Text for copy",
 };

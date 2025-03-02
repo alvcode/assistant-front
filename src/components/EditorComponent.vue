@@ -1,5 +1,32 @@
 <template>
-  <div ref="editor"></div>
+  <div class="editor-component--container">
+    <div ref="editor"></div>
+
+    <div class="additional">
+      <div class="actions text-right">
+        <div class="btn btn-sm btn-outline-info" @click="showForCopyPopup">{{ $t('app_for_copy') }}</div>
+      </div>
+    </div>
+
+    <popup
+        :closeButton="forCopyPopup.closeButton"
+        :show="forCopyPopup.show"
+        @closePopup="closeForCopyPopup"
+    >
+      <template v-slot:header>{{ $t('app_text_for_copy') }}</template>
+      <template v-slot:body>
+        <div class="for-copy--content">
+          <div class="copy-item" v-for="fc in data.blocks" :key="fc.id">
+            <div v-if="fc.type !== 'list'">{{ stripHtmlTags(fc.data.text) }}</div>
+            <div v-if="fc.type === 'list'">
+              <div class="copy-item-list" v-for="fci in fc.data.items" :key="fci.content">{{ stripHtmlTags(fci.content) }}</div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </popup>
+
+  </div>
 </template>
 
 <script>
@@ -14,9 +41,11 @@ import createGenericInlineTool, {
   ItalicInlineTool,
   UnderlineInlineTool,
 } from 'editorjs-inline-tool'
+import Popup from "@/components/Popup.vue";
 
 export default {
   name: "EditorComponent",
+  components: {Popup},
   props: {
     data: {
       type: Object,
@@ -30,6 +59,10 @@ export default {
   data() {
     return {
       editor: null,
+      forCopyPopup: {
+        show: false,
+        closeButton: this.$t('app_close'),
+      },
     };
   },
   watch: {
@@ -103,6 +136,15 @@ export default {
           }
         },
       });
+    },
+    stripHtmlTags(html) {
+      return html.replace(/<[^>]*>/g, '');
+    },
+    closeForCopyPopup() {
+      this.forCopyPopup.show = false;
+    },
+    showForCopyPopup() {
+      this.forCopyPopup.show = true;
     },
     destroyEditor() {
       if (this.editor) {

@@ -169,7 +169,7 @@ export default {
   padding: 15px 5px;
   box-sizing: border-box;
   color: #4f4f4f;
-  font-size: 14px !important;
+  //font-size: 14px !important;
   font-weight: 400;
 }
 .pop-up--modal-footer {

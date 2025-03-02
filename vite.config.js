@@ -3,6 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa';
+import store from "@/store/index.js";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -37,6 +38,23 @@ export default defineConfig({
       },
       workbox: {
         // Настройки Workbox (опционально)
+      },
+      onUpdateFound: () => {
+        console.log('Новый контент загружен.');
+      },
+      onUpdated: () => {
+        console.log('Доступен новый контент. Пожалуйста, обновитесь.');
+        caches.keys().then(function (names) {
+          for (let name of names) caches.delete(name);
+        });
+        // Вызов действия в store (если store доступен)
+        store.dispatch('setManualUpdate');
+      },
+      onOfflineReady: () => {
+        console.log('Приложение готово к работе в оффлайн-режиме.');
+      },
+      onError: (error) => {
+        console.error('Ошибка при регистрации сервис-воркера:', error);
       },
     }),
   ],

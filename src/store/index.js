@@ -5,10 +5,11 @@ import { createStore } from "vuex";
 import preloader from "./modules/preloader";
 import notificator from "./modules/notificator";
 import authorization from "@/store/modules/authorization.js";
+import manual_updater from "@/store/modules/manual_updater.js";
 
 export default createStore({
   modules: {
-    preloader, notificator, authorization,
+    preloader, notificator, authorization, manual_updater
   }
 });
 

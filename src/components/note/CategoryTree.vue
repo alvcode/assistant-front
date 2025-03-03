@@ -70,49 +70,6 @@ export default {
 
 <style scoped lang="less">
 .ul {
-  li {
-    & > .name {
-      //background-color: #7FA1CA;
-    }
-    .ul {
-      li {
-        & > .name {
-          //background-color: #8aacd5;
-        }
-        .ul {
-          li {
-            & > .name {
-              //background-color: #92b4dd;
-            }
-            .ul {
-              li {
-                & > .name {
-                  //background-color: #9cbee6;
-                }
-                .ul {
-                  li {
-                    & > .name {
-                      background-color: #a7c9f1;
-                    }
-                    .ul {
-                      li {
-                        & > .name {
-                          background-color: #b2d2f8;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-.ul {
   list-style: none;
   padding-left: 0;
   margin-left: 0;
@@ -122,13 +79,10 @@ export default {
     margin-left: 18px;
   }
   li.active > .name {
-    //background-color: #2b70c3 !important;
     background-color: #f1f1ff !important;
   }
   li {
     margin-top: 5px;
-    //border: 1px solid red;
-    //color: #fff;
 
     .name {
       border: .5px solid #ededed;
@@ -137,7 +91,6 @@ export default {
       padding: 0 8px;
       border-radius: 10px;
       font-size: 15px;
-      //font-weight: 700;
       display: flex;
       flex-wrap: nowrap;
       justify-content: space-between;

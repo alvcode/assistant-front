@@ -6,6 +6,7 @@
           <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
         </div>
       </div>
+      <div v-show="list.length === 0" class="empty text-bold text-danger text-center">{{ $t('app_empty_for_now') }}</div>
       <div class="list">
         <category-tree
             :categories="categoryTree"
@@ -16,7 +17,10 @@
     </div>
     <div class="mobile">
       <div class="selected">
-        {{ $t('app_selected_category') }}: <b>{{ selectedCategoryName }}</b>
+        <span v-show="selectedCategoryName !== ''">
+          {{ $t('app_selected_category') }}: <b>{{ selectedCategoryName }}</b>
+        </span>
+        <div v-show="list.length === 0" class="empty text-bold text-danger">{{ $t('app_empty_for_now') }}</div>
       </div>
       <div class="action">
         <div class="btn btn-sm btn-outline-info" @click="showManageCategoryPopup">{{ $t('app_manage') }}</div>
@@ -128,6 +132,7 @@ export default {
           return this.list[i].name;
         }
       }
+      return '';
     },
     categoryTree() {
       const categoryMap = new Map();

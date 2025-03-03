@@ -17,9 +17,9 @@
       <template v-slot:body>
         <div class="for-copy--content">
           <div class="copy-item" v-for="fc in data.blocks" :key="fc.id">
-            <div v-if="fc.type !== 'list'">{{ stripHtmlTags(fc.data.text) }}</div>
+            <div v-if="fc.type !== 'list'">{{ decodeStringForCopy(fc.data.text) }}</div>
             <div v-if="fc.type === 'list'">
-              <div class="copy-item-list" v-for="fci in fc.data.items" :key="fci.content">{{ stripHtmlTags(fci.content) }}</div>
+              <div class="copy-item-list" v-for="fci in fc.data.items" :key="fci.content">{{ decodeStringForCopy(fci.content) }}</div>
             </div>
           </div>
         </div>
@@ -34,6 +34,7 @@ import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import Paragraph from "@coolbytes/editorjs-paragraph";
+import he from 'he';
 //import InlineTool from 'editorjs-inline-tool';
 import ImageTool from "@editorjs/image";
 
@@ -137,6 +138,9 @@ export default {
         },
       });
     },
+    decodeStringForCopy(str) {
+      return this.stripHtmlTags(he.decode(str));
+    },
     stripHtmlTags(html) {
       return html.replace(/<[^>]*>/g, '');
     },
@@ -164,5 +168,9 @@ export default {
 .editor {
   border: 1px solid #ddd;
   padding: 10px;
+}
+.copy-item {
+  margin-top: 5px;
+  overflow-wrap: break-word;
 }
 </style>

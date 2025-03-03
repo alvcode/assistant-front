@@ -14,4 +14,5 @@ export default {
     "error_need_choice_service": "Please select a service",
     "error_need_choice_staff": "Please select an employee",
     "error_need_choice_slot": "Please select a time to book",
+    "error_must_create_one_category": "You must create at least 1 category",
 };

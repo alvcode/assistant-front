@@ -20,6 +20,7 @@
     "axios": "^1.6.2",
     "dayjs": "^1.11.13",
     "editorjs-inline-tool": "^0.4.0",
+    "he": "^1.2.0",
     "qrcode.vue": "^3.4.1",
     "vue": "^3.3.11",
     "vue-axios": "^3.5.2",

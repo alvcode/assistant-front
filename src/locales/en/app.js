@@ -42,4 +42,6 @@ export default {
     "app_manage": "Manage",
     "app_for_copy": "For copy",
     "app_text_for_copy": "Text for copy",
+    "app_deleting_note": "Deleting a note",
+    "app_deleting_note_text": "The note will be deleted permanently. Continue?",
 };

@@ -91,6 +91,20 @@
       </template>
     </popup>
 
+    <popup
+        :closeButton="deleteNotePopup.closeButton"
+        :actionButton="deleteNotePopup.actionButton"
+        :action-class="deleteNotePopup.actionClass"
+        :show="deleteNotePopup.show"
+        @closePopup="closeDeleteNotePopup"
+        @actionPopup="submitDeleteNotePopup"
+    >
+      <template v-slot:header>{{ $t('app_deleting_note') }}</template>
+      <template v-slot:body>
+        {{ $t('app_deleting_note_text') }}
+      </template>
+    </popup>
+
   </div>
 </template>
 
@@ -134,6 +148,14 @@ export default {
       ],
       selectedSortType: 0,
       noteIdSubmenu: 0,
+
+      deletedNoteId: 0,
+      deleteNotePopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_continue'),
+        actionClass: 'btn-success',
+      },
     }
   },
   props: {
@@ -190,9 +212,22 @@ export default {
   },
   methods: {
     deleteNote(noteId) {
-      noteRepository.delete(noteId).then(() => {
+      this.deletedNoteId = noteId;
+      this.showDeleteNotePopup();
+    },
+    closeDeleteNotePopup() {
+      this.deleteNotePopup.show = false;
+      this.noteIdSubmenu = 0;
+    },
+    showDeleteNotePopup() {
+      this.deleteNotePopup.show = true;
+    },
+    submitDeleteNotePopup() {
+      this.$store.dispatch("startPreloader");
+      noteRepository.delete(this.deletedNoteId).then(() => {
         this.noteIdSubmenu = 0;
         this.loadNotes(this.categoryId);
+        this.closeDeleteNotePopup();
         this.$store.dispatch("stopPreloader");
       }).catch(err =>  {
         this.$store.dispatch("addNotification", {
@@ -237,6 +272,14 @@ export default {
       }
     },
     showNewNotePopup() {
+      if (this.categories.length === 0) {
+        this.$store.dispatch("addNotification", {
+          text: this.$t('error_must_create_one_category'),
+          time: 4,
+          color: "danger"
+        });
+        return false;
+      }
       this.editorData.blocks = [{type: "header", data: {text: "Title", level: 2}}];
       this.editorOtherData.blocks = [{type: "header", data: {text: "Title", level: 2}}];
       this.editorOtherData.categoryId = this.categoryId;

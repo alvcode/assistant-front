@@ -379,7 +379,6 @@ export default {
     },
     handleEditorChange(data) {
       this.editorOtherData.blocks = data.blocks;
-      console.log("Editor Data Updated:", data);
     },
   },
   created() {

@@ -225,7 +225,6 @@ export default {
     },
     handleUpdateNewCategoryData(data) {
       this.newCategoryData = data;
-      console.log(this.newCategoryData);
     },
     closeNewCategoryPopup() {
       this.newCategoryPopup.show = false;

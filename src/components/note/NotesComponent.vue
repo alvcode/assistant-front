@@ -398,12 +398,12 @@ export default {
   .list {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: flex-start;
     flex-direction: row;
 
     .note {
       margin: 10px 10px;
-      width: 290px;
+      min-width: 290px;
       position: relative;
 
       .note-menu {
@@ -514,6 +514,9 @@ export default {
   .notes {
     .list {
       justify-content: center;
+    }
+    .note {
+      width: 90%;
     }
   }
 }

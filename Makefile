@@ -15,6 +15,9 @@ deploy:
 	git pull;
 	make build;
 
+prune:
+	docker system prune -a --volumes
+
 exec: # str=
 	docker exec -it assistant-lk $(str)
 

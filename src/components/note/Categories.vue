@@ -12,6 +12,7 @@
             :categories="categoryTree"
             @update:selectedCat="selectCategory"
             @action:delete="actionDeleteCategory"
+            @action:edit="actionEditCategory"
         ></category-tree>
       </div>
     </div>
@@ -71,6 +72,25 @@
     </popup>
 
     <popup
+        :closeButton="updateCategoryPopup.closeButton"
+        :actionButton="updateCategoryPopup.actionButton"
+        :action-class="updateCategoryPopup.actionClass"
+        :show="updateCategoryPopup.show"
+        @closePopup="closeUpdateCategoryPopup"
+        @actionPopup="submitUpdateCategoryPopup"
+    >
+      <template v-slot:header>{{ $t('app_edit_category') }}</template>
+      <template v-slot:body>
+        <category-fields
+            :show="newCategoryPopup.show"
+            :categories="list"
+            :default-values="updateCategoryData"
+            @update:data="handleUpdateEditCategoryData"
+        ></category-fields>
+      </template>
+    </popup>
+
+    <popup
         :closeButton="deleteCategoryPopup.closeButton"
         :actionButton="deleteCategoryPopup.actionButton"
         :action-class="deleteCategoryPopup.actionClass"
@@ -122,6 +142,16 @@ export default {
       manageCategoryPopup: {
         show: false,
         closeButton: this.$t('app_cancel'),
+      },
+
+      updateCategoryId: 0,
+      updateCategoryData: {},
+      updateCategoryDataForSubmit: {},
+      updateCategoryPopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_save'),
+        actionClass: 'btn-success',
       },
     }
   },
@@ -182,6 +212,46 @@ export default {
     }
   },
   methods: {
+    handleUpdateEditCategoryData(data) {
+      this.updateCategoryDataForSubmit = data;
+    },
+    submitUpdateCategoryPopup() {
+      let request = {name: this.updateCategoryDataForSubmit.name};
+      if (this.updateCategoryDataForSubmit.parent_id > 0) {
+        request.parent_id = this.updateCategoryDataForSubmit.parent_id;
+      }
+
+      this.$store.dispatch("startPreloader");
+      noteCategoryRepository.update(this.updateCategoryId, request).then(() => {
+        this.getAll();
+        this.closeUpdateCategoryPopup();
+
+        this.$store.dispatch("stopPreloader");
+      }).catch(err =>  {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
+    showUpdateCategoryPopup() {
+      this.updateCategoryPopup.show = true;
+    },
+    closeUpdateCategoryPopup() {
+      this.updateCategoryPopup.show = false;
+    },
+    actionEditCategory(catId) {
+      this.updateCategoryId = catId;
+      for (let key in this.list) {
+        if (+this.list[key].id === +catId) {
+          this.updateCategoryData = this.list[key];
+        }
+      }
+      this.showUpdateCategoryPopup();
+    },
+
     closeManageCategoryPopup() {
       this.manageCategoryPopup.show = false;
     },

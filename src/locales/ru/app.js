@@ -44,4 +44,5 @@ export default {
     "app_text_for_copy": "Текст для копирования",
     "app_deleting_note": "Удаление заметки",
     "app_deleting_note_text": "Заметка будет удалена без возможности восстановления. Продолжить?",
+    "app_edit_category": "Изменение категории",
 };

@@ -24,6 +24,7 @@
           :categories="category.children"
           @update:selectedCat="selectItem"
           @action:delete="remove"
+          @action:edit="edit"
       />
     </li>
   </ul>
@@ -33,7 +34,7 @@
 
 export default {
   name: "CategoryTree",
-  emits: ['update:selectedCat', 'action:delete'],
+  emits: ['update:selectedCat', 'action:delete', 'action:edit'],
   data() {
     return {
 
@@ -56,7 +57,7 @@ export default {
       console.log("вверх " +catId);
     },
     edit(catId) {
-      console.log("edit " +catId);
+      this.$emit('action:edit', catId);
     },
     remove(catId) {
       this.$emit('action:delete', catId);
@@ -111,7 +112,7 @@ export default {
           margin-right: 10px;
         }
         &>div:hover {
-          color: #c8faff;
+          color: #838383;
         }
       }
     }

@@ -47,6 +47,7 @@
                 :categories="categoryTree"
                 @update:selectedCat="selectCategoryMobile"
                 @action:delete="actionDeleteCategory"
+                @action:edit="actionEditCategory"
             ></category-tree>
           </div>
         </div>

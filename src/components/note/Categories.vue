@@ -298,7 +298,7 @@ export default {
       if (newCatId > 0) {
         let existsSelectedCategory = false;
 
-        this.list.forEach((category, index) => {
+        this.list.forEach((category) => {
           if (+newCatId === +category.id) {
             existsSelectedCategory = true;
           }

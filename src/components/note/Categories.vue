@@ -115,6 +115,8 @@ import CategoryTree from "@/components/note/CategoryTree.vue";
 import Popup from "@/components/Popup.vue";
 import CategoryFields from "@/components/note/CategoryFields.vue";
 
+const SELECTED_CATEGORY_LS_KEY = 'selectedCategoryId';
+
 export default {
   name: "Categories",
   components: {CategoryFields, Popup, CategoryTree},
@@ -169,12 +171,16 @@ export default {
       const categoryMap = new Map();
       const tree = [];
 
+      if (this.list.length === 0) {
+        return tree;
+      }
+
       const copiedList = JSON.parse(JSON.stringify(this.list));
 
       copiedList.forEach((category, index) => {
         if (this.selectedCategoryId === 0 && index === 0) {
           category.active = true;
-          this.selectCategory(category.id);
+          //this.selectCategory(category.id);
         } else if (this.selectedCategoryId > 0 && this.selectedCategoryId === category.id) {
           category.active = true;
         } else {
@@ -266,7 +272,7 @@ export default {
         this.closeDeleteCategoryPopup();
 
         if (this.deletedCategoryId === this.selectedCategoryId) {
-          this.selectedCategoryId = 0;
+          this.selectCategory(0);
         }
 
         this.$store.dispatch("stopPreloader");
@@ -287,8 +293,36 @@ export default {
       this.deleteCategoryPopup.show = true;
     },
     selectCategory(catId) {
-      this.selectedCategoryId = catId;
-      this.$emit('update:categoryId', catId);
+      let newCatId = catId;
+
+      if (newCatId > 0) {
+        let existsSelectedCategory = false;
+
+        this.list.forEach((category, index) => {
+          if (+newCatId === +category.id) {
+            existsSelectedCategory = true;
+          }
+        });
+
+        if (!existsSelectedCategory) {
+          // установим первую категорию в списке
+          this.list.forEach((category, index) => {
+            if (index === 0) {
+              newCatId = category.id;
+            }
+          });
+        }
+      } else if (+newCatId === 0) {
+        this.list.forEach((category, index) => {
+          if (index === 0) {
+            newCatId = category.id;
+          }
+        });
+      }
+
+      this.selectedCategoryId = newCatId;
+      localStorage.setItem(SELECTED_CATEGORY_LS_KEY, newCatId);
+      this.$emit('update:categoryId', newCatId);
     },
     selectCategoryMobile(catId) {
       this.selectCategory(catId);
@@ -311,7 +345,11 @@ export default {
       }
 
       noteCategoryRepository.create(request).then(() => {
-        this.getAll();
+        this.getAll().then(() => {
+          if (this.list.length === 1) {
+            this.selectCategory(0);
+          }
+        });
         this.closeNewCategoryPopup();
 
         this.$store.dispatch("stopPreloader");
@@ -324,8 +362,8 @@ export default {
         this.$store.dispatch("stopPreloader");
       });
     },
-    getAll() {
-      noteCategoryRepository.all().then(resp => {
+    async getAll() {
+      await noteCategoryRepository.all().then(resp => {
         this.list = resp.data;
         this.$emit('update:list', this.list);
       }).catch(err =>  {
@@ -337,8 +375,15 @@ export default {
       });
     },
   },
-  created() {
-    this.getAll();
+  async created() {
+   await this.getAll();
+
+    let selectedCategoryId = localStorage.getItem(SELECTED_CATEGORY_LS_KEY);
+    if (selectedCategoryId) {
+      this.selectCategory(+selectedCategoryId);
+    } else {
+      this.selectCategory(0);
+    }
   }
 };
 </script>

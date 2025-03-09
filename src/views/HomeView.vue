@@ -1,5 +1,5 @@
 <template>
-  <div class="home--container">
+  <div class="home--container" v-show="showContent">
     <div class="container">
       <div class="header">
         <div class="header-lang">
@@ -43,6 +43,11 @@ import LangIndexComponent from "@/components/LangIndexComponent.vue";
 export default {
   name: "HomeView",
   components: {LangIndexComponent},
+  data() {
+    return {
+      showContent: false,
+    }
+  },
   computed: {
     ...mapState({
       userData: state => state.authorization.userData
@@ -57,6 +62,13 @@ export default {
     getProjectName() {
       return config.projectName;
     },
+  },
+  beforeMount() {
+    if (this.userData && this.userData[0] && this.userData[0].token) {
+      this.$router.push("notes");
+    } else {
+      this.showContent = true;
+    }
   },
 }
 </script>

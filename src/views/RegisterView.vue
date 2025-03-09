@@ -20,15 +20,41 @@
                 id="login-login"
             />
           </div>
-          <div class="input-block">
-            <label for="login-password">{{ $t('app_password') }}</label>
-            <input
-                @focus="clearError"
-                type="password"
-                v-model="password"
-                id="login-password"
-            />
-            <div class="form-error"></div>
+          <div class="password-block">
+            <div v-show="showPassword" @click="toggleShowPassword" class="show-password">
+              <f-awesome :icon="['fas', 'eye']" />
+            </div>
+            <div v-show="!showPassword" @click="toggleShowPassword" class="show-password">
+              <f-awesome :icon="['fas', 'eye-slash']" />
+            </div>
+            <div class="input-block">
+              <label for="login-password">{{ $t('app_password') }}</label>
+              <input
+                  @focus="clearError"
+                  :type="showPassword ? 'text' : 'password'"
+                  v-model="password"
+                  id="login-password"
+              />
+              <div class="form-error"></div>
+            </div>
+          </div>
+          <div class="password-block">
+            <div v-show="showRepeatPassword" @click="toggleShowRepeatPassword" class="show-password">
+              <f-awesome :icon="['fas', 'eye']" />
+            </div>
+            <div v-show="!showRepeatPassword" @click="toggleShowRepeatPassword" class="show-password">
+              <f-awesome :icon="['fas', 'eye-slash']" />
+            </div>
+            <div class="input-block">
+              <label for="login-repeat-password">{{ $t('app_repeat_password') }}</label>
+              <input
+                  @focus="clearError"
+                  :type="showRepeatPassword ? 'text' : 'password'"
+                  v-model="repeatPassword"
+                  id="login-repeat-password"
+              />
+              <div class="form-error"></div>
+            </div>
           </div>
           <div v-show="errorText" class="mrg-t-10 mrg-b-10">
             <div class="alert alert-sm alert-danger">{{errorText}}</div>
@@ -60,7 +86,11 @@ export default {
     return {
       login: "",
       password: "",
+      repeatPassword: "",
       errorText: "",
+
+      showPassword: false,
+      showRepeatPassword: false,
     };
   },
   computed: {
@@ -69,10 +99,20 @@ export default {
     })
   },
   methods: {
+    toggleShowRepeatPassword() {
+      this.showRepeatPassword = !this.showRepeatPassword;
+    },
+    toggleShowPassword() {
+      this.showPassword = !this.showPassword;
+    },
     register() {
+      if (this.password !== this.repeatPassword) {
+        this.errorText = this.$t('app_passwords_not_match');
+        return false;
+      }
+
       let login = this.login;
       let password = this.password;
-      // this.$store.dispatch("startPreloader");
       localStorage.setItem("userLogin", login);
 
       this.$store.dispatch("startPreloader");
@@ -114,6 +154,17 @@ export default {
 .register--container{
   min-height: 65vh;
   margin-bottom: 100px;
+}
+.password-block {
+  position: relative;
+
+  .show-password {
+    display: inline-block;
+    position: absolute;
+    top: 25px;
+    right: 7px;
+    cursor: pointer;
+  }
 }
 @media (max-width: 700px) {
   .register--form-container {

@@ -20,15 +20,23 @@
                 id="login-login"
             />
           </div>
-          <div class="input-block">
-            <label for="login-password">{{ $t('app_password') }}</label>
-            <input
-                @focus="clearError"
-                type="password"
-                v-model="password"
-                id="login-password"
-            />
-            <div class="form-error"></div>
+          <div class="password-block">
+            <div v-show="showPassword" @click="toggleShowPassword" class="show-password">
+              <f-awesome :icon="['fas', 'eye']" />
+            </div>
+            <div v-show="!showPassword" @click="toggleShowPassword" class="show-password">
+              <f-awesome :icon="['fas', 'eye-slash']" />
+            </div>
+            <div class="input-block">
+              <label for="login-password">{{ $t('app_password') }}</label>
+              <input
+                  @focus="clearError"
+                  :type="showPassword ? 'text' : 'password'"
+                  v-model="password"
+                  id="login-password"
+              />
+              <div class="form-error"></div>
+            </div>
           </div>
           <div v-show="errorText" class="mrg-t-10 mrg-b-10">
             <div class="alert alert-sm alert-danger">{{errorText}}</div>
@@ -61,6 +69,8 @@ export default {
       login: "",
       password: "",
       errorText: "",
+
+      showPassword: false,
     };
   },
   computed: {
@@ -69,6 +79,9 @@ export default {
     })
   },
   methods: {
+    toggleShowPassword() {
+      this.showPassword = !this.showPassword;
+    },
     loginSubmit() {
       let login = this.login;
       let password = this.password;
@@ -115,6 +128,17 @@ export default {
 .login--container{
   min-height: 65vh;
   margin-bottom: 100px;
+}
+.password-block {
+  position: relative;
+
+  .show-password {
+    display: inline-block;
+    position: absolute;
+    top: 25px;
+    right: 7px;
+    cursor: pointer;
+  }
 }
 @media (max-width: 700px) {
   .login--form-container {

@@ -23,6 +23,8 @@ export default {
     "app_to_panel": "Go to panel",
     "app_login": "Login",
     "app_password": "Password",
+    "app_repeat_password": "Repeat password",
+    "app_passwords_not_match": "The passwords entered do not match",
     "app_thank_for_choosing": "Thank you for choosing",
     "app_you_can_login": "You can now log into your personal account",
     "app_categories": "Categories",

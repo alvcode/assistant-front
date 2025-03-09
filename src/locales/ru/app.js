@@ -23,6 +23,8 @@ export default {
     "app_to_panel": "В личный кабинет",
     "app_login": "Логин",
     "app_password": "Пароль",
+    "app_repeat_password": "Повторите пароль",
+    "app_passwords_not_match": "Введенные пароли не совпадают",
     "app_thank_for_choosing": "Спасибо, что выбрали",
     "app_you_can_login": "Теперь вы можете войти в личный кабинет",
     "app_categories": "Категории",

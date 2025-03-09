@@ -17,9 +17,16 @@
       <template v-slot:body>
         <div class="for-copy--content">
           <div class="copy-item" v-for="fc in data.blocks" :key="fc.id">
-            <div v-if="fc.type !== 'list'">{{ decodeStringForCopy(fc.data.text) }}</div>
-            <div v-if="fc.type === 'list'">
+            <div v-if="fc.type !== 'list' && fc.type !== 'table'">{{ decodeStringForCopy(fc.data.text) }}</div>
+            <div v-if="fc.type === 'list'" class="mrg-t-10 mrg-b-10">
               <div class="copy-item-list" v-for="fci in fc.data.items" :key="fci.content">{{ decodeStringForCopy(fci.content) }}</div>
+            </div>
+            <div v-if="fc.type === 'table'" class="mrg-t-10 mrg-b-10">
+              <div class="copy-item-list" v-for="(fcr, index) in fc.data.content" :key="index">
+                <span v-for="(columnVal, index) in fcr" :key="index">
+                  {{columnVal}} |
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -34,6 +41,7 @@ import EditorJS from "@editorjs/editorjs";
 import Header from "@editorjs/header";
 import List from "@editorjs/list";
 import Paragraph from "@coolbytes/editorjs-paragraph";
+import Table from '@editorjs/table';
 import he from 'he';
 //import InlineTool from 'editorjs-inline-tool';
 import ImageTool from "@editorjs/image";
@@ -89,6 +97,7 @@ export default {
         //inlineToolbar: ['link', 'marker', 'bold', 'italic'],
         data: this.data,
         tools: {
+          table: Table,
           header: Header,
           list: List,
           paragraph: {

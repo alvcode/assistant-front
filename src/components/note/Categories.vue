@@ -369,7 +369,6 @@ export default {
         this.getAll();
         this.$store.dispatch("stopPreloader");
       }).catch(err =>  {
-        console.log(err);
         this.$store.dispatch("addNotification", {
           text: err.response.data.message,
           time: 5,

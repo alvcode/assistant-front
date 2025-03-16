@@ -55,7 +55,6 @@ export default {
       this.$emit('update:selectedCat', catId);
     },
     up(catId) {
-      //console.log("вверх " +catId);
       this.$emit('action:up', catId);
     },
     edit(catId) {

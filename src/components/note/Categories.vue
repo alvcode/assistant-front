@@ -13,6 +13,7 @@
             @update:selectedCat="selectCategory"
             @action:delete="actionDeleteCategory"
             @action:edit="actionEditCategory"
+            @action:up="actionUpCategory"
         ></category-tree>
       </div>
     </div>
@@ -362,9 +363,25 @@ export default {
         this.$store.dispatch("stopPreloader");
       });
     },
+    actionUpCategory(catId) {
+      this.$store.dispatch("startPreloader");
+      noteCategoryRepository.positionUp(catId).then(resp => {
+        this.getAll();
+        this.$store.dispatch("stopPreloader");
+      }).catch(err =>  {
+        console.log(err);
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
     async getAll() {
       await noteCategoryRepository.all().then(resp => {
-        this.list = resp.data;
+        this.list = resp.data.sort((a, b) => a.position - b.position)
+        //this.list = resp.data;
         this.$emit('update:list', this.list);
       }).catch(err =>  {
         this.$store.dispatch("addNotification", {

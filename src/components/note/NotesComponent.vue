@@ -195,9 +195,9 @@ export default {
       } else if (+this.selectedSortType === 2) {
         return result.sort((a, b) => new Date(a.updated_at) - new Date(b.updated_at))
       } else if (+this.selectedSortType === 3) {
-        return result.sort((a, b) => new Date(b.id) - new Date(a.id))
+        return result.sort((a, b) => b.id - a.id)
       } else if (+this.selectedSortType === 4) {
-        return result.sort((a, b) => new Date(a.id) - new Date(b.id))
+        return result.sort((a, b) => a.id - b.id)
       }
 
       return result;

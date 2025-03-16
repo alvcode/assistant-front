@@ -68,10 +68,20 @@ app.config.globalProperties.$http = axios;
 app.config.globalProperties.$http.defaults.headers.common["locale"] = chooseLocale;
 // Устанавливаем базовый URL для всех запросов axios в приложении
 app.config.globalProperties.$http.defaults.baseURL = config.api_point;
+app.config.globalProperties.$http.defaults.timeout = 6000;
 
 app.config.globalProperties.$http.interceptors.response.use(undefined, error => {
     let res = error.response;
 
+    if (error.code === "ECONNABORTED") {
+        error.response = { data: {} };
+        error.response.data.message = "The timeout for a response from the server has been exceeded";
+        return Promise.reject(error);
+    } else if (!error.response) {
+        error.response = { data: {} };
+        error.response.data.message = "No internet connection";
+        return Promise.reject(error);
+    }
     if (res.status === 401 && res.config && !res.config.__isRetryRequest) {
         return new Promise((resolve, reject) => {
             let userData = JSON.parse(localStorage.getItem("userData"));

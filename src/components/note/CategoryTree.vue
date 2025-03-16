@@ -25,6 +25,7 @@
           @update:selectedCat="selectItem"
           @action:delete="remove"
           @action:edit="edit"
+          @action:up="up"
       />
     </li>
   </ul>
@@ -34,7 +35,7 @@
 
 export default {
   name: "CategoryTree",
-  emits: ['update:selectedCat', 'action:delete', 'action:edit'],
+  emits: ['update:selectedCat', 'action:delete', 'action:edit', 'action:up'],
   data() {
     return {
 
@@ -54,7 +55,8 @@ export default {
       this.$emit('update:selectedCat', catId);
     },
     up(catId) {
-      console.log("вверх " +catId);
+      //console.log("вверх " +catId);
+      this.$emit('action:up', catId);
     },
     edit(catId) {
       this.$emit('action:edit', catId);

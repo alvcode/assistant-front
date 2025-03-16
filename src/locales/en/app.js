@@ -47,4 +47,6 @@ export default {
     "app_deleting_note": "Deleting a note",
     "app_deleting_note_text": "The note will be deleted permanently. Continue?",
     "app_edit_category": "Change category",
+    "app_pin": "Pin",
+    "app_unpin": "Unpin",
 };

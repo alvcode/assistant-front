@@ -36,36 +36,28 @@
     <div class="notes mrg-t-10">
       <div v-show="notes.length === 0" class="empty text-bold text-danger text-center">{{ $t('app_empty_for_now') }}</div>
       <div v-show="notes.length > 0" class="list">
-        <div @click="openNote(item.id)" class="note cursor-pointer shadow-card" v-for="item in computedNotes" :key="item.id">
-          <div class="title"><b># {{item.title}}</b></div>
-          <div class="updated">{{datetimeToUserTimezone(item.updated_at)}}</div>
-          <div class="category">
-            <f-awesome :icon="['fas', 'list']" />
-            {{getCategoryNameById(item.category_id)}}
-          </div>
-          <div class="note-menu">
-            <div
-                @click.stop="showNoteSubmenu(item.id)"
-                class="menu-btn"
-            >
-              <f-awesome :icon="['fas', 'ellipsis-vertical']" />
-            </div>
-          </div>
-          <div
-              v-show="item.id === noteIdSubmenu"
-              class="menu-block shadow-card"
-              @click.stop="false"
-          >
-            <div
-                @click.stop="deleteNote(item.id)"
-                class="delete-note menu-block-item no-select"
-            >
-              {{ $t('app_delete') }}
+        <div class="pinned" v-show="computedPinnedNotes.length > 0">
+          <div class="text-bold">Pinned</div>
+          <div class="pinned-cards">
+            <div @click="openNote(item.id)" class="note cursor-pointer shadow-card" v-for="item in computedPinnedNotes" :key="item.id">
+              <note-card
+                  :note="item"
+                  @action:delete="deleteNote"
+                  @action:unpin="unpinNote"
+              ></note-card>
             </div>
           </div>
         </div>
+        <div class="unpinned">
+          <div @click="openNote(item.id)" class="note cursor-pointer shadow-card" v-for="item in computedUnpinnedNotes" :key="item.id">
+            <note-card
+                :note="item"
+                @action:delete="deleteNote"
+                @action:pin="pinNote"
+            ></note-card>
+          </div>
+        </div>
       </div>
-      <div v-show="noteIdSubmenu > 0" class="note-background" @click="clearNoteSubmenu"></div>
     </div>
 
     <popup
@@ -114,10 +106,11 @@ import Popup from "@/components/Popup.vue";
 import CategoryFields from "@/components/note/CategoryFields.vue";
 import EditorComponent from "@/components/EditorComponent.vue";
 import noteRepository from "@/repositories/note/index.js";
+import NoteCard from "@/components/note/NoteCard.vue";
 
 export default {
   name: "NotesComponent",
-  components: {EditorComponent, CategoryFields, Popup},
+  components: {NoteCard, EditorComponent, CategoryFields, Popup},
   data() {
     return {
       editorData: {
@@ -147,7 +140,7 @@ export default {
         {id: 4, name: this.$t('app_sort_created_ascending')},
       ],
       selectedSortType: 0,
-      noteIdSubmenu: 0,
+      //noteIdSubmenu: 0,
 
       deletedNoteId: 0,
       deleteNotePopup: {
@@ -179,6 +172,24 @@ export default {
     }
   },
   computed: {
+    computedUnpinnedNotes() {
+      let result = [];
+      for (let key in this.computedNotes) {
+        if (!this.computedNotes[key].pinned) {
+          result[result.length] = this.computedNotes[key];
+        }
+      }
+      return result;
+    },
+    computedPinnedNotes() {
+      let result = [];
+      for (let key in this.computedNotes) {
+        if (this.computedNotes[key].pinned) {
+          result[result.length] = this.computedNotes[key];
+        }
+      }
+      return result;
+    },
     computedNotes() {
       let result = [];
       for (let i = 0; i < this.notes.length; i++) {
@@ -187,7 +198,9 @@ export default {
             continue;
           }
         }
-        result[result.length] = this.notes[i];
+        let obj = this.notes[i];
+        obj.categoryName = this.getCategoryNameById(this.notes[i].category_id);
+        result[result.length] = obj;
       }
 
       if (+this.selectedSortType === 1) {
@@ -211,6 +224,42 @@ export default {
     }
   },
   methods: {
+    unpinNote(noteId) {
+      this.$store.dispatch("startPreloader");
+      noteRepository.unpin(noteId).then(() => {
+        for (let key in this.notes) {
+          if (this.notes[key].id === +noteId) {
+            this.notes[key].pinned = false;
+          }
+        }
+        this.$store.dispatch("stopPreloader");
+      }).catch(err =>  {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
+    pinNote(noteId) {
+      this.$store.dispatch("startPreloader");
+      noteRepository.pin(noteId).then(() => {
+        for (let key in this.notes) {
+          if (this.notes[key].id === +noteId) {
+            this.notes[key].pinned = true;
+          }
+        }
+        this.$store.dispatch("stopPreloader");
+      }).catch(err =>  {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
     deleteNote(noteId) {
       this.deletedNoteId = noteId;
       this.showDeleteNotePopup();
@@ -396,65 +445,67 @@ export default {
 <style scoped lang="less">
 .notes {
   .list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    flex-direction: row;
+    .unpinned, .pinned-cards {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      flex-direction: row;
+    }
 
     .note {
       margin: 10px 10px;
       min-width: 290px;
       position: relative;
 
-      .note-menu {
-        position: absolute;
-        top: 3px;
-        right: 0;
-
-        .menu-btn {
-          width: 30px;
-          height: 30px;
-          text-align: center;
-          line-height: 30px;
-        }
-      }
-      .menu-block {
-        position: absolute;
-        width: 140px;
-        top: -21px;
-        right: 0;
-        z-index: 2;
-
-        .menu-block-item {
-          padding: 5px 0;
-        }
-      }
+      //.note-menu {
+      //  position: absolute;
+      //  top: 3px;
+      //  right: 0;
+      //
+      //  .menu-btn {
+      //    width: 30px;
+      //    height: 30px;
+      //    text-align: center;
+      //    line-height: 30px;
+      //  }
+      //}
+      //.menu-block {
+      //  position: absolute;
+      //  width: 140px;
+      //  top: -21px;
+      //  right: 0;
+      //  z-index: 2;
+      //
+      //  .menu-block-item {
+      //    padding: 5px 0;
+      //  }
+      //}
 
       .title {
 
       }
-      .updated {
-        margin-top: 5px;
-        font-size: 12px;
-        color: gray;
-      }
-      .category {
-        margin-top: 5px;
-        font-size: 13px;
-        color: gray;
-      }
+      //.updated {
+      //  margin-top: 5px;
+      //  font-size: 12px;
+      //  color: gray;
+      //}
+      //.category {
+      //  margin-top: 5px;
+      //  font-size: 13px;
+      //  color: gray;
+      //}
     }
   }
-  .note-background {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
-    margin: auto;
-    //background-color: rgba(123, 123, 98, 0.4);
-    z-index: 1;
-  }
+  //.note-background {
+  //  position: fixed;
+  //  top: 0;
+  //  right: 0;
+  //  left: 0;
+  //  bottom: 0;
+  //  margin: auto;
+  //  //background-color: rgba(123, 123, 98, 0.4);
+  //  z-index: 1;
+  //}
 }
 .notes--updated {
   text-align: right;
@@ -513,10 +564,12 @@ export default {
 @media (max-width: 683px) {
   .notes {
     .list {
-      justify-content: center;
-    }
-    .note {
-      width: 90%;
+      .unpinned, .pinned-cards {
+        justify-content: center;
+      }
+      .note {
+        width: 90%;
+      }
     }
   }
 }

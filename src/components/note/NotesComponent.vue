@@ -37,8 +37,8 @@
       <div v-show="notes.length === 0" class="empty text-bold text-danger text-center">{{ $t('app_empty_for_now') }}</div>
       <div v-show="notes.length > 0" class="list">
         <div class="pinned" v-show="computedPinnedNotes.length > 0">
-          <div class="text-bold">Pinned</div>
-          <div class="pinned-cards">
+          <div class="text-hint">{{ $t('app_pinned') }}</div>
+          <div class="pinned-cards mrg-b-15">
             <div @click="openNote(item.id)" class="note cursor-pointer shadow-card" v-for="item in computedPinnedNotes" :key="item.id">
               <note-card
                   :note="item"
@@ -49,12 +49,15 @@
           </div>
         </div>
         <div class="unpinned">
-          <div @click="openNote(item.id)" class="note cursor-pointer shadow-card" v-for="item in computedUnpinnedNotes" :key="item.id">
-            <note-card
-                :note="item"
-                @action:delete="deleteNote"
-                @action:pin="pinNote"
-            ></note-card>
+          <div v-if="computedPinnedNotes.length > 0" class="text-hint">{{ $t('app_other_notes') }}</div>
+          <div class="unpinned-cards">
+            <div @click="openNote(item.id)" class="note cursor-pointer shadow-card" v-for="item in computedUnpinnedNotes" :key="item.id">
+              <note-card
+                  :note="item"
+                  @action:delete="deleteNote"
+                  @action:pin="pinNote"
+              ></note-card>
+            </div>
           </div>
         </div>
       </div>
@@ -287,12 +290,6 @@ export default {
         this.$store.dispatch("stopPreloader");
       });
     },
-    showNoteSubmenu(noteId) {
-      this.noteIdSubmenu = noteId;
-    },
-    clearNoteSubmenu() {
-      this.noteIdSubmenu = 0;
-    },
     clearSearch() {
       this.searchQuery = '';
     },
@@ -309,9 +306,6 @@ export default {
         });
         this.$store.dispatch("stopPreloader");
       });
-    },
-    datetimeToUserTimezone(datetimeUTC) {
-      return this.$dayjs(datetimeUTC).format(this.$t('app_datetime_format'));
     },
     getCategoryNameById(catId) {
       for (let i = 0; i < this.categories.length; i++) {
@@ -445,7 +439,7 @@ export default {
 <style scoped lang="less">
 .notes {
   .list {
-    .unpinned, .pinned-cards {
+    .unpinned-cards, .pinned-cards {
       display: flex;
       flex-wrap: wrap;
       justify-content: flex-start;
@@ -456,56 +450,8 @@ export default {
       margin: 10px 10px;
       min-width: 290px;
       position: relative;
-
-      //.note-menu {
-      //  position: absolute;
-      //  top: 3px;
-      //  right: 0;
-      //
-      //  .menu-btn {
-      //    width: 30px;
-      //    height: 30px;
-      //    text-align: center;
-      //    line-height: 30px;
-      //  }
-      //}
-      //.menu-block {
-      //  position: absolute;
-      //  width: 140px;
-      //  top: -21px;
-      //  right: 0;
-      //  z-index: 2;
-      //
-      //  .menu-block-item {
-      //    padding: 5px 0;
-      //  }
-      //}
-
-      .title {
-
-      }
-      //.updated {
-      //  margin-top: 5px;
-      //  font-size: 12px;
-      //  color: gray;
-      //}
-      //.category {
-      //  margin-top: 5px;
-      //  font-size: 13px;
-      //  color: gray;
-      //}
     }
   }
-  //.note-background {
-  //  position: fixed;
-  //  top: 0;
-  //  right: 0;
-  //  left: 0;
-  //  bottom: 0;
-  //  margin: auto;
-  //  //background-color: rgba(123, 123, 98, 0.4);
-  //  z-index: 1;
-  //}
 }
 .notes--updated {
   text-align: right;
@@ -564,7 +510,7 @@ export default {
 @media (max-width: 683px) {
   .notes {
     .list {
-      .unpinned, .pinned-cards {
+      .unpinned-cards, .pinned-cards {
         justify-content: center;
       }
       .note {

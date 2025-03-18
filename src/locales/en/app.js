@@ -49,4 +49,6 @@ export default {
     "app_edit_category": "Change category",
     "app_pin": "Pin",
     "app_unpin": "Unpin",
+    "app_pinned": "Pinned",
+    "app_other_notes": "Other",
 };

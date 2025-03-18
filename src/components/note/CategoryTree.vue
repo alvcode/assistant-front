@@ -1,5 +1,5 @@
 <template>
-  <ul class="ul">
+  <ul class="ul no-select">
     <li
         :class="{'first-level': category.isFirstLevel, 'active': category.active}"
         v-for="category in categories"

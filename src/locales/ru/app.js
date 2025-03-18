@@ -49,4 +49,6 @@ export default {
     "app_edit_category": "Изменение категории",
     "app_pin": "Закрепить",
     "app_unpin": "Открепить",
+    "app_pinned": "Закрепленные",
+    "app_other_notes": "Остальные",
 };

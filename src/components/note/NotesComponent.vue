@@ -78,7 +78,11 @@
       </template>
       <template v-slot:body>
         <div class="notes--editor">
-          <editor-component :data="editorData" @change="handleEditorChange"></editor-component>
+          <editor-component
+              :data="editorData"
+              @change="handleEditorChange"
+              @update:insert="handleEditorChangeForInsert"
+          ></editor-component>
         </div>
         <div v-show="updatedDatetime !== ''" class="notes--updated mrg-t-20">
           {{$t('app_updated')}}: {{updatedDatetime}}
@@ -419,6 +423,10 @@ export default {
         });
         this.$store.dispatch("stopPreloader");
       });
+    },
+    handleEditorChangeForInsert(data) {
+      this.editorData.blocks = data;
+      this.editorOtherData.blocks = data;
     },
     handleEditorChange(data) {
       this.editorOtherData.blocks = data.blocks;

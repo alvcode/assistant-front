@@ -43,7 +43,9 @@ export default {
     "app_selected_category": "Selected category",
     "app_manage": "Manage",
     "app_for_copy": "For copy",
+    "app_insert_third_party_text": "Insert third-party text",
     "app_text_for_copy": "Text for copy",
+    "app_text_for_insert": "Text for insert",
     "app_deleting_note": "Deleting a note",
     "app_deleting_note_text": "The note will be deleted permanently. Continue?",
     "app_edit_category": "Change category",
@@ -51,4 +53,6 @@ export default {
     "app_unpin": "Unpin",
     "app_pinned": "Pinned",
     "app_other_notes": "Other",
+    "app_complete_text_replacement": "Complete text replacement",
+    "app_insert_at_the_end_document": "Insert at the end of the document"
 };

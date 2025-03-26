@@ -4,6 +4,7 @@
 
     <div class="additional">
       <div class="actions text-right">
+        <div class="btn btn-sm btn-outline-info" @click="showInsertTextPopup">{{ $t('app_insert_third_party_text') }}</div>
         <div class="btn btn-sm btn-outline-info" @click="showForCopyPopup">{{ $t('app_for_copy') }}</div>
       </div>
     </div>
@@ -11,6 +12,7 @@
     <popup
         :closeButton="forCopyPopup.closeButton"
         :show="forCopyPopup.show"
+        :size="'lg'"
         @closePopup="closeForCopyPopup"
     >
       <template v-slot:header>{{ $t('app_text_for_copy') }}</template>
@@ -42,6 +44,33 @@
       </template>
     </popup>
 
+    <popup
+        :closeButton="insertPopup.closeButton"
+        :show="insertPopup.show"
+        :action-button="insertPopup.actionButton"
+        :action-class="insertPopup.actionClass"
+        :size="'lg'"
+        @closePopup="closeInsertTextPopup"
+        @actionPopup="submitInsertTextPopup"
+    >
+      <template v-slot:header>{{ $t('app_text_for_insert') }}</template>
+      <template v-slot:body>
+        <div class="input-block">
+          <textarea v-model="insertTextModel" rows="16"></textarea>
+        </div>
+        <div class="input-block">
+          <div class="radio">
+            <input type="radio" id="full_replace" v-model="insertTextMode" value="full_replace" />
+            <label for="full_replace">{{ $t('app_complete_text_replacement') }}</label>
+          </div>
+          <div class="radio">
+            <input type="radio" id="insert_to_end" v-model="insertTextMode" value="insert_end" />
+            <label for="insert_to_end">{{ $t('app_insert_at_the_end_document') }}</label>
+          </div>
+        </div>
+      </template>
+    </popup>
+
   </div>
 </template>
 
@@ -66,6 +95,7 @@ import Popup from "@/components/Popup.vue";
 export default {
   name: "EditorComponent",
   components: {Popup},
+  emits: ['update:insert'],
   props: {
     data: {
       type: Object,
@@ -83,6 +113,14 @@ export default {
         show: false,
         closeButton: this.$t('app_close'),
       },
+      insertPopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_add'),
+        actionClass: 'btn-success',
+      },
+      insertTextModel: '',
+      insertTextMode: 'full_replace',
     };
   },
   watch: {
@@ -178,6 +216,61 @@ export default {
         this.editor = null;
       }
     },
+    showInsertTextPopup() {
+      this.insertPopup.show = true;
+    },
+    closeInsertTextPopup() {
+      this.insertPopup.show = false;
+      this.insertTextModel = '';
+      this.insertTextMode = 'full_replace';
+    },
+    submitInsertTextPopup() {
+      const lines = this.insertTextModel.split(/\r?\n/);
+
+      let result = [];
+      if (this.insertTextMode === 'insert_end') {
+        for (let key in this.data.blocks) {
+          result[result.length] = this.data.blocks[key];
+        }
+      } else if (this.insertTextMode === 'full_replace') {
+        if (
+            this.data.blocks.length > 0 &&
+            this.data.blocks[0].type === 'header'
+        ) {
+          result[result.length] = this.data.blocks[0];
+        }
+      }
+
+      let existsLine = false;
+      for (let key in lines) {
+        if (lines[key].trim() === '') {
+          continue;
+        }
+        result[result.length] = this.getParagraph(lines[key]);
+        existsLine = true;
+      }
+
+      if (!existsLine) {
+        return false;
+      }
+
+      this.$emit('update:insert', result);
+      this.closeInsertTextPopup();
+    },
+    getParagraph(text) {
+      return {
+        id: this.generateHash(),
+        type: 'paragraph',
+        data: {
+          text: text,
+          align: 'left'
+        }
+      };
+    },
+    generateHash(length = 10) {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-";
+      return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    }
   },
   beforeUnmount() {
     this.destroyEditor();

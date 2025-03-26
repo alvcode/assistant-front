@@ -43,7 +43,9 @@ export default {
     "app_selected_category": "Выбранная категория",
     "app_manage": "Управлять",
     "app_for_copy": "Для копирования",
+    "app_insert_third_party_text": "Вставка стороннего текста",
     "app_text_for_copy": "Текст для копирования",
+    "app_text_for_insert": "Текст для вставки",
     "app_deleting_note": "Удаление заметки",
     "app_deleting_note_text": "Заметка будет удалена без возможности восстановления. Продолжить?",
     "app_edit_category": "Изменение категории",
@@ -51,4 +53,6 @@ export default {
     "app_unpin": "Открепить",
     "app_pinned": "Закрепленные",
     "app_other_notes": "Остальные",
+    "app_complete_text_replacement": "Полная замена текста",
+    "app_insert_at_the_end_document": "Вставить в конец документа"
 };

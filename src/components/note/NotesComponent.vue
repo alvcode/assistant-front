@@ -7,11 +7,11 @@
     </div>
 
     <div class="search-and-note-actions mrg-t-25" v-show="notes.length > 0">
-      <div class="search">
-        <div class="search-icon">
+      <div class="input-with-icons">
+        <div class="left-icon">
           <f-awesome :icon="['fas', 'magnifying-glass']" />
         </div>
-        <div @click="clearSearch" v-show="searchQuery !== ''" class="clear-icon">
+        <div class="right-icon cursor-pointer" @click="clearSearch" v-show="searchQuery !== ''">
           <f-awesome :icon="['fas', 'xmark']" />
         </div>
         <div class="input-block">
@@ -472,30 +472,8 @@ export default {
   justify-content: space-between;
   flex-direction: row;
 
-  .search {
+  .input-with-icons {
     width: 45%;
-    position: relative;
-
-    .search-icon {
-      display: inline-block;
-      position: absolute;
-      top: 5px;
-      left: 7px;
-    }
-    .clear-icon {
-      display: inline-block;
-      position: absolute;
-      top: 5px;
-      right: 7px;
-      cursor: pointer;
-    }
-
-    .input-block {
-      input {
-        padding-left: 26px !important;
-        padding-right: 26px !important;
-      }
-    }
   }
   .note-actions {
     width: 45%;
@@ -507,7 +485,7 @@ export default {
   .search-and-note-actions {
     flex-wrap: wrap;
 
-    .search {
+    .input-with-icons {
       width: 100%;
     }
     .note-actions {

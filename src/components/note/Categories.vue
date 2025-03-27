@@ -6,6 +6,19 @@
           <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
         </div>
       </div>
+      <div v-show="list.length > 0" class="search-line mrg-t-15">
+        <div class="input-with-icons">
+          <div class="left-icon">
+            <f-awesome :icon="['fas', 'magnifying-glass']" />
+          </div>
+          <div class="right-icon cursor-pointer" @click="clearSearch" v-show="searchQuery !== ''">
+            <f-awesome :icon="['fas', 'xmark']" />
+          </div>
+          <div class="input-block">
+            <input type="text" v-model="searchQuery">
+          </div>
+        </div>
+      </div>
       <div v-show="list.length === 0" class="empty text-bold text-danger text-center">{{ $t('app_empty_for_now') }}</div>
       <div class="list">
         <category-tree
@@ -41,6 +54,19 @@
           <div class="actions text-right">
             <div @click="showNewCategoryPopup" class="btn btn-sm btn-outline-info">
               <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
+            </div>
+          </div>
+          <div v-show="list.length > 0" class="search-line mrg-t-15">
+            <div class="input-with-icons">
+              <div class="left-icon">
+                <f-awesome :icon="['fas', 'magnifying-glass']" />
+              </div>
+              <div class="right-icon cursor-pointer" @click="clearSearch" v-show="searchQuery !== ''">
+                <f-awesome :icon="['fas', 'xmark']" />
+              </div>
+              <div class="input-block">
+                <input type="text" v-model="searchQuery">
+              </div>
             </div>
           </div>
           <div class="list">
@@ -125,6 +151,7 @@ export default {
   emits: ['update:categoryId', 'update:list'],
   data() {
     return {
+      searchQuery: '',
       list: [],
       selectedCategoryId: 0,
       //categoryTree: [],
@@ -177,7 +204,26 @@ export default {
         return tree;
       }
 
-      const copiedList = JSON.parse(JSON.stringify(this.list));
+      let copiedList = JSON.parse(JSON.stringify(this.list));
+
+      if (this.searchQuery !== '') {
+        const searchedIds = [];
+        for (let key in copiedList) {
+          if (copiedList[key].name.toLowerCase().includes(this.searchQuery.toLowerCase())) {
+            const recursiveItems = this.recursiveSearchParentHierarchy(copiedList[key].id, copiedList);
+            for (let keyR in recursiveItems) {
+              if (!searchedIds.includes(recursiveItems[keyR])) {
+                searchedIds[searchedIds.length] = recursiveItems[keyR];
+              }
+            }
+          }
+        }
+        if (searchedIds.length > 0) {
+          copiedList = copiedList.filter((item) => {
+            return searchedIds.includes(item.id);
+          });
+        }
+      }
 
       copiedList.forEach((category, index) => {
         if (this.selectedCategoryId === 0 && index === 0) {
@@ -221,6 +267,22 @@ export default {
     }
   },
   methods: {
+    recursiveSearchParentHierarchy(startId, catArr) {
+      const result = [];
+      for (let key in catArr) {
+        if (catArr[key].id === startId) {
+          result.push(catArr[key].id);
+
+          if (catArr[key].parent_id) {
+            result.push(...this.recursiveSearchParentHierarchy(catArr[key].parent_id, catArr));
+          }
+        }
+      }
+      return result;
+    },
+    clearSearch() {
+      this.searchQuery = '';
+    },
     handleUpdateEditCategoryData(data) {
       this.updateCategoryDataForSubmit = data;
     },

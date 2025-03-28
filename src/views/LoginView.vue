@@ -2,7 +2,8 @@
   <div class="login--container">
     <div class="container">
       <div class="header">
-        <div class="header-lang">
+        <div class="header-actions">
+          <theme-button :mode="'bool'" :value="isDarkTheme" @input="setIsDarkTheme"></theme-button>
           <lang-index-component></lang-index-component>
         </div>
       </div>
@@ -60,17 +61,18 @@
 <script>
 import { mapState } from "vuex";
 import LangIndexComponent from "@/components/LangIndexComponent.vue";
+import ThemeButton from "@/components/ui/ThemeButton.vue";
 
 export default {
   name: "LoginView",
-  components: {LangIndexComponent},
+  components: {ThemeButton, LangIndexComponent},
   data() {
     return {
       login: "",
       password: "",
       errorText: "",
-
       showPassword: false,
+      isDarkTheme: false,
     };
   },
   computed: {
@@ -79,6 +81,25 @@ export default {
     })
   },
   methods: {
+    setIsDarkTheme(val) {
+      localStorage.setItem('isDarkTheme', val ? 'true' : 'false');
+      this.isDarkTheme = val;
+    },
+    isDarkThemeEnabled() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    },
+    initTheme() {
+      const isDarkTheme = localStorage.getItem('isDarkTheme');
+      if (isDarkTheme) {
+        this.isDarkTheme = isDarkTheme === 'true';
+      } else {
+        if (this.isDarkThemeEnabled()) {
+          this.setIsDarkTheme(true);
+        } else {
+          this.setIsDarkTheme(false);
+        }
+      }
+    },
     toggleShowPassword() {
       this.showPassword = !this.showPassword;
     },
@@ -107,6 +128,9 @@ export default {
       this.errorText = "";
     }
   },
+  async created() {
+    this.initTheme();
+  },
 }
 </script>
 
@@ -116,8 +140,16 @@ export default {
   margin: 10px auto;
   text-align: center;
 
-  .header-lang {
-    display: inline-block;
+  .header-actions {
+    //display: inline-block;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    flex-direction: row;
+
+    &>div {
+      margin: 0 5px;
+    }
   }
 }
 .login--form-container {

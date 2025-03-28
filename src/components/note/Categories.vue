@@ -218,11 +218,10 @@ export default {
             }
           }
         }
-        if (searchedIds.length > 0) {
-          copiedList = copiedList.filter((item) => {
-            return searchedIds.includes(item.id);
-          });
-        }
+
+        copiedList = copiedList.filter((item) => {
+          return searchedIds.includes(item.id);
+        });
       }
 
       copiedList.forEach((category, index) => {

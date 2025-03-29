@@ -1,12 +1,13 @@
 <template>
-  <div class="thankyou">
+  <div class="thankyou view" :class="{'dark-theme': isDarkTheme === true, 'light-theme': isDarkTheme === false}">
     <div class="thankyou--container">
       <div class="header">
-        <div class="header-lang">
+        <div class="header-actions">
+          <theme-button :mode="'bool'" :value="isDarkTheme" @input="setIsDarkTheme"></theme-button>
           <lang-index-component></lang-index-component>
         </div>
       </div>
-      <div class="container shadow-card">
+      <div class="container shadow-card mrg-t-25">
         <h3>{{ $t('app_thank_for_choosing') }} {{ getProjectName() }}!</h3>
         <p>
           {{ $t('app_you_can_login') }}
@@ -24,7 +25,7 @@
 <!--          Отправить повторно-->
 <!--        </div>-->
         <router-link
-            class="btn btn-sm btn-info"
+            class="btx btx-sm btx-info"
             tag="a"
             :to="`/login`"
         >
@@ -40,20 +41,42 @@
 
 import LangIndexComponent from "@/components/LangIndexComponent.vue";
 import config from "@/config.js";
+import ThemeButton from "@/components/ui/ThemeButton.vue";
 
 export default {
   name: "ThankyouView",
   components: {
+    ThemeButton,
     LangIndexComponent
 
   },
   computed: {},
   data() {
     return {
-      sendButton: localStorage.getItem("confirmEmail")
+      sendButton: localStorage.getItem("confirmEmail"),
+      isDarkTheme: false,
     };
   },
   methods: {
+    setIsDarkTheme(val) {
+      localStorage.setItem('isDarkTheme', val ? 'true' : 'false');
+      this.isDarkTheme = val;
+    },
+    isDarkThemeEnabled() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    },
+    initTheme() {
+      const isDarkTheme = localStorage.getItem('isDarkTheme');
+      if (isDarkTheme) {
+        this.isDarkTheme = isDarkTheme === 'true';
+      } else {
+        if (this.isDarkThemeEnabled()) {
+          this.setIsDarkTheme(true);
+        } else {
+          this.setIsDarkTheme(false);
+        }
+      }
+    },
     sendConfirm() {
       this.$store.dispatch("startPreloader");
       let userEmail = localStorage.getItem("confirmEmail");
@@ -74,7 +97,8 @@ export default {
       return config.projectName;
     }
   },
-  created() {
+  async created() {
+    this.initTheme();
     if (this.userData) {
       this.$router.push("/");
     }
@@ -88,14 +112,21 @@ export default {
   margin: 10px auto;
   text-align: center;
 
-  .header-lang {
-    display: inline-block;
+  .header-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    flex-direction: row;
+
+    &>div {
+      margin: 0 5px;
+    }
   }
 }
 .thankyou--container {
   text-align: center;
   padding: 15px 0;
-  min-height: 75vh;
+  min-height: 100vh;
   box-sizing: border-box;
 }
 </style>

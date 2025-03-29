@@ -1,5 +1,5 @@
 <template>
-  <div class="back-template--container">
+  <div class="back-template--container" :class="{'dark-theme': isDarkTheme === true, 'light-theme': isDarkTheme === false}">
     <div class="back-template--content">
       <div class="left" v-bind:class="{ 'min-sidebar': !isDesktop, 'max-sidebar': isDesktop }">
         <div class="sidebar-content" v-show="showMainSidebar">
@@ -24,6 +24,8 @@
               </div>
             </div>
             <div class="top-bar--right">
+              <theme-button :mode="'bool'" :value="isDarkTheme" @input="setIsDarkTheme"></theme-button>
+
               <div class="lang shadow-card cursor-pointer" :class="{'active': showLang}" @click.self="toggleLang">
                 <div class="above" @click="toggleLang">
                   <div class="icon">
@@ -37,15 +39,15 @@
                   </div>
                 </div>
               </div>
-              <div class="bell shadow-card cursor-pointer" :class="{'active': showBell}" @click.self="toggleBell">
-                <div class="above" @click="toggleBell">
-                  <f-awesome class="angle-account" :icon="['fas', 'bell']" />
-                </div>
-                <div class="inside shadow-card" v-show="showBell">
-                  <div class="item">Тут текст уведомления ла-ла-ла</div>
-                  <div class="item">Тут еще один текст уведомления ла-ла-ла</div>
-                </div>
-              </div>
+<!--              <div class="bell shadow-card cursor-pointer" :class="{'active': showBell}" @click.self="toggleBell">-->
+<!--                <div class="above" @click="toggleBell">-->
+<!--                  <f-awesome class="angle-account" :icon="['fas', 'bell']" />-->
+<!--                </div>-->
+<!--                <div class="inside shadow-card" v-show="showBell">-->
+<!--                  <div class="item">Тут текст уведомления ла-ла-ла</div>-->
+<!--                  <div class="item">Тут еще один текст уведомления ла-ла-ла</div>-->
+<!--                </div>-->
+<!--              </div>-->
               <div class="account shadow-card cursor-pointer" :class="{'active': showAccountBar}" @click.self="toggleAccountBar">
                 <div class="above no-select" @click="toggleAccountBar">
                   <div class="username">{{ userLogin }}</div>
@@ -97,6 +99,8 @@
 </template>
 
 <script>
+import ThemeButton from "@/components/ui/ThemeButton.vue";
+
 const MOBILE_WIDTH_STEP = 1100;
 
 import Notificator from "@/components/Notificator.vue";
@@ -105,7 +109,7 @@ import LeftSidebar from "@/components/LeftSidebar.vue";
 
 export default {
   name: "BackTemplate",
-  components: {LeftSidebar, Preloader, Notificator},
+  components: {ThemeButton, LeftSidebar, Preloader, Notificator},
   data() {
     return {
       showMainSidebar: true,
@@ -120,6 +124,7 @@ export default {
         {id: "en", name: "EN"},
       ],
       userLogin: '',
+      isDarkTheme: false,
     };
   },
   computed: {
@@ -152,6 +157,25 @@ export default {
     },
   },
   methods: {
+    setIsDarkTheme(val) {
+      localStorage.setItem('isDarkTheme', val ? 'true' : 'false');
+      this.isDarkTheme = val;
+    },
+    isDarkThemeEnabled() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    },
+    initTheme() {
+      const isDarkTheme = localStorage.getItem('isDarkTheme');
+      if (isDarkTheme) {
+        this.isDarkTheme = isDarkTheme === 'true';
+      } else {
+        if (this.isDarkThemeEnabled()) {
+          this.setIsDarkTheme(true);
+        } else {
+          this.setIsDarkTheme(false);
+        }
+      }
+    },
     clickSelectLang(langId) {
       this.selectLanguage(langId);
       this.toggleShowList();
@@ -193,6 +217,7 @@ export default {
     },
   },
   created() {
+    this.initTheme();
     this.clientWidth = document.documentElement.clientWidth;
     this.initSidebars(this.clientWidth);
 
@@ -238,10 +263,37 @@ export default {
     cursor: pointer;
   }
 }
+
+.dark-theme .page-content {
+  color: #fff;
+  background: linear-gradient(135deg, #2a2a2c, #343436, #404043);
+  background-blend-mode: overlay;
+}
+.dark-theme .right--main-content {
+  color: #fff;
+  background: linear-gradient(135deg, #2a2a2c, #343436, #404043);
+  background-blend-mode: overlay;
+}
+.light-theme .page-content {
+  color: #333;
+  background-color: #fafefd;
+  background-blend-mode: overlay;
+}
+.light-theme .right--main-content {
+  background-color: #fafefd;
+  background-blend-mode: overlay;
+}
+.dark-theme.back-template--container {
+  //background: linear-gradient(135deg, #2a2a2c, #343436, #404043);
+  background: linear-gradient(135deg, #1f1f20, #1e1e1e, #201f1f);
+}
+.light-theme.back-template--container {
+  background-color: #1b1c30;
+}
+
 .back-template--container {
   width: 100%;
   height: 100vh;
-  background-color: #1b1c30;
   overflow: auto;
 }
 .back-template--content {
@@ -276,7 +328,7 @@ export default {
       margin: 5px 0;
       padding-bottom: 20px;
       height: calc(100vh - 10px);
-      background-color: #fafefd;
+      //background-color: #fafefd;
       border-radius: 30px;
 
       .top-bar {
@@ -367,7 +419,7 @@ export default {
     .links{
       text-align: center;
       //padding: 5px 0;
-      background-color: #fff;
+      //background-color: #fff;
       line-height: 17px;
 
       svg{
@@ -379,7 +431,7 @@ export default {
         flex-wrap: nowrap;
         justify-content: space-around;
         flex-direction: row;
-        color: #333;
+        //color: #333;
         cursor: pointer;
 
         &>div:nth-of-type(1){
@@ -388,7 +440,7 @@ export default {
         }
         &>div:nth-of-type(2){
           width: 77%;
-          color: #333;
+          //color: #333;
         }
       }
     }
@@ -418,7 +470,7 @@ export default {
     right: 0;
     width: 200px;
     z-index: 2;
-    background-color: #fff;
+    //background-color: #fff;
 
     .item {
       margin-bottom: 9px;
@@ -451,7 +503,7 @@ export default {
     right: 0;
     width: 50px;
     z-index: 2;
-    background-color: #fff;
+    //background-color: #fff;
 
     .item {
       text-align: center;

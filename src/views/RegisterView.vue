@@ -1,8 +1,9 @@
 <template>
-  <div class="register--container">
+  <div class="register--container view" :class="{'dark-theme': isDarkTheme === true, 'light-theme': isDarkTheme === false}">
     <div class="container">
       <div class="header">
-        <div class="header-lang">
+        <div class="header-actions">
+          <theme-button :mode="'bool'" :value="isDarkTheme" @input="setIsDarkTheme"></theme-button>
           <lang-index-component></lang-index-component>
         </div>
       </div>
@@ -57,17 +58,17 @@
             </div>
           </div>
           <div v-show="errorText" class="mrg-t-10 mrg-b-10">
-            <div class="alert alert-sm alert-danger">{{errorText}}</div>
+            <div class="notification-box danger">{{errorText}}</div>
           </div>
           <div class="input-block">
-            <button type="submit" class="btn btn-sm btn-success">{{ $t('app_register') }}</button>
+            <button type="submit" class="btx btx-sm btx-success">{{ $t('app_register') }}</button>
           </div>
         </form>
 
         <div class="mrg-t-30">
           <hr>
           <div class="mrg-t-20 text-right">
-            <router-link class="btn btn-sm btn-info" tag="a" :to="`/login`">{{ $t('app_sign_in') }}</router-link>
+            <router-link class="btx btx-sm btx-info" tag="a" :to="`/login`">{{ $t('app_sign_in') }}</router-link>
           </div>
         </div>
       </div>
@@ -78,10 +79,11 @@
 <script>
 import { mapState } from "vuex";
 import LangIndexComponent from "@/components/LangIndexComponent.vue";
+import ThemeButton from "@/components/ui/ThemeButton.vue";
 
 export default {
   name: "LoginView",
-  components: {LangIndexComponent},
+  components: {ThemeButton, LangIndexComponent},
   data() {
     return {
       login: "",
@@ -91,6 +93,7 @@ export default {
 
       showPassword: false,
       showRepeatPassword: false,
+      isDarkTheme: false,
     };
   },
   computed: {
@@ -99,6 +102,25 @@ export default {
     })
   },
   methods: {
+    setIsDarkTheme(val) {
+      localStorage.setItem('isDarkTheme', val ? 'true' : 'false');
+      this.isDarkTheme = val;
+    },
+    isDarkThemeEnabled() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    },
+    initTheme() {
+      const isDarkTheme = localStorage.getItem('isDarkTheme');
+      if (isDarkTheme) {
+        this.isDarkTheme = isDarkTheme === 'true';
+      } else {
+        if (this.isDarkThemeEnabled()) {
+          this.setIsDarkTheme(true);
+        } else {
+          this.setIsDarkTheme(false);
+        }
+      }
+    },
     toggleShowRepeatPassword() {
       this.showRepeatPassword = !this.showRepeatPassword;
     },
@@ -133,17 +155,27 @@ export default {
       this.errorText = "";
     }
   },
+  async created() {
+    this.initTheme();
+  },
 }
 </script>
 
 <style scoped lang="less">
 .header {
-  width: 500px;
+  //width: 500px;
   margin: 10px auto;
   text-align: center;
 
-  .header-lang {
-    display: inline-block;
+  .header-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    flex-direction: row;
+
+    &>div {
+      margin: 0 5px;
+    }
   }
 }
 .register--form-container {
@@ -152,8 +184,9 @@ export default {
   padding-bottom: 35px;
 }
 .register--container{
-  min-height: 65vh;
-  margin-bottom: 100px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding-top: 1px;
 }
 .password-block {
   position: relative;

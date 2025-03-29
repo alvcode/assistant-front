@@ -104,7 +104,7 @@ export default {
     right: 0;
     width: 50px;
     z-index: 2;
-    background-color: #fff;
+    //background-color: #fff;
 
     .item {
       text-align: center;

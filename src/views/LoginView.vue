@@ -1,5 +1,5 @@
 <template>
-  <div class="login--container">
+  <div class="login--container view" :class="{'dark-theme': isDarkTheme === true, 'light-theme': isDarkTheme === false}">
     <div class="container">
       <div class="header">
         <div class="header-actions">
@@ -40,17 +40,17 @@
             </div>
           </div>
           <div v-show="errorText" class="mrg-t-10 mrg-b-10">
-            <div class="alert alert-sm alert-danger">{{errorText}}</div>
+            <div class="notification-box danger">{{errorText}}</div>
           </div>
           <div class="input-block">
-            <button type="submit" class="btn btn-sm btn-success">{{ $t('app_sign_in') }}</button>
+            <button type="submit" class="btx btx-sm btx-success">{{ $t('app_sign_in') }}</button>
           </div>
         </form>
 
         <div class="mrg-t-30">
           <hr>
           <div class="mrg-t-20 text-right">
-            <router-link class="btn btn-sm btn-info" tag="a" :to="`/register/`">{{ $t('app_register') }}</router-link>
+            <router-link class="btx btx-sm btx-info" tag="a" :to="`/register/`">{{ $t('app_register') }}</router-link>
           </div>
         </div>
       </div>
@@ -136,12 +136,11 @@ export default {
 
 <style scoped lang="less">
 .header {
-  width: 500px;
+  //width: 500px;
   margin: 10px auto;
   text-align: center;
 
   .header-actions {
-    //display: inline-block;
     display: flex;
     flex-wrap: nowrap;
     justify-content: center;
@@ -158,8 +157,10 @@ export default {
   padding-bottom: 35px;
 }
 .login--container{
-  min-height: 65vh;
-  margin-bottom: 100px;
+  min-height: 100vh;
+  //margin-bottom: 100px;
+  box-sizing: border-box;
+  padding-top: 1px;
 }
 .password-block {
   position: relative;

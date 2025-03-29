@@ -2,7 +2,7 @@
   <div class="categories--container">
     <div class="full">
       <div class="actions text-right">
-        <div @click="showNewCategoryPopup" class="btn btn-sm btn-outline-info">
+        <div @click="showNewCategoryPopup" class="btx btx-sm btx-outline-info">
           <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
         </div>
       </div>
@@ -38,7 +38,7 @@
         <div v-show="list.length === 0" class="empty text-bold text-danger">{{ $t('app_empty_for_now') }}</div>
       </div>
       <div class="action">
-        <div class="btn btn-sm btn-outline-info" @click="showManageCategoryPopup">{{ $t('app_manage') }}</div>
+        <div class="btx btx-sm btx-outline-info" @click="showManageCategoryPopup">{{ $t('app_manage') }}</div>
       </div>
     </div>
 
@@ -52,7 +52,7 @@
       <template v-slot:body>
         <div class="">
           <div class="actions text-right">
-            <div @click="showNewCategoryPopup" class="btn btn-sm btn-outline-info">
+            <div @click="showNewCategoryPopup" class="btx btx-sm btx-outline-info">
               <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
             </div>
           </div>

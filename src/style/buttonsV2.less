@@ -1,0 +1,199 @@
+.btx {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  border: .5px solid transparent;
+  padding: .260rem .65rem;
+  font-size: .875rem;
+  line-height: 1.5;
+  border-radius: .45rem;
+  margin: 0 4px 0 4px;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+.btx.btx-sm {
+  padding: .20px .5rem;
+  font-size: .825rem;
+  line-height: 1.8;
+  border-radius: .2rem;
+}
+.btx-sm.form-line{
+  margin-top: 20px;
+}
+.btx-circle{
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  text-align: center;
+  line-height: 30px;
+  border-radius: 30px;
+  vertical-align: middle;
+  margin: 0 4px 0 4px;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  cursor: pointer;
+  user-select: none;
+}
+.btx-sm-circle{
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  text-align: center;
+  line-height: 22px;
+  border-radius: 22px;
+  vertical-align: middle;
+  margin: 0 4px 0 4px;
+  font-size: 12px;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  cursor: pointer;
+  user-select: none;
+}
+
+.btx:not(:disabled):not(.disabled) {
+  cursor: pointer;
+}
+
+
+.light-theme .btx-success {
+  color: #fff;
+  background-color: #41c860; /* Более мягкий зелёный */
+  //border-color: #28a745;
+}
+
+.light-theme .btx-danger {
+  color: #fff;
+  background-color: #dc3545; /* Чёткий красный */
+  border-color: #dc3545;
+}
+
+.light-theme .btx-outline-danger {
+  border-color: #dc3545;
+  color: #dc3545;
+  background-color: transparent; /* Прозрачный фон */
+}
+
+.light-theme .btx-info {
+  color: #fff;
+  background-color: #17a2b8; /* Голубой */
+  border-color: #17a2b8;
+}
+
+.light-theme .btx-outline-info {
+  border-color: #17a2b8;
+  color: #17a2b8;
+  background-color: transparent; /* Прозрачный фон */
+}
+
+.light-theme .btx-orange {
+  color: #fff;
+  background-color: #fd7e14; /* Ярко-оранжевый */
+  border-color: #fd7e14;
+}
+
+.dark-theme .btx-success {
+  color: #000; /* Чёрный текст */
+  background-color: #81C784; /* Светло-зелёный */
+  border-color: #81C784;
+}
+
+.dark-theme .btx-danger {
+  color: #fff; /* Белый текст */
+  background-color: #e57373; /* Мягкий красный */
+  border-color: #e57373;
+}
+
+.dark-theme .btx-outline-danger {
+  border-color: #e57373;
+  color: #e57373;
+  background-color: transparent; /* Прозрачный фон */
+}
+
+.dark-theme .btx-info {
+  color: #000; /* Чёрный текст */
+  background-color: #64b5f6; /* Нежно-голубой */
+  border-color: #64b5f6;
+}
+
+.dark-theme .btx-outline-info {
+  border-color: #64b5f6;
+  color: #64b5f6;
+  background-color: transparent; /* Прозрачный фон */
+}
+
+.dark-theme .btx-orange {
+  color: #fff;
+  background-color: #ffb74d; /* Светло-оранжевый */
+  border-color: #ffb74d;
+}
+
+
+//.btn-orange:hover {
+//  opacity: 0.9;
+//  color: white;
+//}
+//.btn-info:hover {
+//  color: #fff;
+//  background-color: #50acfd;
+//}
+//.btn-outline-info:hover{
+//  border-color: #57adff;
+//  color: #57adff;
+//}
+//.btn-outline-danger:hover{
+//  opacity: 0.9;
+//}
+
+
+//.btn-danger:hover {
+//  opacity: 0.9;
+//  color: white;
+//}
+//.btn-success:hover {
+//  opacity: 0.9;
+//  color: white;
+//}
+
+.slide-circle{
+  border: 1px solid gray;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  border-radius: 30px;
+  cursor: pointer;
+}
+
+.check_circle_false_orange{
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 16px;
+  border: 1px solid #F97979;
+  cursor: pointer;
+}
+.check_circle_true_orange{
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 16px;
+  border: 1px solid #F97979;
+  cursor: pointer;
+}
+.check_circle_true_orange:after{
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 16px;
+  background-color: #F97979;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+}

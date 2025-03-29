@@ -1,8 +1,13 @@
 <template>
-  <div class="home--container" v-show="showContent">
+  <div
+      class="home--container view"
+      :class="{'dark-theme': isDarkTheme === true, 'light-theme': isDarkTheme === false}"
+      v-show="showContent"
+  >
     <div class="container">
       <div class="header">
-        <div class="header-lang">
+        <div class="header-actions">
+          <theme-button :mode="'bool'" :value="isDarkTheme" @input="setIsDarkTheme"></theme-button>
           <lang-index-component></lang-index-component>
         </div>
       </div>
@@ -14,19 +19,19 @@
         <div v-if="userData" class="account-card">
           <div class="email fs-16 text-bold mrg-b-5">{{userData[0].login}}</div>
           <div class="actions">
-            <router-link tag="a" class="btn btn-sm btn-info" :to="`/notes/`">
+            <router-link tag="a" class="btx btx-sm btx-info" :to="`/notes/`">
               <f-awesome :icon="['fas', 'sign-in-alt']" /> {{ $t('app_to_panel') }}
             </router-link>
-            <div @click="logout" class="btn btn-sm btn-orange">{{ $t('app_logout') }}</div>
+            <div @click="logout" class="btx btx-sm btx-orange">{{ $t('app_logout') }}</div>
           </div>
         </div>
 
         <div v-if="!userData" class="buttons mrg-t-25">
-          <router-link tag="a" class="btn btn-sm btn-info" :to="`/login/`">
+          <router-link tag="a" class="btx btx-sm btx-info" :to="`/login/`">
             <f-awesome :icon="['fas', 'sign-in-alt']" /> {{ $t('app_sign_in') }}
           </router-link>
 
-          <router-link tag="a" class="btn btn-sm btn-orange" :to="`/register/`">
+          <router-link tag="a" class="btx btx-sm btx-orange" :to="`/register/`">
             <f-awesome :icon="['fas', 'user-plus']" /> {{ $t('app_register') }}
           </router-link>
         </div>
@@ -39,13 +44,15 @@
 import { mapState } from "vuex";
 import config from "@/config.js";
 import LangIndexComponent from "@/components/LangIndexComponent.vue";
+import ThemeButton from "@/components/ui/ThemeButton.vue";
 
 export default {
   name: "HomeView",
-  components: {LangIndexComponent},
+  components: {ThemeButton, LangIndexComponent},
   data() {
     return {
       showContent: false,
+      isDarkTheme: false,
     }
   },
   computed: {
@@ -54,6 +61,25 @@ export default {
     })
   },
   methods: {
+    setIsDarkTheme(val) {
+      localStorage.setItem('isDarkTheme', val ? 'true' : 'false');
+      this.isDarkTheme = val;
+    },
+    isDarkThemeEnabled() {
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    },
+    initTheme() {
+      const isDarkTheme = localStorage.getItem('isDarkTheme');
+      if (isDarkTheme) {
+        this.isDarkTheme = isDarkTheme === 'true';
+      } else {
+        if (this.isDarkThemeEnabled()) {
+          this.setIsDarkTheme(true);
+        } else {
+          this.setIsDarkTheme(false);
+        }
+      }
+    },
     logout() {
       this.$store.dispatch("logout").then(() => {
         this.$router.push("/");
@@ -64,6 +90,7 @@ export default {
     },
   },
   beforeMount() {
+    this.initTheme();
     if (this.userData && this.userData[0] && this.userData[0].token) {
       this.$router.push("notes");
     } else {
@@ -75,12 +102,19 @@ export default {
 
 <style scoped lang="less">
 .header {
-  width: 500px;
+  //width: 500px;
   margin: 10px auto;
   text-align: center;
 
-  .header-lang {
-    display: inline-block;
+  .header-actions {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    flex-direction: row;
+
+    &>div {
+      margin: 0 5px;
+    }
   }
 }
 .home--form-container {
@@ -89,8 +123,10 @@ export default {
   padding-bottom: 35px;
 }
 .home--container {
-  min-height: 65vh;
-  margin-bottom: 100px;
+  min-height: 100vh;
+  //margin-bottom: 100px;
+  box-sizing: border-box;
+  padding-top: 1px;
 }
 @media (max-width: 700px) {
   .header {

@@ -79,9 +79,13 @@ export default {
   flex-wrap: nowrap;
   flex-direction: row;
 
-  //&>.toggle-button-button{
-  //  min-width: 50px;
-  //}
+  &>.toggle-button-button{
+    position: relative;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: center;
+  }
   &>.toggle-button--text{
     margin-left: 5px;
   }

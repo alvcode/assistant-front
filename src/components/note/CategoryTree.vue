@@ -71,6 +71,26 @@ export default {
 </script>
 
 <style scoped lang="less">
+.light-theme ul {
+  li.active > .name {
+    background-color: #f1f1ff !important;
+  }
+  li {
+    .name {
+      border: .5px solid #ededed;
+    }
+  }
+}
+.dark-theme ul {
+  li.active > .name {
+    background: rgba(100, 100, 102, 0.9);
+  }
+  li {
+    .name {
+      border: .5px solid #6c6c6c;
+    }
+  }
+}
 .ul {
   list-style: none;
   padding-left: 0;
@@ -80,14 +100,13 @@ export default {
   li:not(.first-level) {
     margin-left: 18px;
   }
-  li.active > .name {
-    background-color: #f1f1ff !important;
-  }
+  //li.active > .name {
+  //  background-color: #f1f1ff !important;
+  //}
   li {
     margin-top: 5px;
 
     .name {
-      border: .5px solid #ededed;
       height: 39px;
       line-height: 39px;
       padding: 0 8px;

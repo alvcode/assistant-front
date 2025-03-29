@@ -65,15 +65,35 @@ export default {
   top: 5px;
   right: 9px;
 }
-.not_danger {
-  background-color: rgba(220, 53, 69, 0.95);
+.light-theme {
+  .not_danger {
+    background-color: #fdb7bd;
+    color: #842029;
+  }
+  .not_success {
+    background-color: rgb(179, 251, 176);
+    color: #333;
+  }
 }
-.not_success {
-  background-color: rgba(49, 199, 154, 0.95);
+.dark-theme {
+  .not_danger {
+    background-color: #7e3435;
+    color: #f5cacb;
+  }
+  .not_success {
+    background-color: #477a4c;
+    color: #c8e6c9;
+  }
 }
-.not_warning {
-  background-color: rgba(255, 193, 7, 0.95);
-}
+//.not_danger {
+//  background-color: rgba(220, 53, 69, 0.95);
+//}
+//.not_success {
+//  background-color: rgba(49, 199, 154, 0.95);
+//}
+//.not_warning {
+//  background-color: rgba(255, 193, 7, 0.95);
+//}
 .slide-fade-enter-active {
   transition: all 0.3s ease;
 }

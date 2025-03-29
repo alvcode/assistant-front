@@ -1,7 +1,7 @@
 <template>
   <div class="notes--container">
     <div class="actions">
-      <div @click="showNewNotePopup" class="btn btn-sm btn-outline-info">
+      <div @click="showNewNotePopup" class="btx btx-sm btx-outline-info">
         <f-awesome icon="plus"></f-awesome> {{ $t('app_add') }}
       </div>
     </div>

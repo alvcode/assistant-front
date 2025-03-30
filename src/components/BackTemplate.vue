@@ -255,13 +255,18 @@ export default {
 
   .left {
     width: 300px;
-    background-color: #1b1c30;
   }
   .right {
     width: 90%;
     background: rgba(27, 28, 48, 0.4);
     cursor: pointer;
   }
+}
+.light-theme .floating-left-sidebar .left {
+  background-color: #1b1c30;
+}
+.dark-theme .floating-left-sidebar .left {
+  background: linear-gradient(135deg, #2a2a2c, #343436, #404043);
 }
 
 .dark-theme .page-content {
@@ -284,7 +289,6 @@ export default {
   background-blend-mode: overlay;
 }
 .dark-theme.back-template--container {
-  //background: linear-gradient(135deg, #2a2a2c, #343436, #404043);
   background: linear-gradient(135deg, #1f1f20, #1e1e1e, #201f1f);
 }
 .light-theme.back-template--container {

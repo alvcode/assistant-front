@@ -103,15 +103,26 @@ export default {
     color: #7c7c7c;
   }
 }
+
+.light-theme .updated {
+  color: gray;
+}
+.dark-theme .updated {
+  color: gray;
+}
+.light-theme .category {
+  color: gray;
+}
+.dark-theme .category {
+  color: #c8c7c7;
+}
 .updated {
   margin-top: 5px;
   font-size: 12px;
-  color: gray;
 }
 .category {
   margin-top: 5px;
   font-size: 13px;
-  color: gray;
 }
 .note-background {
   position: fixed;

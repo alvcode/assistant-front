@@ -361,6 +361,16 @@ hr {
   & input:focus:not([type='checkbox']):not([type='file']):not([type='radio']) {
     background-color: #fff;
   }
+  textarea {
+    color: #495057;
+    background-color: #fff;
+    //border-color: #80bdff;
+  }
+  textarea:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #80bdff;
+  }
 }
 
 .dark-theme .input-block {
@@ -375,9 +385,16 @@ hr {
   }
   & select {
     background-color: #2a2a2c;
+    color: #fff;
   }
-  & select:focus {
-
+  textarea {
+    background-color: #2a2a2c;
+    color: #fff;
+    border-color: #2a2a2c;
+  }
+  textarea:focus {
+    background-color: #2a2a2c;
+    color: #fff;
   }
 }
 
@@ -478,9 +495,9 @@ hr {
   }
 
   & textarea:focus {
-    color: #495057;
-    background-color: #fff;
-    border-color: #80bdff;
+    //color: #495057;
+    //background-color: #fff;
+    //border-color: #80bdff;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
   }

@@ -6,9 +6,8 @@
           'pop_up__modal_lg': size === 'lg',
           'pop_up__modal_sm': size !== 'lg' && size !== 'full',
           'pop_up__modal_full': size === 'full',
-          'pop_up__background-wgray': backgroundColor === 'wgray',
-          'pop_up__background-white': backgroundColor !== 'wgray'
         }"
+        class="modal"
       >
         <div class="pop-up--content">
           <div class="pop-up--modal-header">
@@ -26,14 +25,14 @@
             <div
               v-on:click="closePopup"
               v-if="closeButtonShow"
-              class="btn btn-sm btn-danger"
+              class="btx btx-sm btx-danger"
             >
               {{ closeButton }}
             </div>
             <div
               v-on:click="actionPopup"
               v-if="actionButtonShow"
-              class="btn btn-sm"
+              class="btx btx-sm"
               v-bind:class="actionClass"
             >
               {{ actionButton }}
@@ -64,7 +63,6 @@ export default {
     actionClass: String, // Класс кнопки действия, например btn-success
     size: String, // 'lg' - широкое окно, если не указывать- узкое окно
     dontHideOverflow: Boolean, // Если true - не скрывает прокрутку при открытии
-    backgroundColor: String // если нет - белый, wgray
   },
   watch: {
     show: function(val) {
@@ -122,12 +120,20 @@ export default {
   overflow: auto;
   -webkit-overflow-scrolling: touch;
 }
-.pop_up__background-white{
+
+.light-theme .modal {
   background-color: #fff;
 }
-.pop_up__background-wgray{
-  background-color: #f0f0fb;
+.dark-theme .modal {
+  background: rgba(60, 60, 62, 1);
 }
+
+//.pop_up__background-white{
+//  background-color: #fff;
+//}
+//.pop_up__background-wgray{
+//  background-color: #f0f0fb;
+//}
 .pop_up__modal_sm {
   max-width: 500px;
   margin: 20px auto 20px auto;
@@ -147,7 +153,7 @@ export default {
 .pop_up__modal_full{
   width: 100%;
   height: 100vh;
-  background-color: #fff;
+  //background-color: #fff;
   margin: 0;
   padding: 25px;
   box-sizing: border-box;
@@ -157,7 +163,7 @@ export default {
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
-  color: #4f4f4f;
+  //color: #4f4f4f;
 }
 .pop-up--title {
   width: 90%;
@@ -168,7 +174,7 @@ export default {
 .pop-up--modal-body {
   padding: 15px 5px;
   box-sizing: border-box;
-  color: #4f4f4f;
+  //color: #4f4f4f;
   //font-size: 14px !important;
   font-weight: 400;
 }

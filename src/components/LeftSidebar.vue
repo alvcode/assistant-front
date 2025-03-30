@@ -84,9 +84,14 @@ export default {
     }
     a.router-link-active {
       border-radius: 10px;
-      background-color: #2a4063;
       box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.25);
     }
   }
+}
+.dark-theme a.router-link-active {
+  background: rgba(60, 60, 62, 0.9);
+}
+.light-theme a.router-link-active {
+  background-color: #2a4063;
 }
 </style>

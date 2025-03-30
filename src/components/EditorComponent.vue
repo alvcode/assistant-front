@@ -4,8 +4,8 @@
 
     <div class="additional">
       <div class="actions text-right">
-        <div class="btn btn-sm btn-outline-info" @click="showInsertTextPopup">{{ $t('app_insert_third_party_text') }}</div>
-        <div class="btn btn-sm btn-outline-info" @click="showForCopyPopup">{{ $t('app_for_copy') }}</div>
+        <div class="btx btx-sm btx-outline-info" @click="showInsertTextPopup">{{ $t('app_insert_third_party_text') }}</div>
+        <div class="btx btx-sm btx-outline-info" @click="showForCopyPopup">{{ $t('app_for_copy') }}</div>
       </div>
     </div>
 

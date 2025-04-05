@@ -154,6 +154,9 @@ export default {
           paragraph: {
             class: Paragraph,
             inlineToolbar: true,
+            config: {
+              preserveBlank: true
+            },
           },
           bold: {
             class: createGenericInlineTool({
@@ -232,14 +235,15 @@ export default {
         for (let key in this.data.blocks) {
           result[result.length] = this.data.blocks[key];
         }
-      } else if (this.insertTextMode === 'full_replace') {
-        if (
-            this.data.blocks.length > 0 &&
-            this.data.blocks[0].type === 'header'
-        ) {
-          result[result.length] = this.data.blocks[0];
-        }
       }
+      // else if (this.insertTextMode === 'full_replace') {
+      //   if (
+      //       this.data.blocks.length > 0 &&
+      //       this.data.blocks[0].type === 'header'
+      //   ) {
+      //     result[result.length] = this.data.blocks[0];
+      //   }
+      // }
 
       let existsLine = false;
       for (let key in lines) {

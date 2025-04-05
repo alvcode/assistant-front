@@ -77,6 +77,14 @@
         <span v-if="!isNewEditor">{{ $t('app_edit_note') }}</span>
       </template>
       <template v-slot:body>
+        <div class="title-block">
+          <textarea
+              class="title-area"
+              v-model="editorTitle"
+              placeholder="Title"
+              @input="resizeTitle"
+          />
+        </div>
         <div class="notes--editor">
           <editor-component
               :data="editorData"
@@ -124,6 +132,7 @@ export default {
         time: Date.now(),
         blocks: [],
       },
+      editorTitle: '',
       editorOtherData: {
         id: '',
         categoryId: 0,
@@ -231,6 +240,13 @@ export default {
     }
   },
   methods: {
+    resizeTitle() {
+      const el = document.getElementsByClassName('title-area')[0];
+      if (el) {
+        el.style.height = 'auto';
+        el.style.height = el.scrollHeight + 'px';
+      }
+    },
     unpinNote(noteId) {
       this.$store.dispatch("startPreloader");
       noteRepository.unpin(noteId).then(() => {
@@ -327,11 +343,12 @@ export default {
         });
         return false;
       }
-      this.editorData.blocks = [{type: "header", data: {text: "Title", level: 2}}];
-      this.editorOtherData.blocks = [{type: "header", data: {text: "Title", level: 2}}];
+      this.editorData.blocks = [];
+      this.editorOtherData.blocks = [];
       this.editorOtherData.categoryId = this.categoryId;
       this.editorOtherData.updatedAt = '';
       this.editorOtherData.id = '';
+      this.editorTitle = '';
       this.isNewEditor = true;
       this.newNotePopup.show = true;
     },
@@ -349,11 +366,13 @@ export default {
       this.$store.dispatch("startPreloader");
       noteRepository.create({
         category_id: this.editorOtherData.categoryId,
+        title: this.editorTitle,
         note_blocks: this.editorOtherData.blocks
       }).then((resp) => {
         this.editorOtherData.updatedAt = resp.data.updated_at;
         this.editorOtherData.id = resp.data.id;
         this.editorData.blocks = resp.data.note_blocks;
+        this.editorTitle = resp.data.title;
         this.isNewEditor = false;
         this.loadNotes(this.categoryId);
 
@@ -378,10 +397,12 @@ export default {
       noteRepository.update({
         id: this.editorOtherData.id,
         category_id: this.editorOtherData.categoryId,
+        title: this.editorTitle,
         note_blocks: this.editorOtherData.blocks
       }).then((resp) => {
         this.editorOtherData.updatedAt = resp.data.updated_at;
         this.editorData.blocks = resp.data.note_blocks;
+        this.editorTitle = resp.data.title;
         this.loadNotes(this.categoryId);
 
         this.$store.dispatch("addNotification", {
@@ -412,6 +433,7 @@ export default {
         this.editorOtherData.id = resp.data.id;
         this.editorOtherData.blocks = resp.data.note_blocks;
         this.editorData.blocks = resp.data.note_blocks;
+        this.editorTitle = resp.data.title;
         this.isNewEditor = false;
         this.newNotePopup.show = true;
         this.$store.dispatch("stopPreloader");
@@ -445,6 +467,37 @@ export default {
 </script>
 
 <style scoped lang="less">
+.title-block {
+  textarea {
+    width: 100%;
+    min-height: 1em;
+    max-height: 8em;
+    resize: none;
+    overflow-y: hidden;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    font-size: 20px;
+    font-weight: bold;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+}
+.light-theme {
+  .title-block {
+    textarea {
+      color: #495057;
+    }
+  }
+}
+.dark-theme {
+  .title-block {
+    textarea {
+      color: #fff;
+    }
+  }
+}
 .notes {
   .list {
     .unpinned-cards, .pinned-cards {
@@ -456,7 +509,7 @@ export default {
 
     .note {
       margin: 10px 10px;
-      min-width: 290px;
+      width: 290px;
       position: relative;
     }
   }

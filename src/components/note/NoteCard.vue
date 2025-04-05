@@ -76,6 +76,11 @@ export default {
 </script>
 
 <style scoped lang="less">
+.note-card {
+  .title {
+    width: 96%;
+  }
+}
 .note-menu {
   position: absolute;
   top: 3px;

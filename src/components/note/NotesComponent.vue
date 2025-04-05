@@ -83,9 +83,11 @@
               v-model="editorTitle"
               placeholder="Title"
               @input="resizeTitle"
+              @focus="resizeTitle"
+              rows="1"
           />
         </div>
-        <div class="notes--editor">
+        <div class="notes--editor mrg-t-10">
           <editor-component
               :data="editorData"
               @change="handleEditorChange"
@@ -434,6 +436,7 @@ export default {
         this.editorOtherData.blocks = resp.data.note_blocks;
         this.editorData.blocks = resp.data.note_blocks;
         this.editorTitle = resp.data.title;
+        this.resizeTitle();
         this.isNewEditor = false;
         this.newNotePopup.show = true;
         this.$store.dispatch("stopPreloader");
@@ -470,12 +473,11 @@ export default {
 .title-block {
   textarea {
     width: 100%;
-    min-height: 1em;
+    min-height: 30px;
     max-height: 8em;
     resize: none;
     overflow-y: hidden;
     box-sizing: border-box;
-    padding: 6px 8px;
     font-size: 20px;
     font-weight: bold;
     background-color: transparent;

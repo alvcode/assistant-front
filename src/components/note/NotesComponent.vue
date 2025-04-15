@@ -73,10 +73,6 @@
         @actionPopup="submitEditor"
     >
       <template v-slot:header>
-        <span v-if="isNewEditor">{{ $t('app_new_note') }}</span>
-        <span v-if="!isNewEditor">{{ $t('app_edit_note') }}</span>
-      </template>
-      <template v-slot:body>
         <div class="title-block">
           <textarea
               class="title-area"
@@ -87,6 +83,8 @@
               rows="1"
           />
         </div>
+      </template>
+      <template v-slot:body>
         <div class="notes--editor mrg-t-10">
           <editor-component
               :data="editorData"

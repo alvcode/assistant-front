@@ -28,6 +28,7 @@ export default {
     "app_thank_for_choosing": "Спасибо, что выбрали",
     "app_you_can_login": "Теперь вы можете войти в личный кабинет",
     "app_categories": "Категории",
+    "app_category": "Категория",
     "app_new_category": "Новая категория",
     "app_delete_category": "Удаление категории",
     "app_delete_category_text": "Категория будет удалена без возможности восстановления. Продолжить?",

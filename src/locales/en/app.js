@@ -28,6 +28,7 @@ export default {
     "app_thank_for_choosing": "Thank you for choosing",
     "app_you_can_login": "You can now log into your personal account",
     "app_categories": "Categories",
+    "app_category": "Category",
     "app_new_category": "New category",
     "app_delete_category": "Delete a category",
     "app_delete_category_text": "The category will be permanently deleted. Continue?",

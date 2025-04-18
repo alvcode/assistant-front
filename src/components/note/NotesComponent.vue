@@ -92,7 +92,13 @@
               @update:insert="handleEditorChangeForInsert"
           ></editor-component>
         </div>
-        <div v-show="updatedDatetime !== ''" class="notes--updated mrg-t-20">
+        <div class="input-block mrg-t-10">
+          <label>{{ $t('app_category') }}</label>
+          <select v-model="editorOtherData.categoryId">
+            <option v-for="item in categories" :key="item.id" :value="item.id">{{item.name}}</option>
+          </select>
+        </div>
+        <div v-show="updatedDatetime !== ''" class="notes--updated mrg-t-10">
           {{$t('app_updated')}}: {{updatedDatetime}}
         </div>
       </template>

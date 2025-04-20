@@ -20,7 +20,10 @@
         <div class="for-copy--content">
           <div class="copy-item" v-for="fc in data.blocks" :key="fc.id">
             <div
-                v-if="fc.type !== 'list' && fc.type !== 'table' && fc.type !== 'code' && fc.type !== 'alert'"
+                v-if="
+                  fc.type !== 'list' && fc.type !== 'table' && fc.type !== 'code' && fc.type !== 'alert' &&
+                  fc.type !== 'image' && fc.type !== 'attaches'
+                "
             >
               {{ decodeStringForCopy(fc.data.text) }}
             </div>
@@ -83,14 +86,43 @@ import Table from '@editorjs/table';
 import CodeTool from '@editorjs/code';
 import Alert from 'editorjs-alert';
 import he from 'he';
-//import InlineTool from 'editorjs-inline-tool';
 import ImageTool from "@editorjs/image";
+import AttachesTool from '@editorjs/attaches';
 
 import createGenericInlineTool, {
   ItalicInlineTool,
   UnderlineInlineTool,
 } from 'editorjs-inline-tool'
 import Popup from "@/components/Popup.vue";
+
+
+class CustomImageTool extends ImageTool {
+  render() {
+    const container = super.render();
+    console.log('попытка получения файла');
+    // Если в данных есть ID вместо URL
+    if (this.data.file?.id) {
+      const img = container.querySelector('img');
+      img.src = 'https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg';
+      // if (img) {
+      //   img.src = `/api/files/${this.data.file.id}`;
+      //   // Добавляем заголовок авторизации через fetch
+      //   img.onerror = async () => {
+      //     const response = await fetch(`/api/files/${this.data.file.id}`, {
+      //       headers: {
+      //         'Authorization': `Bearer ${yourAuthToken}`
+      //       }
+      //     });
+      //     const blob = await response.blob();
+      //     img.src = URL.createObjectURL(blob);
+      //   };
+      // }
+    }
+
+    return container;
+  }
+}
+
 
 export default {
   name: "EditorComponent",
@@ -182,15 +214,70 @@ export default {
             }),
           },
           underline: UnderlineInlineTool,
-          // image: {
-          //   class: ImageTool,
-          //   config: {
-          //     endpoints: {
-          //       byFile: "http://localhost:8000/uploadFile", // Загрузка файла
-          //       byUrl: "http://localhost:8000/fetchUrl",   // Загрузка по URL
-          //     },
-          //   },
-          // },
+          image: {
+            class: CustomImageTool,
+            config: {
+              endpoints: {
+                byFile: "http://localhost:8000/uploadFile", // Загрузка файла
+                byUrl: "http://localhost:8000/fetchUrl",   // Загрузка по URL
+              },
+              uploader: {
+                // uploadByFile: async (file) => {
+                //   // const formData = new FormData();
+                //   // formData.append('image', file);
+                //   //
+                //   // const response = await fetch('/api/upload-image', {
+                //   //   method: 'POST',
+                //   //   headers: {
+                //   //     'Authorization': `Bearer ${yourAuthToken}`
+                //   //   },
+                //   //   body: formData
+                //   // });
+                //
+                //   //return response.json();
+                //   console.log('asdgdh');
+                //   return {
+                //     success: 1,
+                //     file: {
+                //       url : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg"
+                //     }
+                //   };
+                // },
+                uploadByFile: async (file) => {
+                  //return response.json();
+                  console.log('asdgdh');
+                  return {
+                    success: 1,
+                    file: {
+                      id : 25
+                    }
+                  };
+                }
+              }
+            },
+          },
+          attaches: {
+            class: AttachesTool,
+            config: {
+              endpoint: 'http://localhost:8000/uploadFile',
+              uploader: {
+                uploadByFile: async (file) => {
+                  //return response.json();
+                  console.log('asdgdh');
+                  return {
+                    success: 1,
+                    file: {
+                      url : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg",
+                      name: "hero.jpg",
+                      extension: "jpg",
+                      title: "hero.jpg",
+                      size: 1234
+                    },
+                  };
+                }
+              }
+            }
+          }
         },
         onChange: () => {
           if (this.onChange) {

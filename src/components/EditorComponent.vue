@@ -94,35 +94,7 @@ import createGenericInlineTool, {
   UnderlineInlineTool,
 } from 'editorjs-inline-tool'
 import Popup from "@/components/Popup.vue";
-
-
-class CustomImageTool extends ImageTool {
-  render() {
-    const container = super.render();
-    console.log('попытка получения файла');
-    // Если в данных есть ID вместо URL
-    if (this.data.file?.id) {
-      const img = container.querySelector('img');
-      img.src = 'https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg';
-      // if (img) {
-      //   img.src = `/api/files/${this.data.file.id}`;
-      //   // Добавляем заголовок авторизации через fetch
-      //   img.onerror = async () => {
-      //     const response = await fetch(`/api/files/${this.data.file.id}`, {
-      //       headers: {
-      //         'Authorization': `Bearer ${yourAuthToken}`
-      //       }
-      //     });
-      //     const blob = await response.blob();
-      //     img.src = URL.createObjectURL(blob);
-      //   };
-      // }
-    }
-
-    return container;
-  }
-}
-
+import fileRepository from "@/repositories/file/index.js";
 
 export default {
   name: "EditorComponent",
@@ -215,41 +187,29 @@ export default {
           },
           underline: UnderlineInlineTool,
           image: {
-            class: CustomImageTool,
+            class: ImageTool,
             config: {
-              endpoints: {
-                byFile: "http://localhost:8000/uploadFile", // Загрузка файла
-                byUrl: "http://localhost:8000/fetchUrl",   // Загрузка по URL
-              },
+              // endpoints: {
+              //   byFile: "http://localhost:8000/uploadFile", // Загрузка файла
+              //   byUrl: "http://localhost:8000/fetchUrl",   // Загрузка по URL
+              // },
               uploader: {
-                // uploadByFile: async (file) => {
-                //   // const formData = new FormData();
-                //   // formData.append('image', file);
-                //   //
-                //   // const response = await fetch('/api/upload-image', {
-                //   //   method: 'POST',
-                //   //   headers: {
-                //   //     'Authorization': `Bearer ${yourAuthToken}`
-                //   //   },
-                //   //   body: formData
-                //   // });
-                //
-                //   //return response.json();
-                //   console.log('asdgdh');
-                //   return {
-                //     success: 1,
-                //     file: {
-                //       url : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg"
-                //     }
-                //   };
-                // },
                 uploadByFile: async (file) => {
-                  //return response.json();
-                  console.log('asdgdh');
+                  const response = await fileRepository.upload(file).then((resp) => {
+                    return resp.data;
+                  }).catch(err =>  {
+                    this.$store.dispatch("addNotification", {
+                      text: err.response.data.message,
+                      time: 5,
+                      color: "danger"
+                    });
+                  });
+
                   return {
                     success: 1,
                     file: {
-                      id : 25
+                      id: response.id,
+                      url : response.url
                     }
                   };
                 }
@@ -259,19 +219,28 @@ export default {
           attaches: {
             class: AttachesTool,
             config: {
-              endpoint: 'http://localhost:8000/uploadFile',
+              //endpoint: 'http://localhost:8000/uploadFile',
               uploader: {
                 uploadByFile: async (file) => {
-                  //return response.json();
-                  console.log('asdgdh');
+                  const response = await fileRepository.upload(file).then((resp) => {
+                    return resp.data;
+                  }).catch(err =>  {
+                    this.$store.dispatch("addNotification", {
+                      text: err.response.data.message,
+                      time: 5,
+                      color: "danger"
+                    });
+                  });
+
                   return {
                     success: 1,
                     file: {
-                      url : "https://www.tesla.com/tesla_theme/assets/img/_vehicle_redesign/roadster_and_semi/roadster/hero.jpg",
-                      name: "hero.jpg",
-                      extension: "jpg",
-                      title: "hero.jpg",
-                      size: 1234
+                      id: response.id,
+                      url : response.url,
+                      name: response.original_filename,
+                      extension: response.ext,
+                      title: response.original_filename,
+                      size: response.size_bytes
                     },
                   };
                 }

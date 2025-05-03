@@ -1,7 +1,7 @@
-import uploadBase64Request from "@/repositories/file/requests/upload-base64-request.js";
+import uploadRequest from "@/repositories/file/requests/upload-request.js";
 
 const fileRepository = {
-    uploadBase64: uploadBase64Request,
+    upload: uploadRequest,
 };
 
 export default fileRepository;

@@ -20,7 +20,10 @@
         <div class="for-copy--content">
           <div class="copy-item" v-for="fc in data.blocks" :key="fc.id">
             <div
-                v-if="fc.type !== 'list' && fc.type !== 'table' && fc.type !== 'code' && fc.type !== 'alert'"
+                v-if="
+                  fc.type !== 'list' && fc.type !== 'table' && fc.type !== 'code' && fc.type !== 'alert' &&
+                  fc.type !== 'image' && fc.type !== 'attaches'
+                "
             >
               {{ decodeStringForCopy(fc.data.text) }}
             </div>
@@ -83,14 +86,15 @@ import Table from '@editorjs/table';
 import CodeTool from '@editorjs/code';
 import Alert from 'editorjs-alert';
 import he from 'he';
-//import InlineTool from 'editorjs-inline-tool';
 import ImageTool from "@editorjs/image";
+import AttachesTool from '@editorjs/attaches';
 
 import createGenericInlineTool, {
   ItalicInlineTool,
   UnderlineInlineTool,
 } from 'editorjs-inline-tool'
 import Popup from "@/components/Popup.vue";
+import fileRepository from "@/repositories/file/index.js";
 
 export default {
   name: "EditorComponent",
@@ -182,15 +186,63 @@ export default {
             }),
           },
           underline: UnderlineInlineTool,
-          // image: {
-          //   class: ImageTool,
-          //   config: {
-          //     endpoints: {
-          //       byFile: "http://localhost:8000/uploadFile", // Загрузка файла
-          //       byUrl: "http://localhost:8000/fetchUrl",   // Загрузка по URL
-          //     },
-          //   },
-          // },
+          image: {
+            class: ImageTool,
+            config: {
+              uploader: {
+                uploadByFile: async (file) => {
+                 return await fileRepository.upload(file).then((resp) => {
+                    return {
+                      success: 1,
+                      file: {
+                        id: resp.data.id,
+                        url : resp.data.url
+                      }
+                    };
+                  }).catch(err =>  {
+                    this.$store.dispatch("addNotification", {
+                      text: err.response.data.message,
+                      time: 7,
+                      color: "danger"
+                    });
+                    const index = this.editor.blocks.getCurrentBlockIndex();
+                    this.editor.blocks.delete(index);
+                    return Promise.reject(err);
+                  });
+                }
+              }
+            },
+          },
+          attaches: {
+            class: AttachesTool,
+            config: {
+              uploader: {
+                uploadByFile: async (file) => {
+                  const response = await fileRepository.upload(file).then((resp) => {
+                    return resp.data;
+                  }).catch(err =>  {
+                    this.$store.dispatch("addNotification", {
+                      text: err.response.data.message,
+                      time: 7,
+                      color: "danger"
+                    });
+                  });
+
+                  return {
+                    success: 1,
+                    file: {
+                      id: response.id,
+                      url : response.url,
+                      name: response.original_filename,
+                      extension: response.ext,
+                      title: response.original_filename,
+                      size: response.size_bytes
+                    },
+                  };
+                }
+              }
+            }
+          }
         },
         onChange: () => {
           if (this.onChange) {

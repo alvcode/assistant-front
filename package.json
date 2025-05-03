@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@coolbytes/editorjs-paragraph": "^1.0.2",
+    "@editorjs/attaches": "^1.3.0",
     "@editorjs/code": "^2.9.3",
     "@editorjs/editorjs": "^2.30.7",
     "@editorjs/header": "^2.8.8",

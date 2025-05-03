@@ -189,29 +189,26 @@ export default {
           image: {
             class: ImageTool,
             config: {
-              // endpoints: {
-              //   byFile: "http://localhost:8000/uploadFile", // Загрузка файла
-              //   byUrl: "http://localhost:8000/fetchUrl",   // Загрузка по URL
-              // },
               uploader: {
                 uploadByFile: async (file) => {
-                  const response = await fileRepository.upload(file).then((resp) => {
-                    return resp.data;
+                 return await fileRepository.upload(file).then((resp) => {
+                    return {
+                      success: 1,
+                      file: {
+                        id: resp.data.id,
+                        url : resp.data.url
+                      }
+                    };
                   }).catch(err =>  {
                     this.$store.dispatch("addNotification", {
                       text: err.response.data.message,
-                      time: 5,
+                      time: 7,
                       color: "danger"
                     });
+                    const index = this.editor.blocks.getCurrentBlockIndex();
+                    this.editor.blocks.delete(index);
+                    return Promise.reject(err);
                   });
-
-                  return {
-                    success: 1,
-                    file: {
-                      id: response.id,
-                      url : response.url
-                    }
-                  };
                 }
               }
             },
@@ -219,7 +216,6 @@ export default {
           attaches: {
             class: AttachesTool,
             config: {
-              //endpoint: 'http://localhost:8000/uploadFile',
               uploader: {
                 uploadByFile: async (file) => {
                   const response = await fileRepository.upload(file).then((resp) => {
@@ -227,7 +223,7 @@ export default {
                   }).catch(err =>  {
                     this.$store.dispatch("addNotification", {
                       text: err.response.data.message,
-                      time: 5,
+                      time: 7,
                       color: "danger"
                     });
                   });

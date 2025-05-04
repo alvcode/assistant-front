@@ -454,8 +454,18 @@ export default {
       });
     },
     handleEditorChangeForInsert(data) {
-      this.editorData.blocks = data;
-      this.editorOtherData.blocks = data;
+      let result = [];
+      if (data.type === 'insert_end') {
+        for (let key in this.editorOtherData.blocks) {
+          result[result.length] = this.editorOtherData.blocks[key];
+        }
+      }
+      for (let key in data.blocks) {
+        result[result.length] = data.blocks[key];
+      }
+
+      this.editorData.blocks = result;
+      this.editorOtherData.blocks = result;
     },
     handleEditorChange(data) {
       this.editorOtherData.blocks = data.blocks;

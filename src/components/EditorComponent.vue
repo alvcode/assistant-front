@@ -282,27 +282,17 @@ export default {
     submitInsertTextPopup() {
       const lines = this.insertTextModel.split(/\r?\n/);
 
-      let result = [];
-      if (this.insertTextMode === 'insert_end') {
-        for (let key in this.data.blocks) {
-          result[result.length] = this.data.blocks[key];
-        }
-      }
-      // else if (this.insertTextMode === 'full_replace') {
-      //   if (
-      //       this.data.blocks.length > 0 &&
-      //       this.data.blocks[0].type === 'header'
-      //   ) {
-      //     result[result.length] = this.data.blocks[0];
-      //   }
-      // }
+      let result = {
+        type: this.insertTextMode,
+        blocks: []
+      };
 
       let existsLine = false;
       for (let key in lines) {
         if (lines[key].trim() === '') {
           continue;
         }
-        result[result.length] = this.getParagraph(lines[key]);
+        result.blocks[result.blocks.length] = this.getParagraph(lines[key]);
         existsLine = true;
       }
 

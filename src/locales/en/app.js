@@ -55,5 +55,9 @@ export default {
     "app_pinned": "Pinned",
     "app_other_notes": "Other",
     "app_complete_text_replacement": "Complete text replacement",
-    "app_insert_at_the_end_document": "Insert at the end of the document"
+    "app_insert_at_the_end_document": "Insert at the end of the document",
+    "app_drive": "Drive",
+    "app_mb": "MB",
+    "app_gb": "GB",
+    "app_drive_space_text": "Used {used} out of {total}"
 };

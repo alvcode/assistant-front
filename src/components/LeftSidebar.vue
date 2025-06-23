@@ -17,6 +17,16 @@
             </div>
           </router-link>
         </li>
+        <li>
+          <router-link tag="a" :to="`/drive/`">
+            <div>
+              <f-awesome :icon="['fas', 'database']" />
+            </div>
+            <div>
+              {{$t('app_drive')}}
+            </div>
+          </router-link>
+        </li>
       </ul>
     </div>
   </div>

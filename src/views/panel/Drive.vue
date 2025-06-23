@@ -1,9 +1,9 @@
 <template>
   <back-template>
-    <template v-slot:page-title>{{$t('app_notes')}}</template>
+    <template v-slot:page-title>{{$t('app_drive')}}</template>
     <template v-slot:page-content>
-      <div class="notes--container">
-        <notes-main></notes-main>
+      <div class="drive--container">
+        <drive-main></drive-main>
       </div>
     </template>
   </back-template>
@@ -11,12 +11,12 @@
 
 <script>
 import BackTemplate from "@/components/BackTemplate.vue";
-import NotesMain from "@/components/note/NotesMain.vue";
+import DriveMain from "@/components/drive/DriveMain.vue";
 
 export default {
-  name: "Notes",
+  name: "Drive",
   components: {
-    NotesMain,
+    DriveMain,
     BackTemplate,
   },
   data() {

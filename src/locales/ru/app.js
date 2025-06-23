@@ -55,5 +55,9 @@ export default {
     "app_pinned": "Закрепленные",
     "app_other_notes": "Остальные",
     "app_complete_text_replacement": "Полная замена текста",
-    "app_insert_at_the_end_document": "Вставить в конец документа"
+    "app_insert_at_the_end_document": "Вставить в конец документа",
+    "app_drive": "Диск",
+    "app_mb": "МБ",
+    "app_gb": "ГБ",
+    "app_drive_space_text": "Использовано {used} из {total}"
 };

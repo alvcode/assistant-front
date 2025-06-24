@@ -2,7 +2,9 @@
   <div class="drive-space--container">
     <div class="main-content">
       <div>
-        <progress max="100" :value="usedPercent"></progress>
+        <div class="progress-bar">
+          <div class="progress-fill" :style="{ width: usedPercent + '%' }"></div>
+        </div>
       </div>
       <div>
         {{ $t('app_drive_space_text', {used: formattedUsed, total: formattedTotal}) }}
@@ -65,6 +67,19 @@ export default {
   progress {
     width: 100%;
   }
+}
+.progress-bar {
+  width: 100%;
+  height: 7px;
+  background-color: #eee;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background-color: #4da9c7;
+  width: 0;
+  transition: width 0.3s ease;
 }
 @media (max-width: 1380px) {
   .main-content {

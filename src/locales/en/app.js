@@ -59,5 +59,17 @@ export default {
     "app_drive": "Drive",
     "app_mb": "MB",
     "app_gb": "GB",
-    "app_drive_space_text": "Used {used} out of {total}"
+    "app_drive_space_text": "Used {used} out of {total}",
+    "app_month_jan": "Jan",
+    "app_month_feb": "Feb",
+    "app_month_mar": "Mar",
+    "app_month_apr": "Apr",
+    "app_month_may": "May",
+    "app_month_jun": "Jun",
+    "app_month_jul": "Jul",
+    "app_month_aug": "Aug",
+    "app_month_sep": "Sep",
+    "app_month_oct": "Oct",
+    "app_month_nov": "Nov",
+    "app_month_dec": "Dec"
 };

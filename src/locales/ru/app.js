@@ -59,5 +59,17 @@ export default {
     "app_drive": "Диск",
     "app_mb": "МБ",
     "app_gb": "ГБ",
-    "app_drive_space_text": "Использовано {used} из {total}"
+    "app_drive_space_text": "Использовано {used} из {total}",
+    "app_month_jan": "янв",
+    "app_month_feb": "фев",
+    "app_month_mar": "мар",
+    "app_month_apr": "апр",
+    "app_month_may": "май",
+    "app_month_jun": "июн",
+    "app_month_jul": "июл",
+    "app_month_aug": "авг",
+    "app_month_sep": "сен",
+    "app_month_oct": "окт",
+    "app_month_nov": "ноя",
+    "app_month_dec": "дек"
 };

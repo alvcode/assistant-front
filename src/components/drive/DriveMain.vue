@@ -1,8 +1,14 @@
 <template>
   <div class="drive-main--container">
     <div class="main-content">
-      <div class="space">
+      <div class="space mrg-t-10">
         <drive-space :space-obj="space"></drive-space>
+      </div>
+      <div class="drive-tree-desktop mrg-t-20">
+        <drive-tree-desktop :tree="tree"></drive-tree-desktop>
+      </div>
+      <div class="drive-tree-mobile">
+        // mobile
       </div>
     </div>
   </div>
@@ -12,13 +18,17 @@
 
 import DriveSpace from "@/components/drive/DriveSpace.vue";
 import driveRepository from "@/repositories/drive/index.js";
+import DriveTreeDesktop from "@/components/drive/DriveTreeDesktop.vue";
 
 export default {
   name: "DriveMain",
-  components: {DriveSpace},
+  components: {DriveTreeDesktop, DriveSpace},
   data() {
     return {
-      space: {total: 0, used: 0}
+      space: {total: 0, used: 0},
+      tree: [],
+      breadcrumbs: [{name: "My Drive", parentId: null}],
+      parentId: null,
     }
   },
   computed: {
@@ -26,9 +36,20 @@ export default {
   },
   methods: {
     getSpace() {
-      this.$store.dispatch("startPreloader");
       driveRepository.getSpace().then(resp => {
         this.space = resp.data;
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+      });
+    },
+    getTree() {
+      this.$store.dispatch("startPreloader");
+      driveRepository.getTree(this.parentId).then(resp => {
+        this.tree = resp.data;
         this.$store.dispatch("stopPreloader");
       }).catch(err => {
         this.$store.dispatch("addNotification", {
@@ -42,6 +63,7 @@ export default {
   },
   created() {
     this.getSpace();
+    this.getTree();
   }
 };
 </script>
@@ -58,10 +80,24 @@ export default {
   //flex-direction: column;
   justify-content: right;
 }
+.drive-tree-desktop {
+  display: block;
+}
+.drive-tree-mobile {
+  display: none;
+}
 @media (max-width: 1380px) {
   //.main-content {
   //  flex-wrap: wrap;
   //  flex-direction: column-reverse;
   //}
+}
+@media (max-width: 980px) {
+  .drive-tree-desktop {
+    display: none;
+  }
+  .drive-tree-mobile {
+    display: block;
+  }
 }
 </style>

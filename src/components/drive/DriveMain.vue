@@ -82,6 +82,7 @@ export default {
 }
 .drive-tree-desktop {
   display: block;
+  width: 100%;
 }
 .drive-tree-mobile {
   display: none;

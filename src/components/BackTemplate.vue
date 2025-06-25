@@ -312,7 +312,7 @@ export default {
       width: 0;
     }
     &.max-sidebar {
-      width: 280px;
+      width: 15%;
     }
   }
   .right {
@@ -323,10 +323,11 @@ export default {
       width: 100%;
     }
     &.max-sidebar {
-      width: 90%;
+      width: 85%;
     }
 
     .right--main-content {
+      width: 100%;
       overflow: auto;
       box-sizing: border-box;
       margin: 5px 0;
@@ -526,6 +527,20 @@ export default {
 .fade-enter, .fade-leave-to {
   transform: translateX(10px);
   opacity: 0;
+}
+@media (max-width: 1360px) {
+  .back-template--content {
+    .left {
+      &.max-sidebar {
+        width: 18%;
+      }
+    }
+    .right {
+      &.max-sidebar {
+        width: 82%;
+      }
+    }
+  }
 }
 @media (max-width: 550px) {
   .back-template--content {

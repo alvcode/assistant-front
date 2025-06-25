@@ -18,11 +18,17 @@
               <div class="icon"><f-awesome :icon="['fas', 'folder']"></f-awesome></div>
               <div class="name">{{ item.name }}</div>
             </div>
+            <div v-if="item.type === 1" class="row--name">
+              <div class="icon">
+
+              </div>
+              <div class="name">{{ item.name }}</div>
+            </div>
           </div>
           <div>{{ convertDatetime(item.created_at) }}</div>
           <div>
             <span v-if="item.type === 0">-</span>
-            <span v-if="item.type === 1">надо добавить на бэк размер файла в ответе</span>
+            <span v-if="item.type === 1">{{ getSize(item.size) }}</span>
           </div>
           <div>actions</div>
         </div>
@@ -52,6 +58,13 @@ export default {
   methods: {
     convertDatetime(datetime) {
       return this.phpDateTimeToShortString(datetime);
+    },
+    getSize(size) {
+      if (size >= 1024 * 1024 * 1024) {
+        return (size / (1024 * 1024 * 1024)).toFixed(2) + ' ' +this.$t('app_gb');
+      } else {
+        return (size / (1024 * 1024)).toFixed(2) + ' ' +this.$t('app_mb');
+      }
     }
   },
   created() {

@@ -71,5 +71,9 @@ export default {
     "app_month_sep": "Sep",
     "app_month_oct": "Oct",
     "app_month_nov": "Nov",
-    "app_month_dec": "Dec"
+    "app_month_dec": "Dec",
+    "app_drive_table_name": "Name",
+    "app_created": "Created",
+    "app_size": "Size",
+    "app_actions": "Actions"
 };

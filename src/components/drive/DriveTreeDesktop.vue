@@ -2,10 +2,10 @@
   <div class="drive-tree-desktop--container">
     <div class="table">
       <div class="header">
-        <div>Название</div>
-        <div>Создано</div>
-        <div>Размер</div>
-        <div>Действия</div>
+        <div>{{ $t('app_drive_table_name') }}</div>
+        <div>{{ $t('app_created') }}</div>
+        <div>{{ $t('app_size') }}</div>
+        <div>{{ $t('app_actions') }}</div>
       </div>
       <div class="rows">
         <div
@@ -129,8 +129,27 @@ export default {
       }
     }
 
-    .row:hover > div {
-      background-color: #e6f8ff !important;
+    //.row:hover > div {
+    //  background-color: #e6f8ff !important;
+    //}
+  }
+}
+// theme
+.light-theme {
+  .table {
+    .rows {
+      .row:hover > div {
+        background-color: #e6f8ff !important;
+      }
+    }
+  }
+}
+.dark-theme {
+  .table {
+    .rows {
+      .row:hover > div {
+        background-color: #404043 !important;
+      }
     }
   }
 }

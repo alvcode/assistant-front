@@ -71,5 +71,9 @@ export default {
     "app_month_sep": "сен",
     "app_month_oct": "окт",
     "app_month_nov": "ноя",
-    "app_month_dec": "дек"
+    "app_month_dec": "дек",
+    "app_drive_table_name": "Название",
+    "app_created": "Создано",
+    "app_size": "Размер",
+    "app_actions": "Действия"
 };

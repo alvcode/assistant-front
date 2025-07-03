@@ -9,9 +9,10 @@
       </div>
       <div class="rows">
         <div
-            class="row cursor-pointer"
+            class="row cursor-pointer no-select"
             v-for="item in tree"
             :key="item.id"
+            @dblclick="fallInside(item.id, item.type)"
         >
           <div>
             <div v-if="item.type === 0" class="row--name">
@@ -42,6 +43,7 @@ import dateFormatMixin from "@/components/mixins/dateFormatMixin.js";
 
 export default {
   name: "DriveTreeDesktop",
+  emits: ["fallInside"],
   components: {},
   data() {
     return {
@@ -65,7 +67,12 @@ export default {
       } else {
         return (size / (1024 * 1024)).toFixed(2) + ' ' +this.$t('app_mb');
       }
-    }
+    },
+    fallInside(itemId, itemType) {
+      if (itemType === 0) {
+        this.$emit('fallInside', itemId);
+      }
+    },
   },
   created() {
 

@@ -5,7 +5,11 @@
         <drive-space :space-obj="space"></drive-space>
       </div>
       <div class="drive-tree-desktop mrg-t-20">
-        <drive-tree-desktop :tree="tree"></drive-tree-desktop>
+        <drive-breadcrumbs :breadcrumbs="breadcrumbs"></drive-breadcrumbs>
+        <drive-tree-desktop
+            :tree="tree"
+            @fall-inside="fallInside"
+        ></drive-tree-desktop>
       </div>
       <div class="drive-tree-mobile">
         // mobile
@@ -19,10 +23,11 @@
 import DriveSpace from "@/components/drive/DriveSpace.vue";
 import driveRepository from "@/repositories/drive/index.js";
 import DriveTreeDesktop from "@/components/drive/DriveTreeDesktop.vue";
+import DriveBreadcrumbs from "@/components/drive/DriveBreadcrumbs.vue";
 
 export default {
   name: "DriveMain",
-  components: {DriveTreeDesktop, DriveSpace},
+  components: {DriveBreadcrumbs, DriveTreeDesktop, DriveSpace},
   data() {
     return {
       space: {total: 0, used: 0},
@@ -59,6 +64,10 @@ export default {
         });
         this.$store.dispatch("stopPreloader");
       });
+    },
+    fallInside(parentId) {
+      this.parentId = parentId;
+      this.getTree();
     }
   },
   created() {

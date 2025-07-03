@@ -2,7 +2,7 @@ import axios from "axios";
 
 export default async function getTreeRequest(parentId) {
     try {
-        parentId = 8;
+        //parentId = 8;
         let param = '';
         if (parentId && parentId > 0) {
             param = '?parentId=' + parentId;

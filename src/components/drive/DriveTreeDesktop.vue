@@ -4,7 +4,7 @@
       <div @click="fallBack" v-if="showFallback" class="btn btn-sm btn-info">
         <f-awesome icon="arrow-left"></f-awesome>
       </div>
-      <div class="btn btn-sm btn-info">
+      <div @click="showNewDirectoryPopup" class="btn btn-sm btn-info">
         <f-awesome icon="plus"></f-awesome>
         {{ $t('app_drive_create_folder') }}
       </div>
@@ -44,28 +44,88 @@
             <span v-if="item.type === 0">-</span>
             <span v-if="item.type === 1">{{ getSize(item.size) }}</span>
           </div>
-          <div>actions</div>
+          <div>
+            <div @click="showDeletePopup(item.id, item.type, item.name)" class="btx-sm-circle btx-danger">
+              <f-awesome icon="times"></f-awesome>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <popup
+        :closeButton="newDirectoryPopup.closeButton"
+        :actionButton="newDirectoryPopup.actionButton"
+        :action-class="newDirectoryPopup.actionClass"
+        :show="newDirectoryPopup.show"
+        @closePopup="closeNewDirectoryPopup"
+        @actionPopup="submitNewDirectoryPopup"
+    >
+      <template v-slot:header>{{ $t('app_drive_create_folder') }}</template>
+      <template v-slot:body>
+        <div class="input-block">
+          <label>{{ $t('form_name') }}</label>
+          <input type="text" v-model="newDirectoryModel">
+        </div>
+      </template>
+    </popup>
+
+    <popup
+        :closeButton="deletePopup.closeButton"
+        :actionButton="deletePopup.actionButton"
+        :action-class="deletePopup.actionClass"
+        :show="deletePopup.show"
+        @closePopup="closeDeletePopup"
+        @actionPopup="submitDeletePopup"
+    >
+      <template v-slot:header>
+        <span v-if="deletedType === 0">{{ $t('app_drive_delete_directory', {folder: this.deleteName}) }}</span>
+        <span v-if="deletedType === 1">{{ $t('app_drive_delete_file', {file: this.deleteName}) }}</span>
+      </template>
+      <template v-slot:body>
+        <span v-if="deletedType === 0">{{ $t('app_drive_delete_directory_text') }}</span>
+        <span v-if="deletedType === 1">{{ $t('app_drive_delete_file_text') }}</span>
+      </template>
+    </popup>
+
   </div>
 </template>
 
 <script>
 import dateFormatMixin from "@/components/mixins/dateFormatMixin.js";
+import Popup from "@/components/Popup.vue";
+import CategoryFields from "@/components/note/CategoryFields.vue";
+import driveRepository from "@/repositories/drive/index.js";
 
 export default {
   name: "DriveTreeDesktop",
-  emits: ["fallInside", "fallBack"],
-  components: {},
+  emits: ["fallInside", "fallBack", "update:tree", "update:get-tree"],
+  components: {CategoryFields, Popup},
   data() {
     return {
+      newDirectoryPopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_save'),
+        actionClass: 'btn-success',
+      },
+      newDirectoryModel: '',
 
+      deletePopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_continue'),
+        actionClass: 'btn-success',
+      },
+      deletedId: 0,
+      deletedType: 0,
+      deleteName: '',
     }
   },
   mixins: [dateFormatMixin],
   props: {
     tree: Array,
+    parentId: Number,
     showFallback: Boolean,
   },
   computed: {
@@ -89,6 +149,54 @@ export default {
     },
     fallBack() {
       this.$emit('fallBack');
+    },
+    closeNewDirectoryPopup() {
+      this.newDirectoryPopup.show = false;
+    },
+    showNewDirectoryPopup() {
+      this.newDirectoryPopup.show = true;
+    },
+    submitNewDirectoryPopup() {
+      this.$store.dispatch("startPreloader");
+      driveRepository.createDirectory(this.newDirectoryModel, this.parentId).then(resp => {
+        this.closeNewDirectoryPopup();
+        this.newDirectoryModel = '';
+        this.$emit('update:tree', resp.data);
+
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      })
+    },
+
+    closeDeletePopup() {
+      this.deletePopup.show = false;
+    },
+    showDeletePopup(itemId, type, itemName) {
+      this.deletedId = itemId;
+      this.deletedType = type;
+      this.deleteName = itemName;
+      this.deletePopup.show = true;
+    },
+    submitDeletePopup() {
+      this.$store.dispatch("startPreloader");
+      driveRepository.delete(this.deletedId).then(() => {
+        this.closeDeletePopup();
+        this.$emit('update:get-tree');
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      })
     },
   },
   created() {

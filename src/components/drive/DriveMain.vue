@@ -11,9 +11,12 @@
         <drive-tree-desktop
             class="mrg-t-10"
             :tree="tree"
+            :parent-id="parentId"
             :show-fallback="breadcrumbs.length > 1"
             @fall-inside="fallInside"
             @fall-back="fallBack"
+            @update:tree="setTree"
+            @update:get-tree="getTree"
         ></drive-tree-desktop>
       </div>
       <div class="drive-tree-mobile">
@@ -86,6 +89,9 @@ export default {
         this.breadcrumbs.pop();
       }
     },
+    setTree(data) {
+      this.tree = data;
+    }
   },
   created() {
     this.getSpace();

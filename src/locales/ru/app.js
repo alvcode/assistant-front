@@ -76,6 +76,10 @@ export default {
     "app_created": "Создано",
     "app_size": "Размер",
     "app_actions": "Действия",
-    "app_drive_create_folder": "Создать директорию",
-    "app_upload_files": "Загрузить файлы"
+    "app_drive_create_folder": "Создать папку",
+    "app_upload_files": "Загрузить файлы",
+    "app_drive_delete_directory": "Удаление папки '{folder}'",
+    "app_drive_delete_directory_text": "Папка будет удалена вместе с вложенными файлами и подпапками. Продолжить?",
+    "app_drive_delete_file": "Удаление файла '{file}'",
+    "app_drive_delete_file_text": "Файл будет удален без возможности восстановления. Продолжить?"
 };

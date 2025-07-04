@@ -77,5 +77,9 @@ export default {
     "app_size": "Size",
     "app_actions": "Actions",
     "app_drive_create_folder": "Create folder",
-    "app_upload_files": "Upload files"
+    "app_upload_files": "Upload files",
+    "app_drive_delete_directory": "Delete folder '{folder}'",
+    "app_drive_delete_directory_text": "The folder will be deleted along with its attached files and subfolders. Continue?",
+    "app_drive_delete_file": "Delete file '{file}'",
+    "app_drive_delete_file_text": "The file will be deleted without the possibility of recovery. Continue?"
 };

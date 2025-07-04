@@ -1,5 +1,18 @@
 <template>
   <div class="drive-tree-desktop--container">
+    <div class="actions">
+      <div @click="fallBack" v-if="showFallback" class="btn btn-sm btn-info">
+        <f-awesome icon="arrow-left"></f-awesome>
+      </div>
+      <div class="btn btn-sm btn-info">
+        <f-awesome icon="plus"></f-awesome>
+        {{ $t('app_drive_create_folder') }}
+      </div>
+      <div class="btn btn-sm btn-info">
+        <f-awesome icon="upload"></f-awesome>
+        {{ $t('app_upload_files') }}
+      </div>
+    </div>
     <div class="table">
       <div class="header">
         <div>{{ $t('app_drive_table_name') }}</div>
@@ -43,7 +56,7 @@ import dateFormatMixin from "@/components/mixins/dateFormatMixin.js";
 
 export default {
   name: "DriveTreeDesktop",
-  emits: ["fallInside"],
+  emits: ["fallInside", "fallBack"],
   components: {},
   data() {
     return {
@@ -52,7 +65,8 @@ export default {
   },
   mixins: [dateFormatMixin],
   props: {
-    tree: Array
+    tree: Array,
+    showFallback: Boolean,
   },
   computed: {
 
@@ -72,6 +86,9 @@ export default {
       if (itemType === 0) {
         this.$emit('fallInside', itemId);
       }
+    },
+    fallBack() {
+      this.$emit('fallBack');
     },
   },
   created() {

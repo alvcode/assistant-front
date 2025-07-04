@@ -5,10 +5,15 @@
         <drive-space :space-obj="space"></drive-space>
       </div>
       <div class="drive-tree-desktop mrg-t-20">
-        <drive-breadcrumbs :breadcrumbs="breadcrumbs"></drive-breadcrumbs>
+        <drive-breadcrumbs
+            :breadcrumbs="breadcrumbs"
+        ></drive-breadcrumbs>
         <drive-tree-desktop
+            class="mrg-t-10"
             :tree="tree"
+            :show-fallback="breadcrumbs.length > 1"
             @fall-inside="fallInside"
+            @fall-back="fallBack"
         ></drive-tree-desktop>
       </div>
       <div class="drive-tree-mobile">
@@ -32,7 +37,7 @@ export default {
     return {
       space: {total: 0, used: 0},
       tree: [],
-      breadcrumbs: [{name: "My Drive", parentId: null}],
+      breadcrumbs: [{name: this.$t('app_drive'), parentId: null}],
       parentId: null,
     }
   },
@@ -65,10 +70,22 @@ export default {
         this.$store.dispatch("stopPreloader");
       });
     },
-    fallInside(parentId) {
-      this.parentId = parentId;
+    fallInside(rowId) {
+      this.parentId = rowId;
+      for (let i = 0; i < this.tree.length; i++) {
+        if (this.tree[i].id === rowId) {
+          this.breadcrumbs.push({name: this.tree[i].name, parentId: this.parentId});
+        }
+      }
       this.getTree();
-    }
+    },
+    fallBack() {
+      if (this.breadcrumbs.length > 1) {
+        this.parentId = this.breadcrumbs[this.breadcrumbs.length - 2].parentId;
+        this.getTree();
+        this.breadcrumbs.pop();
+      }
+    },
   },
   created() {
     this.getSpace();

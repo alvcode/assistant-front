@@ -75,5 +75,7 @@ export default {
     "app_drive_table_name": "Name",
     "app_created": "Created",
     "app_size": "Size",
-    "app_actions": "Actions"
+    "app_actions": "Actions",
+    "app_drive_create_folder": "Create folder",
+    "app_upload_files": "Upload files"
 };

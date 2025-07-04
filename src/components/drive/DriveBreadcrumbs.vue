@@ -1,7 +1,9 @@
 <template>
   <div class="drive-breadcrumbs--container">
     <div class="main-content">
-      {{breadcrumbs}}
+      <div class="breadcrumbs">
+        {{breadcrumbs}}
+      </div>
     </div>
   </div>
 </template>

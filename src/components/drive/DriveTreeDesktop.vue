@@ -8,7 +8,7 @@
         <f-awesome icon="plus"></f-awesome>
         {{ $t('app_drive_create_folder') }}
       </div>
-      <div class="btn btn-sm btn-info">
+      <div @click="showUploadPopup" class="btn btn-sm btn-info">
         <f-awesome icon="upload"></f-awesome>
         {{ $t('app_upload_files') }}
       </div>
@@ -88,6 +88,20 @@
       </template>
     </popup>
 
+    <popup
+        :closeButton="uploadPopup.closeButton"
+        :actionButton="uploadPopup.actionButton"
+        :action-class="uploadPopup.actionClass"
+        :show="uploadPopup.show"
+        @closePopup="closeUploadPopup"
+        @actionPopup="submitUploadPopup"
+    >
+      <template v-slot:header>{{ $t('app_upload_files') }}</template>
+      <template v-slot:body>
+        // форма загрузки файлов
+      </template>
+    </popup>
+
   </div>
 </template>
 
@@ -120,6 +134,13 @@ export default {
       deletedId: 0,
       deletedType: 0,
       deleteName: '',
+
+      uploadPopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_upload'),
+        actionClass: 'btn-success',
+      },
     }
   },
   mixins: [dateFormatMixin],
@@ -132,6 +153,15 @@ export default {
 
   },
   methods: {
+    showUploadPopup() {
+      this.uploadPopup.show = true;
+    },
+    closeUploadPopup() {
+      this.uploadPopup.show = false;
+    },
+    submitUploadPopup() {
+      console.log('uploaded');
+    },
     convertDatetime(datetime) {
       return this.phpDateTimeToShortString(datetime);
     },

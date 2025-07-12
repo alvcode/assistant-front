@@ -78,6 +78,7 @@ export default {
     "app_actions": "Действия",
     "app_drive_create_folder": "Создать папку",
     "app_upload_files": "Загрузить файлы",
+    "app_upload": "Загрузить",
     "app_drive_delete_directory": "Удаление папки '{folder}'",
     "app_drive_delete_directory_text": "Папка будет удалена вместе с вложенными файлами и подпапками. Продолжить?",
     "app_drive_delete_file": "Удаление файла '{file}'",

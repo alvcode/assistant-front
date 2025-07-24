@@ -8,7 +8,7 @@
         <f-awesome icon="plus"></f-awesome>
         {{ $t('app_drive_create_folder') }}
       </div>
-      <div class="btn btn-sm btn-info">
+      <div @click="showUploadPopup" class="btn btn-sm btn-info">
         <f-awesome icon="upload"></f-awesome>
         {{ $t('app_upload_files') }}
       </div>
@@ -88,6 +88,56 @@
       </template>
     </popup>
 
+    <popup
+        :closeButton="uploadPopup.closeButton"
+        :actionButton="uploadPopup.actionButton"
+        :action-class="uploadPopup.actionClass"
+        :show="uploadPopup.show"
+        @closePopup="closeUploadPopup"
+        @actionPopup="submitUploadPopup"
+    >
+      <template v-slot:header>{{ $t('app_upload_files') }}</template>
+      <template v-slot:body>
+        <div>
+          <div
+              v-show="!files.length"
+              class="upload-area"
+              @dragover.prevent="isDragging = true"
+              @dragleave.prevent="isDragging = false"
+              @drop.prevent="handleDrop"
+              @click="openFileDialog"
+              :class="{ dragover: isDragging }"
+          >
+            <div v-if="!files.length">
+              <div class="mrg-t-30 download-icon"><f-awesome icon="download"></f-awesome></div>
+              <div class="mrg-t-10">{{ $t('form_move_files_or_click') }}</div>
+            </div>
+            <input
+                type="file"
+                multiple
+                ref="fileInput"
+                class="input-file"
+                @change="handleFileChange"
+            />
+          </div>
+          <ul class="upload-ul" v-if="files.length > 0">
+            <li v-for="(file, index) in files" :key="index">
+              <div class="icon">ico</div>
+              <div class="name">{{ file.name }}</div>
+              <div class="delete">
+                <div class="btn-badge btn-danger">
+                  <f-awesome icon="times"></f-awesome>
+                </div>
+              </div>
+            </li>
+          </ul>
+          <div v-if="files.length > 0" class="mrg-t-15">
+            <div @click="clearFiles" class="btn btn-sm btn-danger">{{ $t('app_delete_all') }}</div>
+          </div>
+        </div>
+      </template>
+    </popup>
+
   </div>
 </template>
 
@@ -120,6 +170,16 @@ export default {
       deletedId: 0,
       deletedType: 0,
       deleteName: '',
+
+      uploadPopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_upload'),
+        actionClass: 'btn-success',
+      },
+      files: [],
+      //fileInput: null,
+      isDragging: false,
     }
   },
   mixins: [dateFormatMixin],
@@ -132,6 +192,29 @@ export default {
 
   },
   methods: {
+    clearFiles() {
+      this.files = [];
+    },
+    openFileDialog() {
+      this.$refs.fileInput.click();
+    },
+    handleFileChange(event) {
+      this.files = Array.from(event.target.files);
+    },
+    handleDrop(event) {
+      this.files = Array.from(event.dataTransfer.files);
+      this.isDragging = false;
+    },
+
+    closeUploadPopup() {
+      this.uploadPopup.show = false;
+    },
+    showUploadPopup() {
+      this.uploadPopup.show = true;
+    },
+    submitUploadPopup() {
+      console.log('upload');
+    },
     convertDatetime(datetime) {
       return this.phpDateTimeToShortString(datetime);
     },
@@ -296,6 +379,48 @@ export default {
   }
   .name {
     margin-left: 8px;
+  }
+}
+.input-file {
+  display: none;
+}
+.upload-area {
+  width: 100%;
+  height: 140px;
+  text-align: center;
+  //line-height: 120px;
+  cursor: pointer;
+  background-color: #f2f2f3;
+  border-radius: 20px;
+  border: 2px dashed #d9d9d9;
+
+  .download-icon {
+    font-size: 30px;
+  }
+}
+.upload-ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    flex-direction: row;
+    text-decoration: none;
+    margin-top: 16px;
+
+    .icon {
+      width: 10%;
+    }
+    .name {
+      width: 75%;
+    }
+    .delete {
+      width: 10%;
+    }
   }
 }
 @media (max-width: 1380px) {

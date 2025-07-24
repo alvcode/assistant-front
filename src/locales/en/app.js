@@ -1,5 +1,6 @@
 export default {
     "app_delete": "Delete",
+    "app_delete_all": "Delete all",
     "app_success": "Success",
     "app_add": "Add",
     "app_reset": "Reset",
@@ -78,6 +79,7 @@ export default {
     "app_actions": "Actions",
     "app_drive_create_folder": "Create folder",
     "app_upload_files": "Upload files",
+    "app_upload": "Upload",
     "app_drive_delete_directory": "Delete folder '{folder}'",
     "app_drive_delete_directory_text": "The folder will be deleted along with its attached files and subfolders. Continue?",
     "app_drive_delete_file": "Delete file '{file}'",

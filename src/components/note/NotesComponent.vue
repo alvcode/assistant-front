@@ -34,7 +34,7 @@
     </div>
 
     <div class="notes mrg-t-10">
-      <div v-show="notes.length === 0" class="empty text-bold text-danger text-center">{{ $t('app_empty_for_now') }}</div>
+      <div v-show="notes.length === 0 && isFirstLoaded" class="empty text-bold text-danger text-center">{{ $t('app_empty_for_now') }}</div>
       <div v-show="notes.length > 0" class="list">
         <div class="pinned" v-show="computedPinnedNotes.length > 0">
           <div class="text-hint">{{ $t('app_pinned') }}</div>
@@ -134,6 +134,7 @@ export default {
   components: {NoteCard, EditorComponent, CategoryFields, Popup},
   data() {
     return {
+      isFirstLoaded: false,
       editorData: {
         time: Date.now(),
         blocks: [],
@@ -322,9 +323,11 @@ export default {
     loadNotes(catId) {
       this.$store.dispatch("startPreloader");
       noteRepository.all(catId).then((resp) => {
+        this.isFirstLoaded = true;
         this.notes = resp.data;
         this.$store.dispatch("stopPreloader");
       }).catch(err =>  {
+        this.isFirstLoaded = true;
         this.$store.dispatch("addNotification", {
           text: err.response.data.message,
           time: 5,

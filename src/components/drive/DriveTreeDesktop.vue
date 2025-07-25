@@ -90,7 +90,6 @@
 
     <popup
         :closeButton="uploadPopup.closeButton"
-        :actionButton="uploadPopup.actionButton"
         :action-class="uploadPopup.actionClass"
         :show="uploadPopup.show"
         @closePopup="closeUploadPopup"
@@ -124,15 +123,16 @@
             <li v-for="(file, index) in files" :key="index">
               <div class="icon">ico</div>
               <div class="name">{{ file.name }}</div>
-              <div class="delete">
-                <div class="btn-badge btn-danger">
+              <div @click="clearFile(index)" class="delete">
+                <div class=" btn-sm-circle btn-danger">
                   <f-awesome icon="times"></f-awesome>
                 </div>
               </div>
             </li>
           </ul>
-          <div v-if="files.length > 0" class="mrg-t-15">
-            <div @click="clearFiles" class="btn btn-sm btn-danger">{{ $t('app_delete_all') }}</div>
+          <div v-if="files.length > 0" class="mrg-t-20">
+            <div @click="clearFiles" class="btx btx-sm btx-danger">{{ $t('app_clear_list') }}</div>
+            <div @click="clearFiles" class="btx btx-sm btx-success">{{ $t('app_upload') }}</div>
           </div>
         </div>
       </template>
@@ -173,8 +173,7 @@ export default {
 
       uploadPopup: {
         show: false,
-        closeButton: this.$t('app_cancel'),
-        actionButton: this.$t('app_upload'),
+        closeButton: this.$t('app_close'),
         actionClass: 'btn-success',
       },
       files: [],
@@ -192,6 +191,9 @@ export default {
 
   },
   methods: {
+    clearFile(idx) {
+      this.files.splice(idx, 1);
+    },
     clearFiles() {
       this.files = [];
     },
@@ -358,6 +360,10 @@ export default {
       }
     }
   }
+  .upload-area {
+    background-color: #f2f2f3;
+    border: 2px dashed #d9d9d9;
+  }
 }
 .dark-theme {
   .table {
@@ -366,6 +372,10 @@ export default {
         background-color: #404043 !important;
       }
     }
+  }
+  .upload-area {
+    background-color: #404043;
+    border: 2px dashed #535359;
   }
 }
 .row--name {
@@ -388,11 +398,8 @@ export default {
   width: 100%;
   height: 140px;
   text-align: center;
-  //line-height: 120px;
   cursor: pointer;
-  background-color: #f2f2f3;
   border-radius: 20px;
-  border: 2px dashed #d9d9d9;
 
   .download-icon {
     font-size: 30px;
@@ -414,12 +421,14 @@ export default {
 
     .icon {
       width: 10%;
+      text-align: center;
     }
     .name {
       width: 75%;
     }
     .delete {
       width: 10%;
+      text-align: center;
     }
   }
 }

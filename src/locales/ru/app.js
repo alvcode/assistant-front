@@ -83,5 +83,6 @@ export default {
     "app_drive_delete_directory": "Удаление папки '{folder}'",
     "app_drive_delete_directory_text": "Папка будет удалена вместе с вложенными файлами и подпапками. Продолжить?",
     "app_drive_delete_file": "Удаление файла '{file}'",
-    "app_drive_delete_file_text": "Файл будет удален без возможности восстановления. Продолжить?"
+    "app_drive_delete_file_text": "Файл будет удален без возможности восстановления. Продолжить?",
+    "app_clear_list": "Очистить список"
 };

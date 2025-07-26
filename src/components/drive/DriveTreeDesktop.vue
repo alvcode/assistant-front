@@ -34,7 +34,7 @@
             </div>
             <div v-if="item.type === 1" class="row--name">
               <div class="icon">
-
+                <f-awesome :icon="getFileIconName(item.name)"></f-awesome>
               </div>
               <div class="name">{{ item.name }}</div>
             </div>
@@ -99,7 +99,6 @@
       <template v-slot:body>
         <div>
           <div
-              v-show="!files.length"
               class="upload-area"
               @dragover.prevent="isDragging = true"
               @dragleave.prevent="isDragging = false"
@@ -107,7 +106,7 @@
               @click="openFileDialog"
               :class="{ dragover: isDragging }"
           >
-            <div v-if="!files.length">
+            <div>
               <div class="mrg-t-30 download-icon"><f-awesome icon="download"></f-awesome></div>
               <div class="mrg-t-10">{{ $t('form_move_files_or_click') }}</div>
             </div>
@@ -119,10 +118,18 @@
                 @change="handleFileChange"
             />
           </div>
-          <ul class="upload-ul" v-if="files.length > 0">
-            <li v-for="(file, index) in files" :key="index">
-              <div class="icon">ico</div>
-              <div class="name">{{ file.name }}</div>
+          <ul class="upload-ul" v-if="filesComputed.length > 0">
+            <li v-for="(file, index) in filesComputed" :key="index">
+              <div class="icon">
+                <span v-if="file.status === 'idle'"><f-awesome :icon="getFileIconName(file.name)"></f-awesome></span>
+                <span v-if="file.status === 'process'"><f-awesome icon="spinner" spin></f-awesome></span>
+                <span v-if="file.status === 'uploaded'"><f-awesome icon="check" class="text-success"></f-awesome></span>
+                <span v-if="file.status === 'error'"><f-awesome icon="times" class="text-danger"></f-awesome></span>
+              </div>
+              <div class="name">
+                <div>{{ file.name }}</div>
+                <div v-if="file.status === 'error'" class="file-error text-danger text-small">{{ file.errorText }}</div>
+              </div>
               <div @click="clearFile(index)" class="delete">
                 <div class=" btn-sm-circle btn-danger">
                   <f-awesome icon="times"></f-awesome>
@@ -130,9 +137,9 @@
               </div>
             </li>
           </ul>
-          <div v-if="files.length > 0" class="mrg-t-20">
+          <div v-if="filesComputed.length > 0" class="mrg-t-20">
             <div @click="clearFiles" class="btx btx-sm btx-danger">{{ $t('app_clear_list') }}</div>
-            <div @click="clearFiles" class="btx btx-sm btx-success">{{ $t('app_upload') }}</div>
+            <div @click="submitUploadPopup" class="btx btx-sm btx-success">{{ $t('app_upload') }}</div>
           </div>
         </div>
       </template>
@@ -143,6 +150,7 @@
 
 <script>
 import dateFormatMixin from "@/components/mixins/dateFormatMixin.js";
+import fileIconMixin from "@/components/mixins/fileIconMixin.js";
 import Popup from "@/components/Popup.vue";
 import CategoryFields from "@/components/note/CategoryFields.vue";
 import driveRepository from "@/repositories/drive/index.js";
@@ -177,20 +185,44 @@ export default {
         actionClass: 'btn-success',
       },
       files: [],
-      //fileInput: null,
+      uploadFileStatus: [],
       isDragging: false,
     }
   },
-  mixins: [dateFormatMixin],
+  mixins: [dateFormatMixin, fileIconMixin],
   props: {
     tree: Array,
     parentId: Number,
     showFallback: Boolean,
   },
   computed: {
-
+    filesComputed() {
+      let result = [];
+      for (let key in this.files) {
+        let status = 'idle';
+        let errorText = '';
+        for (let keyStat in this.uploadFileStatus) {
+          if (this.uploadFileStatus[keyStat].idx === key) {
+            status = this.uploadFileStatus[keyStat].status;
+            errorText = this.uploadFileStatus[keyStat].errorText;
+          }
+        }
+        const file = {
+          name: this.files[key].name,
+          size: this.files[key].size,
+          lastModified: this.files[key].lastModified,
+          status: status,
+          errorText: errorText,
+        };
+        result.push(file);
+      }
+      return result;
+    }
   },
   methods: {
+    getFileIconName(filename) {
+      return this.getIconNameByFilename(filename);
+    },
     clearFile(idx) {
       this.files.splice(idx, 1);
     },
@@ -201,21 +233,67 @@ export default {
       this.$refs.fileInput.click();
     },
     handleFileChange(event) {
-      this.files = Array.from(event.target.files);
+      const newFiles = Array.from(event.target.files);
+      this.files = [...this.files, ...newFiles];
     },
     handleDrop(event) {
-      this.files = Array.from(event.dataTransfer.files);
+      const newFiles = Array.from(event.dataTransfer.files);
+      this.files = [...this.files, ...newFiles];
       this.isDragging = false;
     },
 
     closeUploadPopup() {
       this.uploadPopup.show = false;
+      this.files = [];
+      this.uploadFileStatus = [];
     },
     showUploadPopup() {
       this.uploadPopup.show = true;
     },
     submitUploadPopup() {
-      console.log('upload');
+      for (let key in this.files) {
+        let needUpload = true;
+        for (let keyStat in this.uploadFileStatus) {
+          if (this.uploadFileStatus[keyStat].idx === key) {
+            if (
+                this.uploadFileStatus[keyStat].status === 'process' ||
+                this.uploadFileStatus[keyStat].status === 'uploaded'
+            ) {
+              needUpload = false;
+            }
+          }
+        }
+
+        if (needUpload) {
+          this.upsertUploadFileStatus(key, 'process', '');
+
+          driveRepository.upload(this.files[key], this.parentId).then(resp => {
+            this.upsertUploadFileStatus(key, 'uploaded', '');
+            this.$emit('update:tree', resp.data);
+          }).catch(err => {
+            this.upsertUploadFileStatus(key, 'error', err.response.data.message);
+            this.$store.dispatch("stopPreloader");
+          })
+        }
+      }
+    },
+    upsertUploadFileStatus(idx, status, errorText) {
+      let exists = false;
+      for (let key in this.uploadFileStatus) {
+        if (this.uploadFileStatus[key].idx === idx) {
+          exists = true;
+          this.uploadFileStatus[key].status = status;
+          this.uploadFileStatus[key].errorText = errorText;
+        }
+      }
+
+      if (!exists) {
+        this.uploadFileStatus.push({
+          idx: idx,
+          status: status,
+          errorText: errorText,
+        })
+      }
     },
     convertDatetime(datetime) {
       return this.phpDateTimeToShortString(datetime);
@@ -422,6 +500,7 @@ export default {
     .icon {
       width: 10%;
       text-align: center;
+      font-size: 16px;
     }
     .name {
       width: 75%;

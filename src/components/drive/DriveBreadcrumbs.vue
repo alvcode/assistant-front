@@ -3,6 +3,7 @@
     <div class="main-content">
       <div class="breadcrumbs">
         {{breadcrumbs}}
+
       </div>
     </div>
   </div>

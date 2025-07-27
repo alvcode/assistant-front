@@ -27,7 +27,7 @@
             :key="item.id"
             @dblclick="fallInside(item.id, item.type)"
         >
-          <div>
+          <div class="row-name-block">
             <div v-if="item.type === 0" class="row--name">
               <div class="icon"><f-awesome :icon="['fas', 'folder']"></f-awesome></div>
               <div class="name">{{ item.name }}</div>
@@ -45,6 +45,9 @@
             <span v-if="item.type === 1">{{ getSize(item.size) }}</span>
           </div>
           <div>
+            <div @click="showRenamePopup(item.id, item.name)" class="btx-sm-circle btx-info">
+              <f-awesome icon="pen"></f-awesome>
+            </div>
             <div @click="showDeletePopup(item.id, item.type, item.name)" class="btx-sm-circle btx-danger">
               <f-awesome icon="times"></f-awesome>
             </div>
@@ -145,6 +148,23 @@
       </template>
     </popup>
 
+    <popup
+        :closeButton="renamePopup.closeButton"
+        :actionButton="renamePopup.actionButton"
+        :action-class="renamePopup.actionClass"
+        :show="renamePopup.show"
+        @closePopup="closeRenamePopup"
+        @actionPopup="submitRenamePopup"
+    >
+      <template v-slot:header>Переименование</template>
+      <template v-slot:body>
+        <div class="input-block">
+          <label>{{ $t('form_name') }}</label>
+          <input type="text" v-model="renameItemName">
+        </div>
+      </template>
+    </popup>
+
   </div>
 </template>
 
@@ -187,6 +207,15 @@ export default {
       files: [],
       uploadFileStatus: [],
       isDragging: false,
+
+      renamePopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_save'),
+        actionClass: 'btn-success',
+      },
+      renameItemId: 0,
+      renameItemName: '',
     }
   },
   mixins: [dateFormatMixin, fileIconMixin],
@@ -220,6 +249,29 @@ export default {
     }
   },
   methods: {
+    showRenamePopup(id, name) {
+      this.renamePopup.show = true;
+      this.renameItemId = id;
+      this.renameItemName = name;
+    },
+    closeRenamePopup() {
+      this.renamePopup.show = false;
+    },
+    submitRenamePopup() {
+      this.$store.dispatch("startPreloader");
+      driveRepository.rename(this.renameItemId, this.renameItemName).then(resp => {
+        this.$emit('update:get-tree');
+        this.closeRenamePopup();
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      })
+    },
     getFileIconName(filename) {
       return this.getIconNameByFilename(filename);
     },
@@ -384,12 +436,26 @@ export default {
     }
 
     & > div {
-      width: 550px;
+      word-break: break-word;
+      overflow-wrap: break-word; /* для лучшей поддержки */
+      //width: 550px;
       padding: 8px 8px;
       box-sizing: border-box;
       border-bottom: 1px solid;
       border-color: rgba(212, 212, 212, 0.8);
       font-weight: 700;
+    }
+    & > div:nth-of-type(1) {
+      width: 55%;
+    }
+    & > div:nth-of-type(2) {
+      width: 20%;
+    }
+    & > div:nth-of-type(3) {
+      width: 10%;
+    }
+    & > div:nth-of-type(4) {
+      width: 15%;
     }
   }
 
@@ -415,12 +481,25 @@ export default {
       }
 
       & > div {
-        width: 550px;
+        //width: 550px;
         padding: 7px 7px;
         box-sizing: border-box;
         border-bottom: 1px solid;
         border-color: rgba(212, 212, 212, 0.8);
         word-wrap: break-word;
+      }
+
+      & > div:nth-of-type(1) {
+        width: 55%;
+      }
+      & > div:nth-of-type(2) {
+        width: 20%;
+      }
+      & > div:nth-of-type(3) {
+        width: 10%;
+      }
+      & > div:nth-of-type(4) {
+        width: 15%;
       }
     }
 

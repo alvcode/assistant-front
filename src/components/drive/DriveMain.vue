@@ -7,9 +7,10 @@
       <div class="drive-tree-desktop mrg-t-20">
         <drive-breadcrumbs
             :breadcrumbs="breadcrumbs"
+            @fall-to="fallTo"
         ></drive-breadcrumbs>
         <drive-tree-desktop
-            class="mrg-t-10"
+            class="mrg-t-15"
             :tree="tree"
             :parent-id="parentId"
             :show-fallback="breadcrumbs.length > 1"
@@ -88,6 +89,18 @@ export default {
         this.getTree();
         this.breadcrumbs.pop();
       }
+    },
+    fallTo(parentId) {
+      let newBreadcrumbs = [];
+      for (let key in this.breadcrumbs) {
+        newBreadcrumbs.push(this.breadcrumbs[key]);
+        if (parentId === this.breadcrumbs[key].parentId) {
+          break;
+        }
+      }
+      this.breadcrumbs = newBreadcrumbs;
+      this.parentId = parentId;
+      this.getTree();
     },
     setTree(data) {
       this.tree = data;

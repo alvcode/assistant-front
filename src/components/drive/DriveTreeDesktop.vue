@@ -12,7 +12,20 @@
         <f-awesome icon="upload"></f-awesome>
         {{ $t('app_upload_files') }}
       </div>
+      <div @click="cut" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btn btn-sm btn-outline-info mrg-l-15">
+        {{ $t('app_cut') }}
+      </div>
+      <div @click="deselectAll" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btn btn-sm btn-outline-info">
+        {{ $t('app_deselect') }}
+      </div>
+      <div v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btn btn-sm btn-outline-info mrg-l-15">
+        Вставить
+      </div>
+      <div v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btn btn-sm btn-outline-info">
+        Отменить перенос
+      </div>
     </div>
+    {{selectedItems}}
     <div class="table">
       <div class="header">
         <div>{{ $t('app_drive_table_name') }}</div>
@@ -23,9 +36,12 @@
       <div class="rows">
         <div
             class="row cursor-pointer no-select"
-            v-for="item in tree"
+            :class="{'selected': item.selected === true, 'cut': item.cut === true}"
+            v-for="item in treeComputed"
             :key="item.id"
             @dblclick="fallInside(item.id, item.type)"
+            @click.ctrl="selectItemToggle(item.id)"
+            @click.shift="selectItemToggle(item.id)"
         >
           <div class="row-name-block">
             <div v-if="item.type === 0" class="row--name">
@@ -216,6 +232,8 @@ export default {
       },
       renameItemId: 0,
       renameItemName: '',
+
+      selectedItems: [],
     }
   },
   mixins: [dateFormatMixin, fileIconMixin],
@@ -225,6 +243,46 @@ export default {
     showFallback: Boolean,
   },
   computed: {
+    existsSelectedWithoutCut() {
+      let result = true;
+      for (let key in this.selectedItems) {
+        if (this.selectedItems[key].type === 'cut') {
+          result = false;
+          break;
+        }
+      }
+      return result;
+    },
+    existsSelectedWithCut() {
+      let result = false;
+      for (let key in this.selectedItems) {
+        if (this.selectedItems[key].type === 'cut') {
+          result = true;
+          break;
+        }
+      }
+      return result;
+    },
+    treeComputed() {
+      let result = [];
+      for (let key in this.tree) {
+        let item = this.tree[key];
+        item.selected = false;
+        item.cut = false;
+
+        for (let keySelect in this.selectedItems) {
+          if (this.tree[key].id === this.selectedItems[keySelect].id) {
+            if (this.selectedItems[keySelect].type === 'select') {
+              item.selected = true;
+            } else if (this.selectedItems[keySelect].type === 'cut') {
+              item.cut = true;
+            }
+          }
+        }
+        result.push(item);
+      }
+      return result;
+    },
     filesComputed() {
       let result = [];
       for (let key in this.files) {
@@ -249,6 +307,24 @@ export default {
     }
   },
   methods: {
+    cut() {
+      for (let key in this.selectedItems) {
+        this.selectedItems[key].type = 'cut';
+      }
+    },
+    deselectAll() {
+      this.selectedItems = [];
+    },
+    selectItemToggle(id) {
+      console.log(id);
+      for (let key in this.selectedItems) {
+        if (this.selectedItems[key].id === id) {
+          this.selectedItems.splice(key, 1);
+          return;
+        }
+      }
+      this.selectedItems.push({id: id, type: 'select'});
+    },
     showRenamePopup(id, name) {
       this.renamePopup.show = true;
       this.renameItemId = id;
@@ -512,8 +588,14 @@ export default {
 .light-theme {
   .table {
     .rows {
-      .row:hover > div {
+      .row:not(.selected):hover > div {
         background-color: #e6f8ff !important;
+      }
+      .row.selected {
+        background-color: #daf3fb !important;
+      }
+      .row.cut {
+        color: #b3b3b3;
       }
     }
   }
@@ -525,8 +607,14 @@ export default {
 .dark-theme {
   .table {
     .rows {
-      .row:hover > div {
+      .row:not(.selected):hover > div {
         background-color: #404043 !important;
+      }
+      .row.selected {
+        background-color: #48484c !important;
+      }
+      .row.cut {
+        color: #636363;
       }
     }
   }
@@ -592,5 +680,8 @@ export default {
 }
 @media (max-width: 1380px) {
 
+}
+
+.row-name-block {
 }
 </style>

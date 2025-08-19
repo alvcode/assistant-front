@@ -88,4 +88,7 @@ export default {
     "app_deselect": "Снять выделение",
     "app_move": "Переместить",
     "app_cut": "Вырезать",
+    "app_insert": "Вставить",
+    "app_cancel_transfer": "Отменить перенос",
+    "app_entities_cut_for_transfer": "{count} сущностей вырезано для переноса"
 };

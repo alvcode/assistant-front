@@ -37,6 +37,12 @@ export default {
             } else {
                 return 'question';
             }
+        },
+        filenameIsImage(filename) {
+            const parts = filename.split('.');
+            const ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
+            const imageExtensions = ['jpg', 'jpeg', 'png'];
+            return imageExtensions.includes(ext);
         }
     }
 }

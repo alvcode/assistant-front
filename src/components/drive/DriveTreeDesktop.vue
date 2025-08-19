@@ -18,14 +18,16 @@
       <div @click="deselectAll" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btn btn-sm btn-outline-info">
         {{ $t('app_deselect') }}
       </div>
-      <div v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btn btn-sm btn-outline-info mrg-l-15">
-        Вставить
+      <div @click="renMov" v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btn btn-sm btn-outline-info mrg-l-15">
+        {{ $t('app_insert') }}
       </div>
-      <div v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btn btn-sm btn-outline-info">
-        Отменить перенос
+      <div @click="cancelCut" v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btn btn-sm btn-outline-info">
+        {{ $t('app_cancel_transfer') }}
       </div>
     </div>
-    {{selectedItems}}
+    <div v-if="existsSelectedWithCut" class="mrg-t-10 text-hint">
+      {{ $t('app_entities_cut_for_transfer', {count: this.selectedItems.length}) }}
+    </div>
     <div class="table">
       <div class="header">
         <div>{{ $t('app_drive_table_name') }}</div>
@@ -71,6 +73,14 @@
         </div>
       </div>
     </div>
+
+    <vue-easy-lightbox
+        :visible="visible"
+        :imgs="imgs"
+        :index="index"
+        @hide="handleHide"
+        @on-next="imgNext"
+    ></vue-easy-lightbox>
 
     <popup
         :closeButton="newDirectoryPopup.closeButton"
@@ -181,6 +191,19 @@
       </template>
     </popup>
 
+    <popup
+        :show="openFilePopup.show"
+        :size="'lg'"
+        @closePopup="closeOpenFilePopup"
+    >
+      <template v-slot:header></template>
+      <template v-slot:body>
+        <drive-open-file
+          :file="openedFileObject"
+        ></drive-open-file>
+      </template>
+    </popup>
+
   </div>
 </template>
 
@@ -190,11 +213,13 @@ import fileIconMixin from "@/components/mixins/fileIconMixin.js";
 import Popup from "@/components/Popup.vue";
 import CategoryFields from "@/components/note/CategoryFields.vue";
 import driveRepository from "@/repositories/drive/index.js";
+import DriveOpenFile from "@/components/drive/DriveOpenFile.vue";
+import VueEasyLightbox from 'vue-easy-lightbox'
 
 export default {
   name: "DriveTreeDesktop",
   emits: ["fallInside", "fallBack", "update:tree", "update:get-tree"],
-  components: {CategoryFields, Popup},
+  components: {DriveOpenFile, CategoryFields, Popup, VueEasyLightbox},
   data() {
     return {
       newDirectoryPopup: {
@@ -234,6 +259,17 @@ export default {
       renameItemName: '',
 
       selectedItems: [],
+
+      openFilePopup: {
+        show: false,
+      },
+      openedFileObject: {id: 0, name: '', size: 0},
+
+      visible: false,
+      index: 0,
+      imgs: [
+
+      ]
     }
   },
   mixins: [dateFormatMixin, fileIconMixin],
@@ -281,6 +317,17 @@ export default {
         }
         result.push(item);
       }
+
+      result.sort((a, b) => {
+        // Сначала сравниваем type (0 выше 1)
+        if (a.type !== b.type) {
+          return a.type - b.type; // 0 будет выше 1
+        }
+
+        // Если тип одинаковый — сортируем по дате (сначала старые)
+        return new Date(a.created_at) - new Date(b.created_at);
+      });
+
       return result;
     },
     filesComputed() {
@@ -307,6 +354,46 @@ export default {
     }
   },
   methods: {
+    imgNext(oldIndex, newIndex) {
+      setTimeout(() => console.log(oldIndex, newIndex), 6000);
+      this.imgs.push('https://picsum.photos/id/1015/600/400');
+    },
+    showImg(index) {
+      this.index = index
+      this.visible = true
+    },
+    handleHide() {
+      this.visible = false
+    },
+    closeOpenFilePopup() {
+      this.openFilePopup.show = false;
+    },
+    showOpenFilePopup(file) {
+      this.openedFileObject = file;
+      this.openFilePopup.show = true;
+    },
+    renMov() {
+      let structIds = [];
+      for (let key in this.selectedItems) {
+        structIds[structIds.length] = this.selectedItems[key].id;
+      }
+      this.$store.dispatch("startPreloader");
+      driveRepository.renMov(structIds, this.parentId).then(() => {
+        this.$emit('update:get-tree');
+        this.deselectAll();
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      })
+    },
+    cancelCut() {
+      this.selectedItems = [];
+    },
     cut() {
       for (let key in this.selectedItems) {
         this.selectedItems[key].type = 'cut';
@@ -315,8 +402,20 @@ export default {
     deselectAll() {
       this.selectedItems = [];
     },
+    deselectIfOnlySelected() {
+      for (let key in this.selectedItems) {
+        if (this.selectedItems[key].type === 'select') {
+          this.selectedItems = [];
+          break;
+        }
+      }
+    },
     selectItemToggle(id) {
-      console.log(id);
+      for (let key in this.selectedItems) {
+        if (this.selectedItems[key].type === 'cut') {
+          return;
+        }
+      }
       for (let key in this.selectedItems) {
         if (this.selectedItems[key].id === id) {
           this.selectedItems.splice(key, 1);
@@ -435,10 +534,34 @@ export default {
     },
     fallInside(itemId, itemType) {
       if (itemType === 0) {
+        this.deselectIfOnlySelected();
         this.$emit('fallInside', itemId);
+      } else {
+        // открываем файл
+        driveRepository.getFile(itemId).then(resp => {
+          //const blob = await res.blob()
+          //return URL.createObjectURL(blob)
+          this.imgs.push(URL.createObjectURL(resp.data));
+          this.imgs.push('https://picsum.photos/id/1015/600/400');
+          this.showImg(0);
+        }).catch(err => {
+          this.$store.dispatch("addNotification", {
+            text: err.response.data.message,
+            time: 5,
+            color: "danger"
+          });
+          this.$store.dispatch("stopPreloader");
+        })
+        // for (let key in this.treeComputed) {
+        //   if (this.treeComputed[key].id === itemId) {
+        //     //this.openedFileObject = this.treeComputed[key];
+        //     this.showOpenFilePopup(this.treeComputed[key]);
+        //   }
+        // }
       }
     },
     fallBack() {
+      this.deselectIfOnlySelected();
       this.$emit('fallBack');
     },
     closeNewDirectoryPopup() {

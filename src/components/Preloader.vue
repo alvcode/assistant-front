@@ -1,5 +1,5 @@
 <template>
-    <div v-show="isShow" class="preloader">
+    <div v-show="isShow" class="preloader no-select">
       <img src="@/assets/img/loader_6.svg" />
     </div>
 </template>

@@ -80,7 +80,15 @@
         :index="index"
         @hide="handleHide"
         @on-next="imgNext"
-    ></vue-easy-lightbox>
+    >
+      <template v-slot:toolbar="{ toolbarMethods }">
+        <button @click="toolbarMethods.zoomIn">zoom in</button>
+        <button @click="toolbarMethods.zoomOut">zoom out</button>
+        <button @click="toolbarMethods.rotateLeft">Anticlockwise rotation</button>
+        <button @click="toolbarMethods.rotateRight">clockwise rotation</button>
+        <button @click="downloadImg">download</button>
+      </template>
+    </vue-easy-lightbox>
 
     <popup
         :closeButton="newDirectoryPopup.closeButton"
@@ -354,9 +362,14 @@ export default {
     }
   },
   methods: {
+    downloadImg() {
+      console.log('downloaded');
+    },
     imgNext(oldIndex, newIndex) {
-      setTimeout(() => console.log(oldIndex, newIndex), 6000);
-      this.imgs.push('https://picsum.photos/id/1015/600/400');
+      setTimeout(() => {
+        this.imgs[this.imgs.length - 1] = 'https://i.loli.net/2018/11/10/5be6852dec46e.jpeg';
+      }, 2000);
+      //this.imgs.push('https://picsum.photos/id/1015/600/400');
     },
     showImg(index) {
       this.index = index
@@ -538,10 +551,19 @@ export default {
         this.$emit('fallInside', itemId);
       } else {
         // открываем файл
+        /**
+         * Описание алгоритма:
+         * считаем все изображения в текущей папке начиная от переданного индекса.
+         * формируем список айдишников
+         *
+         */
+        this.$store.dispatch("startPreloader");
         driveRepository.getFile(itemId).then(resp => {
           //const blob = await res.blob()
           //return URL.createObjectURL(blob)
-          this.imgs.push(URL.createObjectURL(resp.data));
+          //this.imgs.push(URL.createObjectURL(resp.data));
+          this.$store.dispatch("stopPreloader");
+          this.imgs.push({src: URL.createObjectURL(resp.data), title: 'картинка.jpg'});
           this.imgs.push('https://picsum.photos/id/1015/600/400');
           this.showImg(0);
         }).catch(err => {

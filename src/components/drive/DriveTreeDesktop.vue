@@ -75,11 +75,12 @@
     </div>
 
     <vue-easy-lightbox
-        :visible="visible"
-        :imgs="imgs"
-        :index="index"
+        :visible="lightboxVisible"
+        :imgs="lightboxImgs"
+        :index="lightboxIndex"
         @hide="handleHide"
-        @on-next="imgNext"
+        @on-next="lightboxEvent"
+        @on-prev="lightboxEvent"
     >
       <template v-slot:toolbar="{ toolbarMethods }">
         <button @click="toolbarMethods.zoomIn">zoom in</button>
@@ -273,11 +274,10 @@ export default {
       },
       openedFileObject: {id: 0, name: '', size: 0},
 
-      visible: false,
-      index: 0,
-      imgs: [
-
-      ]
+      lightboxVisible: false,
+      lightboxIndex: 0,
+      lightboxImgs: [],
+      openImagesIds: [],
     }
   },
   mixins: [dateFormatMixin, fileIconMixin],
@@ -365,18 +365,30 @@ export default {
     downloadImg() {
       console.log('downloaded');
     },
-    imgNext(oldIndex, newIndex) {
-      setTimeout(() => {
-        this.imgs[this.imgs.length - 1] = 'https://i.loli.net/2018/11/10/5be6852dec46e.jpeg';
-      }, 2000);
-      //this.imgs.push('https://picsum.photos/id/1015/600/400');
+    lightboxEvent(oldIndex, newIndex) {
+      this.loadImage(this.openImagesIds[newIndex].id, newIndex);
+      this.lightboxImgs[oldIndex] = new URL('../../assets/img/transparent_dot.png', import.meta.url).href;
     },
-    showImg(index) {
-      this.index = index
-      this.visible = true
+    lightboxShowImg(index) {
+      this.lightboxIndex = index
+      this.lightboxVisible = true
+    },
+    loadImage(itemId, setIdx) {
+      this.$store.dispatch("startPreloader");
+      driveRepository.getFile(itemId).then(resp => {
+        this.$store.dispatch("stopPreloader");
+        this.lightboxImgs[setIdx] = {src: URL.createObjectURL(resp.data), title: 'картинка.jpg'};
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      })
     },
     handleHide() {
-      this.visible = false
+      this.lightboxVisible = false
     },
     closeOpenFilePopup() {
       this.openFilePopup.show = false;
@@ -550,36 +562,55 @@ export default {
         this.deselectIfOnlySelected();
         this.$emit('fallInside', itemId);
       } else {
-        // открываем файл
-        /**
-         * Описание алгоритма:
-         * считаем все изображения в текущей папке начиная от переданного индекса.
-         * формируем список айдишников
-         *
-         */
-        this.$store.dispatch("startPreloader");
-        driveRepository.getFile(itemId).then(resp => {
-          //const blob = await res.blob()
-          //return URL.createObjectURL(blob)
-          //this.imgs.push(URL.createObjectURL(resp.data));
-          this.$store.dispatch("stopPreloader");
-          this.imgs.push({src: URL.createObjectURL(resp.data), title: 'картинка.jpg'});
-          this.imgs.push('https://picsum.photos/id/1015/600/400');
-          this.showImg(0);
-        }).catch(err => {
-          this.$store.dispatch("addNotification", {
-            text: err.response.data.message,
-            time: 5,
-            color: "danger"
-          });
-          this.$store.dispatch("stopPreloader");
-        })
-        // for (let key in this.treeComputed) {
-        //   if (this.treeComputed[key].id === itemId) {
-        //     //this.openedFileObject = this.treeComputed[key];
-        //     this.showOpenFilePopup(this.treeComputed[key]);
-        //   }
-        // }
+        let isImg = false;
+        for (let key in this.treeComputed) {
+          if (this.treeComputed[key].id === itemId && this.filenameIsImage(this.treeComputed[key].name)) {
+            isImg = true;
+          }
+        }
+
+        if (isImg) {
+          let clickIdx = 0;
+          let x = 0;
+          this.openImagesIds = [];
+          for (let key in this.treeComputed) {
+            if (this.filenameIsImage(this.treeComputed[key].name)) {
+              this.openImagesIds.push({id: this.treeComputed[key].id});
+              if (this.treeComputed[key].id === itemId) {
+                clickIdx = x;
+              }
+              x++;
+            }
+          }
+
+          this.lightboxImgs = [];
+          for (let key in this.openImagesIds) {
+            this.lightboxImgs.push(new URL('../../assets/img/transparent_dot.png', import.meta.url).href);
+          }
+
+          // открываем файл
+          this.$store.dispatch("startPreloader");
+          driveRepository.getFile(itemId).then(resp => {
+            this.$store.dispatch("stopPreloader");
+            this.lightboxImgs[clickIdx] = {src: URL.createObjectURL(resp.data), title: 'картинка.jpg'};
+            this.lightboxShowImg(clickIdx);
+          }).catch(err => {
+            this.$store.dispatch("addNotification", {
+              text: err.response.data.message,
+              time: 5,
+              color: "danger"
+            });
+            this.$store.dispatch("stopPreloader");
+          })
+        } else {
+          /** TODO: тут открываем для скачивания файла */
+          // for (let key in this.treeComputed) {
+          //   if (this.treeComputed[key].id === itemId) {
+          //     //this.openedFileObject = this.treeComputed[key];
+          //     this.showOpenFilePopup(this.treeComputed[key]);
+          //   }
+          // }
+        }
       }
     },
     fallBack() {

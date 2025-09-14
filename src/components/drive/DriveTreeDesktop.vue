@@ -75,6 +75,7 @@
     </div>
 
     <vue-easy-lightbox
+        :zoomScale="0.50"
         :visible="lightboxVisible"
         :imgs="lightboxImgs"
         :index="lightboxIndex"
@@ -83,11 +84,23 @@
         @on-prev="lightboxEvent"
     >
       <template v-slot:toolbar="{ toolbarMethods }">
-        <button @click="toolbarMethods.zoomIn">zoom in</button>
-        <button @click="toolbarMethods.zoomOut">zoom out</button>
-        <button @click="toolbarMethods.rotateLeft">Anticlockwise rotation</button>
-        <button @click="toolbarMethods.rotateRight">clockwise rotation</button>
-        <button @click="downloadImg">download</button>
+        <div class="lightbox-toolbar">
+          <button @click="toolbarMethods.zoomIn" class="btx btx-sm btx-outline-info">
+            <f-awesome icon="magnifying-glass-plus" />
+          </button>
+          <button @click="toolbarMethods.zoomOut" class="btx btx-sm btx-outline-info">
+            <f-awesome icon="magnifying-glass-minus" />
+          </button>
+          <button @click="toolbarMethods.rotateLeft" class="btx btx-sm btx-outline-info">
+            <f-awesome icon="rotate-left" />
+          </button>
+          <button @click="toolbarMethods.rotateRight" class="btx btx-sm btx-outline-info">
+            <f-awesome icon="rotate-right" />
+          </button>
+          <button @click="downloadImg" class="btx btx-sm btx-outline-info">
+            <f-awesome icon="download" />
+          </button>
+        </div>
       </template>
     </vue-easy-lightbox>
 
@@ -364,6 +377,15 @@ export default {
   methods: {
     downloadImg() {
       console.log('downloaded');
+      //this.lightboxImgs[this.lightboxIndex].src
+      //const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
+      let blobUrl = this.lightboxImgs[this.lightboxIndex].src
+      let link = document.createElement("a");
+      link.href = blobUrl;
+      link.setAttribute("download", this.lightboxImgs[this.lightboxIndex].title);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     },
     lightboxEvent(oldIndex, newIndex) {
       this.loadImage(this.openImagesIds[newIndex].id, newIndex);
@@ -377,7 +399,7 @@ export default {
       this.$store.dispatch("startPreloader");
       driveRepository.getFile(itemId).then(resp => {
         this.$store.dispatch("stopPreloader");
-        this.lightboxImgs[setIdx] = {src: URL.createObjectURL(resp.data), title: 'картинка.jpg'};
+        this.lightboxImgs[setIdx] = {src: URL.createObjectURL(resp.data), title: this.getFilenameFromHeaders(resp.headers)};
       }).catch(err => {
         this.$store.dispatch("addNotification", {
           text: err.response.data.message,
@@ -592,7 +614,7 @@ export default {
           this.$store.dispatch("startPreloader");
           driveRepository.getFile(itemId).then(resp => {
             this.$store.dispatch("stopPreloader");
-            this.lightboxImgs[clickIdx] = {src: URL.createObjectURL(resp.data), title: 'картинка.jpg'};
+            this.lightboxImgs[clickIdx] = {src: URL.createObjectURL(resp.data), title: this.getFilenameFromHeaders(resp.headers)};
             this.lightboxShowImg(clickIdx);
           }).catch(err => {
             this.$store.dispatch("addNotification", {
@@ -612,6 +634,17 @@ export default {
           // }
         }
       }
+    },
+    getFilenameFromHeaders(headers) {
+      let fileName = "img.jpg";
+      const contentDisposition = headers['content-disposition'];
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename="?([^"]+)"?/);
+        if (match && match[1]) {
+          fileName = decodeURIComponent(match[1]);
+        }
+      }
+      return fileName;
     },
     fallBack() {
       this.deselectIfOnlySelected();
@@ -853,6 +886,14 @@ export default {
       text-align: center;
     }
   }
+}
+.lightbox-toolbar {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  margin: auto;
+  text-align: center;
 }
 @media (max-width: 1380px) {
 

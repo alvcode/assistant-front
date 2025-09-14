@@ -90,5 +90,6 @@ export default {
     "app_cut": "Вырезать",
     "app_insert": "Вставить",
     "app_cancel_transfer": "Отменить перенос",
-    "app_entities_cut_for_transfer": "{count} сущностей вырезано для переноса"
+    "app_entities_cut_for_transfer": "{count} сущностей вырезано для переноса",
+    "app_download": "Скачать"
 };

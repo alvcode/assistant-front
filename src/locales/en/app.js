@@ -90,5 +90,6 @@ export default {
     "app_cut": "Cut",
     "app_insert": "Insert",
     "app_cancel_transfer": "Cancel transfer",
-    "app_entities_cut_for_transfer": "{count} entities cut for transfer"
+    "app_entities_cut_for_transfer": "{count} entities cut for transfer",
+    "app_download": "Download"
 };

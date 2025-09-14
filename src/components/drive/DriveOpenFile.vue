@@ -1,8 +1,15 @@
 <template>
   <div class="drive-open-file--container">
-    <div>{{ type }}</div>
-    <div>{{ name }}</div>
-    <div>{{ iconName }}</div>
+    <div class="icon">
+      <f-awesome :icon="iconName"></f-awesome>
+    </div>
+    <div class="name">{{ name }}</div>
+    <div class="download-icon">
+      <div @click="download" class="btx btx-sm btx-info">
+        <f-awesome icon="download"></f-awesome>
+        {{ $t('app_download') }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -11,12 +18,12 @@ import fileIconMixin from "@/components/mixins/fileIconMixin.js";
 
 export default {
   name: "DriveOpenFile",
+  emits: ["download"],
   mixins: [fileIconMixin],
   data() {
     return {
-      type: 'none',
       name: '',
-      iconName: ''
+      iconName: 'question'
     }
   },
   props: {
@@ -30,21 +37,32 @@ export default {
   methods: {
     setData(file) {
       if (file.id > 0) {
-        if (this.filenameIsImage(file.name)) {
-          this.type = "image";
-        } else {
-          this.type = "file";
-        }
         this.name = file.name;
         this.iconName = this.getIconNameByFilename(file.name);
       } else {
-        this.type = "none";
+        this.name = '-';
+        this.iconName = 'question';
       }
-    }
+    },
+    download() {
+      this.$emit('download');
+    },
   },
 }
 </script>
 
 <style scoped lang="less">
-
+.drive-open-file--container {
+  text-align: center;
+}
+.icon {
+  font-size: 36px;
+}
+.name {
+  font-size: 18px;
+  margin-top: 8px;
+}
+.download-icon {
+  margin-top: 17px;
+}
 </style>

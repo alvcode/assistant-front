@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-show="show" class="pop-up">
+    <div v-show="show" class="pop-up" @click.self="handleCloseIfClickBack">
       <div
         v-bind:class="{
           'pop_up__modal_lg': size === 'lg',
@@ -63,6 +63,7 @@ export default {
     actionClass: String, // Класс кнопки действия, например btn-success
     size: String, // 'lg' - широкое окно, если не указывать- узкое окно
     dontHideOverflow: Boolean, // Если true - не скрывает прокрутку при открытии
+    closeIfClickBack: Boolean, // Если true, то popup будет скрываться при клике на пустую область
   },
   watch: {
     show: function(val) {
@@ -88,6 +89,11 @@ export default {
     }
   },
   methods: {
+    handleCloseIfClickBack() {
+      if (this.closeIfClickBack) {
+        this.closePopup();
+      }
+    },
     closePopup() {
       this.$emit("closePopup");
     },

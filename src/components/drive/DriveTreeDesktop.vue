@@ -215,13 +215,14 @@
 
     <popup
         :show="openFilePopup.show"
-        :size="'lg'"
+        :closeIfClickBack="true"
         @closePopup="closeOpenFilePopup"
     >
       <template v-slot:header></template>
       <template v-slot:body>
         <drive-open-file
           :file="openedFileObject"
+          @download="downloadFile"
         ></drive-open-file>
       </template>
     </popup>
@@ -289,6 +290,7 @@ export default {
 
       lightboxVisible: false,
       lightboxIndex: 0,
+      lightboxCurrentIndex: 0,
       lightboxImgs: [],
       openImagesIds: [],
     }
@@ -375,14 +377,34 @@ export default {
     }
   },
   methods: {
+    downloadFile() {
+      this.$store.dispatch("startPreloader");
+      driveRepository.getFile(this.openedFileObject.id).then(resp => {
+        this.$store.dispatch("stopPreloader");
+        const blobUrl = window.URL.createObjectURL(new Blob([resp.data]));
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.setAttribute("download", this.getFilenameFromHeaders(resp.headers));
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        // Освободить память
+        window.URL.revokeObjectURL(blobUrl);
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      })
+    },
     downloadImg() {
-      console.log('downloaded');
-      //this.lightboxImgs[this.lightboxIndex].src
-      //const blobUrl = window.URL.createObjectURL(new Blob([response.data]));
-      let blobUrl = this.lightboxImgs[this.lightboxIndex].src
+      let blobUrl = this.lightboxImgs[this.lightboxCurrentIndex].src
       let link = document.createElement("a");
       link.href = blobUrl;
-      link.setAttribute("download", this.lightboxImgs[this.lightboxIndex].title);
+      link.setAttribute("download", this.lightboxImgs[this.lightboxCurrentIndex].title);
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -392,14 +414,16 @@ export default {
       this.lightboxImgs[oldIndex] = new URL('../../assets/img/transparent_dot.png', import.meta.url).href;
     },
     lightboxShowImg(index) {
-      this.lightboxIndex = index
-      this.lightboxVisible = true
+      this.lightboxIndex = index;
+      this.lightboxCurrentIndex = index;
+      this.lightboxVisible = true;
     },
     loadImage(itemId, setIdx) {
       this.$store.dispatch("startPreloader");
       driveRepository.getFile(itemId).then(resp => {
         this.$store.dispatch("stopPreloader");
         this.lightboxImgs[setIdx] = {src: URL.createObjectURL(resp.data), title: this.getFilenameFromHeaders(resp.headers)};
+        this.lightboxCurrentIndex = setIdx;
       }).catch(err => {
         this.$store.dispatch("addNotification", {
           text: err.response.data.message,
@@ -625,25 +649,29 @@ export default {
             this.$store.dispatch("stopPreloader");
           })
         } else {
-          /** TODO: тут открываем для скачивания файла */
-          // for (let key in this.treeComputed) {
-          //   if (this.treeComputed[key].id === itemId) {
-          //     //this.openedFileObject = this.treeComputed[key];
-          //     this.showOpenFilePopup(this.treeComputed[key]);
-          //   }
-          // }
+          for (let key in this.treeComputed) {
+            if (this.treeComputed[key].id === itemId) {
+              this.showOpenFilePopup(this.treeComputed[key]);
+            }
+          }
         }
       }
     },
     getFilenameFromHeaders(headers) {
       let fileName = "img.jpg";
       const contentDisposition = headers['content-disposition'];
-      if (contentDisposition) {
-        const match = contentDisposition.match(/filename="?([^"]+)"?/);
-        if (match && match[1]) {
-          fileName = decodeURIComponent(match[1]);
-        }
+      if (!contentDisposition) return fileName;
+
+      const filenameStar = contentDisposition.match(/filename\*\s*=\s*UTF-8''([^;]+)/i);
+      if (filenameStar && filenameStar[1]) {
+        return decodeURIComponent(filenameStar[1]);
       }
+
+      const match = contentDisposition.match(/filename="?([^"]+)"?/);
+      if (match && match[1]) {
+        fileName = decodeURIComponent(match[1]);
+      }
+
       return fileName;
     },
     fallBack() {

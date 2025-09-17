@@ -773,8 +773,6 @@ export default {
   }
 
   .rows {
-    //margin-top: 5px;
-
     &.stripped {
       .row:nth-child(2n) {
         & > div {
@@ -794,7 +792,6 @@ export default {
       }
 
       & > div {
-        //width: 550px;
         padding: 7px 7px;
         box-sizing: border-box;
         border-bottom: 1px solid;
@@ -815,10 +812,6 @@ export default {
         width: 15%;
       }
     }
-
-    //.row:hover > div {
-    //  background-color: #e6f8ff !important;
-    //}
   }
 }
 // theme
@@ -866,9 +859,6 @@ export default {
   justify-content: flex-start;
   flex-direction: row;
 
-  .icon {
-
-  }
   .name {
     margin-left: 8px;
   }
@@ -925,8 +915,5 @@ export default {
 }
 @media (max-width: 1380px) {
 
-}
-
-.row-name-block {
 }
 </style>

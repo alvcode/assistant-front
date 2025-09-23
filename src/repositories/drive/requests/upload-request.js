@@ -10,7 +10,7 @@ export default async function uploadRequest(file, parentId) {
             uri += '?parentId=' + parentId;
         }
 
-        return await axios.post(uri, form);
+        return await axios.post(uri, form, {timeout: 0});
     } catch (error) {
         throw error;
     }

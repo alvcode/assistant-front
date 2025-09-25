@@ -1,6 +1,6 @@
 <template>
   <transition name="fade">
-    <div v-show="show" class="pop-up" @click.self="handleCloseIfClickBack">
+    <div v-show="show" class="pop-up" id="popup" @click.self="handleCloseIfClickBack">
       <div
         v-bind:class="{
           'pop_up__modal_lg': size === 'lg',
@@ -64,6 +64,7 @@ export default {
     size: String, // 'lg' - широкое окно, если не указывать- узкое окно
     dontHideOverflow: Boolean, // Если true - не скрывает прокрутку при открытии
     closeIfClickBack: Boolean, // Если true, то popup будет скрываться при клике на пустую область
+    scrollTopCounter: Number, // Крутим счетчик на +1 и страница прокручивается вверх
   },
   watch: {
     show: function(val) {
@@ -78,7 +79,15 @@ export default {
           document.body.style.overflow = "auto";
         }
       }
-    }
+    },
+    scrollTopCounter: function() {
+      setTimeout(() => {
+        document.getElementById('popup').scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }, 400);
+    },
   },
   computed: {
     closeButtonShow() {

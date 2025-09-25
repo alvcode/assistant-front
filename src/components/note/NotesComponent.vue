@@ -68,9 +68,12 @@
         :actionButton="newNotePopup.actionButton"
         :action-class="newNotePopup.actionClass"
         :show="newNotePopup.show"
+        :scroll-top-counter="noteScrollToTopCounter"
         :size="'lg'"
         @closePopup="closeNewNotePopup"
         @actionPopup="submitEditor"
+        @keydown.ctrl.s.prevent="submitEditor"
+        @keydown.ctrl.ы.prevent="submitEditor"
     >
       <template v-slot:header>
         <div class="title-block">
@@ -152,6 +155,7 @@ export default {
         actionButton: this.$t('app_save'),
         actionClass: 'btn-success',
       },
+      noteScrollToTopCounter: 0,
       notes: [],
       blocks: [],
       isNewEditor: false,
@@ -360,6 +364,10 @@ export default {
       this.editorTitle = '';
       this.isNewEditor = true;
       this.newNotePopup.show = true;
+      this.scrollToTop();
+    },
+    scrollToTop() {
+      this.noteScrollToTopCounter++;
     },
     closeNewNotePopup() {
       this.newNotePopup.show = false;
@@ -446,6 +454,8 @@ export default {
         this.resizeTitle();
         this.isNewEditor = false;
         this.newNotePopup.show = true;
+
+        this.scrollToTop();
         this.$store.dispatch("stopPreloader");
       }).catch(err =>  {
         this.$store.dispatch("addNotification", {

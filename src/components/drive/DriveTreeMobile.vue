@@ -1,28 +1,28 @@
 <template>
   <div class="drive-tree-mobile--container">
     <div class="actions">
-      <div @click="fallBack" v-if="showFallback" class="btx btx-sm btx-info mrg-t-10">
+      <div @click="fallBack" v-if="showFallback" class="btx btx-info mrg-t-10">
         <f-awesome icon="arrow-left"></f-awesome>
       </div>
-      <div @click="showNewDirectoryPopup" class="btx btx-sm btx-info mrg-t-10">
+      <div @click="showNewDirectoryPopup" class="btx btx-info mrg-t-10">
         <f-awesome icon="plus"></f-awesome>
         {{ $t('app_drive_create_folder') }}
       </div>
-      <div @click="showUploadPopup" class="btx btx-sm btx-info mrg-t-10">
+      <div @click="showUploadPopup" class="btx btx-info mrg-t-10">
         <f-awesome icon="upload"></f-awesome>
         {{ $t('app_upload_files') }}
       </div>
-      <div @click="selectionModeOn" v-if="treeMode === 0" class="btx btx-sm btx-outline-info mrg-t-10">
+      <div @click="selectionModeOn" v-if="treeMode === 0" class="btx btx-outline-info mrg-t-10">
         {{ $t('app_selection_mode') }}
       </div>
-      <div @click="selectionModeOff" v-if="treeMode === 1" class="btx btx-sm btx-outline-danger mrg-t-10">
+      <div @click="selectionModeOff" v-if="treeMode === 1" class="btx btx-outline-danger mrg-t-10">
         {{ $t('app_selection_mode_cancel') }}
       </div>
 
-      <div @click="cut" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-sm btx-outline-info mrg-l-15 mrg-t-10">
+      <div @click="cut" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-outline-info mrg-t-10">
         {{ $t('app_cut') }}
       </div>
-      <div @click="renMov" v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btx btx-sm btx-outline-info mrg-l-15 mrg-t-10">
+      <div @click="renMov" v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btx btx-outline-info mrg-t-10">
         {{ $t('app_insert') }}
       </div>
     </div>
@@ -73,12 +73,12 @@
         <div class="name">{{ itemMenu.name }}</div>
         <div class="actions mrg-t-30">
           <div>
-            <div @click.prevent="showRenamePopup()" class="btx btx-sm btx-info">
+            <div @click.prevent="showRenamePopup()" class="btx btx-info">
               <f-awesome icon="pen"></f-awesome> {{ $t('app_rename') }}
             </div>
           </div>
           <div class="mrg-t-20">
-            <div @click.prevent="showDeletePopup()" class="btx btx-sm btx-danger">
+            <div @click.prevent="showDeletePopup()" class="btx btx-danger">
               <f-awesome icon="times"></f-awesome> {{ $t('app_delete') }}
             </div>
           </div>
@@ -91,26 +91,25 @@
         :visible="lightboxVisible"
         :imgs="lightboxImgs"
         :index="lightboxIndex"
-        :moveDisabled="true"
         @hide="handleHide"
         @on-next="lightboxEvent"
         @on-prev="lightboxEvent"
     >
       <template v-slot:toolbar="{ toolbarMethods }">
         <div class="lightbox-toolbar">
-          <button @click="toolbarMethods.zoomIn" class="btx btx-sm btx-outline-info">
+          <button @click="toolbarMethods.zoomIn" class="btx btx-outline-info">
             <f-awesome icon="magnifying-glass-plus" />
           </button>
-          <button @click="toolbarMethods.zoomOut" class="btx btx-sm btx-outline-info">
+          <button @click="toolbarMethods.zoomOut" class="btx btx-outline-info">
             <f-awesome icon="magnifying-glass-minus" />
           </button>
-          <button @click="toolbarMethods.rotateLeft" class="btx btx-sm btx-outline-info">
+          <button @click="toolbarMethods.rotateLeft" class="btx btx-outline-info">
             <f-awesome icon="rotate-left" />
           </button>
-          <button @click="toolbarMethods.rotateRight" class="btx btx-sm btx-outline-info">
+          <button @click="toolbarMethods.rotateRight" class="btx btx-outline-info">
             <f-awesome icon="rotate-right" />
           </button>
-          <button @click="downloadImg" class="btx btx-sm btx-outline-info">
+          <button @click="downloadImg" class="btx btx-outline-info">
             <f-awesome icon="download" />
           </button>
         </div>
@@ -202,8 +201,8 @@
             </li>
           </ul>
           <div v-if="filesComputed.length > 0" class="mrg-t-20">
-            <div @click="clearFiles" class="btx btx-sm btx-danger">{{ $t('app_clear_list') }}</div>
-            <div @click="submitUploadPopup" class="btx btx-sm btx-success">{{ $t('app_upload') }}</div>
+            <div @click="clearFiles" class="btx btx-danger">{{ $t('app_clear_list') }}</div>
+            <div @click="submitUploadPopup" class="btx btx-success">{{ $t('app_upload') }}</div>
           </div>
         </div>
       </template>
@@ -816,7 +815,7 @@ export default {
       border-bottom: 1px solid;
       border-color: rgba(212, 212, 212, 0.8);
       font-weight: 700;
-      font-size: 13px;
+      font-size: 15px;
     }
     & > div:nth-of-type(1) {
       width: 80%;
@@ -851,6 +850,7 @@ export default {
         border-bottom: 1px solid;
         border-color: rgba(212, 212, 212, 0.8);
         word-wrap: break-word;
+        font-size: 16px;
       }
 
       & > div:nth-of-type(1) {
@@ -987,6 +987,10 @@ export default {
     margin: 0 auto;
     padding: 20px 0 0 0;
     text-align: center;
+
+    .name {
+      font-size: 16px;
+    }
   }
 }
 .light-theme {

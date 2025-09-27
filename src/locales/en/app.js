@@ -91,5 +91,8 @@ export default {
     "app_insert": "Insert",
     "app_cancel_transfer": "Cancel transfer",
     "app_entities_cut_for_transfer": "{count} entities cut for transfer",
-    "app_download": "Download"
+    "app_download": "Download",
+    "app_selection_mode": "Selection mode",
+    "app_selection_mode_cancel": "Cancel selection mode",
+    "app_rename": "Rename"
 };

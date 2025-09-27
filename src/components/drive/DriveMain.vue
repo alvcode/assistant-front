@@ -21,7 +21,16 @@
         ></drive-tree-desktop>
       </div>
       <div class="drive-tree-mobile">
-        // mobile
+        <drive-tree-mobile
+            class="mrg-t-15"
+            :tree="tree"
+            :parent-id="parentId"
+            :show-fallback="breadcrumbs.length > 1"
+            @fall-inside="fallInside"
+            @fall-back="fallBack"
+            @update:tree="setTree"
+            @update:get-tree="getTree"
+        ></drive-tree-mobile>
       </div>
     </div>
   </div>
@@ -33,10 +42,11 @@ import DriveSpace from "@/components/drive/DriveSpace.vue";
 import driveRepository from "@/repositories/drive/index.js";
 import DriveTreeDesktop from "@/components/drive/DriveTreeDesktop.vue";
 import DriveBreadcrumbs from "@/components/drive/DriveBreadcrumbs.vue";
+import DriveTreeMobile from "@/components/drive/DriveTreeMobile.vue";
 
 export default {
   name: "DriveMain",
-  components: {DriveBreadcrumbs, DriveTreeDesktop, DriveSpace},
+  components: {DriveTreeMobile, DriveBreadcrumbs, DriveTreeDesktop, DriveSpace},
   data() {
     return {
       space: {total: 0, used: 0},

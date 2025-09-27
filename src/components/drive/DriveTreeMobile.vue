@@ -1,28 +1,29 @@
 <template>
-  <div class="drive-tree-desktop--container">
+  <div class="drive-tree-mobile--container">
     <div class="actions">
-      <div @click="fallBack" v-if="showFallback" class="btx btx-sm btx-info">
+      <div @click="fallBack" v-if="showFallback" class="btx btx-sm btx-info mrg-t-10">
         <f-awesome icon="arrow-left"></f-awesome>
       </div>
-      <div @click="showNewDirectoryPopup" class="btx btx-sm btx-info">
+      <div @click="showNewDirectoryPopup" class="btx btx-sm btx-info mrg-t-10">
         <f-awesome icon="plus"></f-awesome>
         {{ $t('app_drive_create_folder') }}
       </div>
-      <div @click="showUploadPopup" class="btx btx-sm btx-info">
+      <div @click="showUploadPopup" class="btx btx-sm btx-info mrg-t-10">
         <f-awesome icon="upload"></f-awesome>
         {{ $t('app_upload_files') }}
       </div>
-      <div @click="cut" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-sm btx-outline-info mrg-l-15">
+      <div @click="selectionModeOn" v-if="treeMode === 0" class="btx btx-sm btx-outline-info mrg-t-10">
+        {{ $t('app_selection_mode') }}
+      </div>
+      <div @click="selectionModeOff" v-if="treeMode === 1" class="btx btx-sm btx-outline-danger mrg-t-10">
+        {{ $t('app_selection_mode_cancel') }}
+      </div>
+
+      <div @click="cut" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-sm btx-outline-info mrg-l-15 mrg-t-10">
         {{ $t('app_cut') }}
       </div>
-      <div @click="deselectAll" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-sm btx-outline-info">
-        {{ $t('app_deselect') }}
-      </div>
-      <div @click="renMov" v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btx btx-sm btx-outline-info mrg-l-15">
+      <div @click="renMov" v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btx btx-sm btx-outline-info mrg-l-15 mrg-t-10">
         {{ $t('app_insert') }}
-      </div>
-      <div @click="cancelCut" v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btx btx-sm btx-outline-info">
-        {{ $t('app_cancel_transfer') }}
       </div>
     </div>
     <div v-if="existsSelectedWithCut" class="mrg-t-10 text-hint">
@@ -31,9 +32,7 @@
     <div class="table">
       <div class="header">
         <div>{{ $t('app_drive_table_name') }}</div>
-        <div>{{ $t('app_created') }}</div>
-        <div>{{ $t('app_size') }}</div>
-        <div>{{ $t('app_actions') }}</div>
+        <div></div>
       </div>
       <div class="rows">
         <div
@@ -41,11 +40,8 @@
             :class="{'selected': item.selected === true, 'cut': item.cut === true}"
             v-for="item in treeComputed"
             :key="item.id"
-            @dblclick="fallInside(item.id, item.type)"
-            @click.ctrl="selectItemToggle(item.id)"
-            @click.shift="selectItemToggle(item.id)"
         >
-          <div class="row-name-block">
+          <div class="row-name-block" @click="clickToItem(item.id, item.type)">
             <div v-if="item.type === 0" class="row--name">
               <div class="icon"><f-awesome :icon="['fas', 'folder']"></f-awesome></div>
               <div class="name">{{ item.name }}</div>
@@ -56,18 +52,34 @@
               </div>
               <div class="name">{{ item.name }}</div>
             </div>
-          </div>
-          <div>{{ convertDatetime(item.created_at) }}</div>
-          <div>
-            <span v-if="item.type === 0">-</span>
-            <span v-if="item.type === 1">{{ getSize(item.size) }}</span>
-          </div>
-          <div>
-            <div @click="showRenamePopup(item.id, item.name)" class="btx-sm-circle btx-info">
-              <f-awesome icon="pen"></f-awesome>
+            <div class="created-and-size">
+              {{ convertDatetime(item.created_at) }} <span v-if="item.type === 1">/ {{ getSize(item.size) }}</span>
             </div>
-            <div @click="showDeletePopup(item.id, item.type, item.name)" class="btx-sm-circle btx-danger">
-              <f-awesome icon="times"></f-awesome>
+          </div>
+          <div class="text-center">
+            <div @click="showItemMenu(item.id, item.name, item.type)" v-if="treeMode === 0" class="btx-sm-circle">
+              <f-awesome icon="ellipsis"></f-awesome>
+            </div>
+            <div v-if="treeMode === 1 && item.selected === true" class="btx-sm-circle">
+              <f-awesome icon="check"></f-awesome>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drive-tree-mobile--item-menu" v-show="itemMenu.show" @click="closeItemMenu">
+      <div class="content">
+        <div class="name">{{ itemMenu.name }}</div>
+        <div class="actions mrg-t-30">
+          <div>
+            <div @click.prevent="showRenamePopup()" class="btx btx-sm btx-info">
+              <f-awesome icon="pen"></f-awesome> {{ $t('app_rename') }}
+            </div>
+          </div>
+          <div class="mrg-t-20">
+            <div @click.prevent="showDeletePopup()" class="btx btx-sm btx-danger">
+              <f-awesome icon="times"></f-awesome> {{ $t('app_delete') }}
             </div>
           </div>
         </div>
@@ -79,6 +91,7 @@
         :visible="lightboxVisible"
         :imgs="lightboxImgs"
         :index="lightboxIndex"
+        :moveDisabled="true"
         @hide="handleHide"
         @on-next="lightboxEvent"
         @on-prev="lightboxEvent"
@@ -239,12 +252,22 @@ import driveRepository from "@/repositories/drive/index.js";
 import DriveOpenFile from "@/components/drive/DriveOpenFile.vue";
 import VueEasyLightbox from 'vue-easy-lightbox'
 
+const MODE_VIEW = 0;
+const MODE_SELECT = 1;
+
 export default {
-  name: "DriveTreeDesktop",
+  name: "DriveTreeMobile",
   emits: ["fallInside", "fallBack", "update:tree", "update:get-tree"],
   components: {DriveOpenFile, CategoryFields, Popup, VueEasyLightbox},
   data() {
     return {
+      treeMode: 0,
+      itemMenu: {
+        show: false,
+        id: 0,
+        name: '',
+        type: 0
+      },
       newDirectoryPopup: {
         show: false,
         closeButton: this.$t('app_cancel'),
@@ -377,6 +400,29 @@ export default {
     }
   },
   methods: {
+    showItemMenu(itemId, itemName, itemType) {
+      this.itemMenu.show = true;
+      this.itemMenu.id = itemId;
+      this.itemMenu.name = itemName;
+      this.itemMenu.type = itemType;
+      //this.itemMenu.itemName =
+    },
+    closeItemMenu() {
+      this.itemMenu.show = false;
+    },
+    selectionModeOn() {
+      this.treeMode = MODE_SELECT;
+    },
+    selectionModeOff() {
+      this.treeMode = MODE_VIEW;
+      if (this.selectedItems.length > 0 && this.existsSelectedWithoutCut) {
+        this.deselectAll();
+      }
+      if (this.selectedItems.length > 0 && this.existsSelectedWithCut) {
+        this.cancelCut();
+      }
+      //existsSelectedWithCut
+    },
     downloadFile() {
       this.$store.dispatch("startPreloader");
       driveRepository.getFile(this.openedFileObject.id).then(resp => {
@@ -452,6 +498,7 @@ export default {
       driveRepository.renMov(structIds, this.parentId).then(() => {
         this.$emit('update:get-tree');
         this.deselectAll();
+        this.selectionModeOff();
         this.$store.dispatch("stopPreloader");
       }).catch(err => {
         this.$store.dispatch("addNotification", {
@@ -482,10 +529,8 @@ export default {
       }
     },
     selectItemToggle(id) {
-      for (let key in this.selectedItems) {
-        if (this.selectedItems[key].type === 'cut') {
-          return;
-        }
+      if (this.existsSelectedWithCut) {
+        return;
       }
       for (let key in this.selectedItems) {
         if (this.selectedItems[key].id === id) {
@@ -495,10 +540,11 @@ export default {
       }
       this.selectedItems.push({id: id, type: 'select'});
     },
-    showRenamePopup(id, name) {
+    showRenamePopup() {
       this.renamePopup.show = true;
-      this.renameItemId = id;
-      this.renameItemName = name;
+      this.renameItemId = this.itemMenu.id;
+      this.renameItemName = this.itemMenu.name;
+      this.closeItemMenu();
     },
     closeRenamePopup() {
       this.renamePopup.show = false;
@@ -603,6 +649,18 @@ export default {
         return (size / (1024 * 1024)).toFixed(2) + ' ' +this.$t('app_mb');
       }
     },
+    clickToItem(itemId, itemType) {
+      if (this.treeMode === MODE_VIEW) {
+        this.fallInside(itemId, itemType);
+      } else if (this.treeMode === MODE_SELECT) {
+        if (this.existsSelectedWithCut) {
+          this.fallInside(itemId, itemType);
+        } else {
+          this.selectItemToggle(itemId);
+        }
+      }
+      //selectItemToggle
+    },
     fallInside(itemId, itemType) {
       if (itemType === 0) {
         this.deselectIfOnlySelected();
@@ -705,11 +763,12 @@ export default {
     closeDeletePopup() {
       this.deletePopup.show = false;
     },
-    showDeletePopup(itemId, type, itemName) {
-      this.deletedId = itemId;
-      this.deletedType = type;
-      this.deleteName = itemName;
+    showDeletePopup() {
+      this.deletedId = this.itemMenu.id;
+      this.deletedType = this.itemMenu.type;
+      this.deleteName = this.itemMenu.name;
       this.deletePopup.show = true;
+      this.closeItemMenu();
     },
     submitDeletePopup() {
       this.$store.dispatch("startPreloader");
@@ -757,18 +816,13 @@ export default {
       border-bottom: 1px solid;
       border-color: rgba(212, 212, 212, 0.8);
       font-weight: 700;
+      font-size: 13px;
     }
     & > div:nth-of-type(1) {
-      width: 55%;
+      width: 80%;
     }
     & > div:nth-of-type(2) {
       width: 20%;
-    }
-    & > div:nth-of-type(3) {
-      width: 10%;
-    }
-    & > div:nth-of-type(4) {
-      width: 15%;
     }
   }
 
@@ -800,16 +854,10 @@ export default {
       }
 
       & > div:nth-of-type(1) {
-        width: 55%;
+        width: 80%;
       }
       & > div:nth-of-type(2) {
         width: 20%;
-      }
-      & > div:nth-of-type(3) {
-        width: 10%;
-      }
-      & > div:nth-of-type(4) {
-        width: 15%;
       }
     }
   }
@@ -852,6 +900,11 @@ export default {
     background-color: #404043;
     border: 2px dashed #535359;
   }
+}
+.created-and-size {
+  margin-top: 5px;
+  font-size: 11px;
+  color: gray;
 }
 .row--name {
   display: flex;
@@ -912,6 +965,48 @@ export default {
   right: 0;
   margin: auto;
   text-align: center;
+}
+.drive-tree-mobile--item-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto;
+
+  .content {
+    width: 100%;
+    height: 30vh;
+    //background-color: #454545;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    position: fixed;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    margin: 0 auto;
+    padding: 20px 0 0 0;
+    text-align: center;
+  }
+}
+.light-theme {
+  .drive-tree-mobile--item-menu {
+    background-color: rgba(0, 0, 0, 0.7);
+
+    .content {
+      background-color: #fff;
+    }
+  }
+}
+.dark-theme {
+  .drive-tree-mobile--item-menu {
+    background-color: rgba(0, 0, 0, 0.5);
+
+    .content {
+      background-color: #3c3c3e;
+      color: #fff;
+    }
+  }
 }
 @media (max-width: 1380px) {
 

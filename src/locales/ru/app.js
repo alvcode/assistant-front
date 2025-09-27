@@ -91,5 +91,8 @@ export default {
     "app_insert": "Вставить",
     "app_cancel_transfer": "Отменить перенос",
     "app_entities_cut_for_transfer": "{count} сущностей вырезано для переноса",
-    "app_download": "Скачать"
+    "app_download": "Скачать",
+    "app_selection_mode": "Режим выделения",
+    "app_selection_mode_cancel": "Отменить режим выделения",
+    "app_rename": "Переименовать"
 };

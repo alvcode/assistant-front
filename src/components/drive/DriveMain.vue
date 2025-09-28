@@ -20,7 +20,12 @@
             @update:get-tree="getTree"
         ></drive-tree-desktop>
       </div>
-      <div class="drive-tree-mobile">
+      <div class="drive-tree-mobile mrg-t-20">
+        <drive-breadcrumbs
+            :breadcrumbs="breadcrumbs"
+            :compact="true"
+            @fall-to="fallTo"
+        ></drive-breadcrumbs>
         <drive-tree-mobile
             class="mrg-t-15"
             :tree="tree"

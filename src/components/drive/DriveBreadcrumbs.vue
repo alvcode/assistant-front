@@ -25,14 +25,14 @@
               class="hamburger-menu-back"
           ></div>
         </div>
-        <div class="item" v-if="getAllExceptLastTwo.length > 0">
+        <div class="item font-normal" v-if="getAllExceptLastTwo.length > 0">
           <f-awesome icon="angle-right"></f-awesome>
         </div>
-        <div class="item" v-for="(item,index) in getLastTwoElements" :key="index">
+        <div class="item" :class="{'font-normal': !compact, 'font-compact': compact}" v-for="(item,index) in getLastTwoElements" :key="index">
           <span v-if="item.type === 'element'" @click="toParent(item.parentId)" class="element">
             {{ item.name }}
           </span>
-          <span v-if="item.type === 'angle'">
+          <span v-if="item.type === 'angle'" class="font-normal">
             <f-awesome icon="angle-right"></f-awesome>
           </span>
         </div>
@@ -53,7 +53,8 @@ export default {
     }
   },
   props: {
-    breadcrumbs: Array
+    breadcrumbs: Array,
+    compact: Boolean,
   },
   computed: {
     getLastTwoElements() {
@@ -100,6 +101,7 @@ export default {
 </script>
 
 <style scoped lang="less">
+
 .main-content {
   width: 100%;
 }
@@ -114,8 +116,14 @@ export default {
     font-size: 22px;
   }
 
+  .font-normal {
+    font-size: 20px;
+  }
+  .font-compact {
+    font-size: 16px;
+  }
+
   .item {
-    font-size: 22px;
     line-height: 18px;
     margin-right: 10px;
     margin-left: 10px;

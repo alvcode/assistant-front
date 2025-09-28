@@ -69,7 +69,7 @@
     </div>
 
     <div class="drive-tree-mobile--item-menu" v-show="itemMenu.show" @click="closeItemMenu">
-      <div class="content">
+      <div class="content" @click.stop="false">
         <div class="name">{{ itemMenu.name }}</div>
         <div class="actions mrg-t-30">
           <div>
@@ -95,6 +95,22 @@
         @on-next="lightboxEvent"
         @on-prev="lightboxEvent"
     >
+      <template v-slot:prev-btn="{ prev }">
+        <div class="lightbox-prev-container" @click="prev">
+          <div>
+            <f-awesome icon="circle-left"></f-awesome>
+          </div>
+        </div>
+      </template>
+
+      <template v-slot:next-btn="{ next }">
+        <div class="lightbox-next-container" @click="next">
+          <div>
+            <f-awesome icon="circle-right"></f-awesome>
+          </div>
+        </div>
+      </template>
+
       <template v-slot:toolbar="{ toolbarMethods }">
         <div class="lightbox-toolbar">
           <button @click="toolbarMethods.zoomIn" class="btx btx-outline-info">
@@ -966,6 +982,38 @@ export default {
   margin: auto;
   text-align: center;
 }
+.lightbox-prev-container {
+  position: fixed;
+  width: 36px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  margin: auto 0;
+
+  & > div {
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+  }
+}
+.lightbox-next-container {
+  position: fixed;
+  width: 36px;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  margin: auto 0;
+
+  & > div {
+    text-align: center;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+  }
+}
 .drive-tree-mobile--item-menu {
   position: absolute;
   top: 0;
@@ -977,7 +1025,6 @@ export default {
   .content {
     width: 100%;
     height: 30vh;
-    //background-color: #454545;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
     position: fixed;
@@ -985,10 +1032,10 @@ export default {
     left: 0;
     bottom: 0;
     margin: 0 auto;
-    padding: 20px 0 0 0;
     text-align: center;
 
     .name {
+      padding: 20px 10px 0 10px;
       font-size: 16px;
     }
   }

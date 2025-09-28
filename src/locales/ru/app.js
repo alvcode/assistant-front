@@ -94,5 +94,7 @@ export default {
     "app_download": "Скачать",
     "app_selection_mode": "Режим выделения",
     "app_selection_mode_cancel": "Отменить режим выделения",
-    "app_rename": "Переименовать"
+    "app_rename": "Переименовать",
+    "app_delete_selected": "Удаление выделенных объектов",
+    "app_delete_selected_text": "Выделенные объекты будут удалены без возможности восстановления. Продолжить?"
 };

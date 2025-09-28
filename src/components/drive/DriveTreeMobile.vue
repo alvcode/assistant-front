@@ -15,15 +15,20 @@
       <div @click="selectionModeOn" v-if="treeMode === 0" class="btx btx-outline-info mrg-t-10">
         {{ $t('app_selection_mode') }}
       </div>
-      <div @click="selectionModeOff" v-if="treeMode === 1" class="btx btx-outline-danger mrg-t-10">
-        {{ $t('app_selection_mode_cancel') }}
-      </div>
 
       <div @click="cut" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-outline-info mrg-t-10">
         {{ $t('app_cut') }}
       </div>
       <div @click="renMov" v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btx btx-outline-info mrg-t-10">
         {{ $t('app_insert') }}
+      </div>
+      <div @click="showDeleteSelected" v-if="selectedItems.length > 0 && treeMode === 1 && !existsSelectedWithCut" class="btx btx-danger mrg-t-10">
+        <f-awesome icon="times"></f-awesome>
+        {{ $t('app_delete') }}
+      </div>
+
+      <div @click="selectionModeOff" v-if="treeMode === 1" class="btx btx-outline-danger mrg-t-10">
+        {{ $t('app_selection_mode_cancel') }}
       </div>
     </div>
     <div v-if="existsSelectedWithCut" class="mrg-t-10 text-hint">
@@ -97,16 +102,16 @@
     >
       <template v-slot:prev-btn="{ prev }">
         <div class="lightbox-prev-container" @click="prev">
-          <div>
-            <f-awesome icon="circle-left"></f-awesome>
+          <div class="text-info">
+            <f-awesome icon="angle-left" v-if="showLightboxPrev"></f-awesome>
           </div>
         </div>
       </template>
 
       <template v-slot:next-btn="{ next }">
         <div class="lightbox-next-container" @click="next">
-          <div>
-            <f-awesome icon="circle-right"></f-awesome>
+          <div class="text-info">
+            <f-awesome icon="angle-right" v-if="showLightboxNext"></f-awesome>
           </div>
         </div>
       </template>
@@ -164,6 +169,22 @@
       <template v-slot:body>
         <span v-if="deletedType === 0">{{ $t('app_drive_delete_directory_text') }}</span>
         <span v-if="deletedType === 1">{{ $t('app_drive_delete_file_text') }}</span>
+      </template>
+    </popup>
+
+    <popup
+        :closeButton="deleteSelectedPopup.closeButton"
+        :actionButton="deleteSelectedPopup.actionButton"
+        :action-class="deleteSelectedPopup.actionClass"
+        :show="deleteSelectedPopup.show"
+        @closePopup="closeDeleteSelectedPopup"
+        @actionPopup="submitDeleteSelectedPopup"
+    >
+      <template v-slot:header>
+        {{ $t('app_delete_selected') }}
+      </template>
+      <template v-slot:body>
+        {{ $t('app_delete_selected_text') }}
       </template>
     </popup>
 
@@ -301,6 +322,13 @@ export default {
       deletedType: 0,
       deleteName: '',
 
+      deleteSelectedPopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_continue'),
+        actionClass: 'btn-success',
+      },
+
       uploadPopup: {
         show: false,
         closeButton: this.$t('app_close'),
@@ -340,6 +368,16 @@ export default {
     showFallback: Boolean,
   },
   computed: {
+    showLightboxNext() {
+      let result = true;
+      if (this.lightboxCurrentIndex === (this.openImagesIds.length - 1)) {
+        result = false;
+      }
+      return result;
+    },
+    showLightboxPrev() {
+      return this.lightboxCurrentIndex !== 0;
+    },
     existsSelectedWithoutCut() {
       let result = true;
       for (let key in this.selectedItems) {
@@ -800,6 +838,30 @@ export default {
         this.$store.dispatch("stopPreloader");
       })
     },
+    showDeleteSelected() {
+      this.deleteSelectedPopup.show = true;
+    },
+    closeDeleteSelectedPopup() {
+      this.deleteSelectedPopup.show = false;
+    },
+    async submitDeleteSelectedPopup() {
+      this.$store.dispatch("startPreloader");
+      for (let key in this.selectedItems) {
+        await driveRepository.delete(this.selectedItems[key].id).then(() => {}).catch(err => {
+          this.$store.dispatch("addNotification", {
+            text: err.response.data.message,
+            time: 5,
+            color: "danger"
+          });
+          this.$store.dispatch("stopPreloader");
+        })
+      }
+
+      this.closeDeleteSelectedPopup();
+      this.selectionModeOff();
+      this.$emit('update:get-tree');
+      this.$store.dispatch("stopPreloader");
+    },
   },
   created() {
 
@@ -996,6 +1058,7 @@ export default {
     top: 50%;
     left: 0;
     right: 0;
+    font-size: 20px;
   }
 }
 .lightbox-next-container {
@@ -1012,6 +1075,7 @@ export default {
     top: 50%;
     left: 0;
     right: 0;
+    font-size: 20px;
   }
 }
 .drive-tree-mobile--item-menu {

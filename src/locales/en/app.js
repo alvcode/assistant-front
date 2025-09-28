@@ -94,5 +94,7 @@ export default {
     "app_download": "Download",
     "app_selection_mode": "Selection mode",
     "app_selection_mode_cancel": "Cancel selection mode",
-    "app_rename": "Rename"
+    "app_rename": "Rename",
+    "app_delete_selected": "Deleting selected objects",
+    "app_delete_selected_text": "The selected objects will be permanently deleted. Continue?"
 };

@@ -15,6 +15,10 @@
       <div @click="cut" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-sm btx-outline-info mrg-l-15">
         {{ $t('app_cut') }}
       </div>
+      <div @click="showDeleteSelected" v-if="selectedItems.length > 0 && !existsSelectedWithCut" class="btx btx-sm btx-danger">
+        <f-awesome icon="times"></f-awesome>
+        {{ $t('app_delete') }}
+      </div>
       <div @click="deselectAll" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-sm btx-outline-info">
         {{ $t('app_deselect') }}
       </div>
@@ -136,6 +140,22 @@
       <template v-slot:body>
         <span v-if="deletedType === 0">{{ $t('app_drive_delete_directory_text') }}</span>
         <span v-if="deletedType === 1">{{ $t('app_drive_delete_file_text') }}</span>
+      </template>
+    </popup>
+
+    <popup
+        :closeButton="deleteSelectedPopup.closeButton"
+        :actionButton="deleteSelectedPopup.actionButton"
+        :action-class="deleteSelectedPopup.actionClass"
+        :show="deleteSelectedPopup.show"
+        @closePopup="closeDeleteSelectedPopup"
+        @actionPopup="submitDeleteSelectedPopup"
+    >
+      <template v-slot:header>
+        {{ $t('app_delete_selected') }}
+      </template>
+      <template v-slot:body>
+        {{ $t('app_delete_selected_text') }}
       </template>
     </popup>
 
@@ -262,6 +282,13 @@ export default {
       deletedId: 0,
       deletedType: 0,
       deleteName: '',
+
+      deleteSelectedPopup: {
+        show: false,
+        closeButton: this.$t('app_cancel'),
+        actionButton: this.$t('app_continue'),
+        actionClass: 'btn-success',
+      },
 
       uploadPopup: {
         show: false,
@@ -725,6 +752,30 @@ export default {
         });
         this.$store.dispatch("stopPreloader");
       })
+    },
+    showDeleteSelected() {
+      this.deleteSelectedPopup.show = true;
+    },
+    closeDeleteSelectedPopup() {
+      this.deleteSelectedPopup.show = false;
+    },
+    async submitDeleteSelectedPopup() {
+      this.$store.dispatch("startPreloader");
+      for (let key in this.selectedItems) {
+        await driveRepository.delete(this.selectedItems[key].id).then(() => {}).catch(err => {
+          this.$store.dispatch("addNotification", {
+            text: err.response.data.message,
+            time: 5,
+            color: "danger"
+          });
+          this.$store.dispatch("stopPreloader");
+        })
+      }
+
+      this.closeDeleteSelectedPopup();
+      this.deselectAll();
+      this.$emit('update:get-tree');
+      this.$store.dispatch("stopPreloader");
     },
   },
   created() {

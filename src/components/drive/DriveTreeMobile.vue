@@ -566,7 +566,7 @@ export default {
     },
     submitRenamePopup() {
       this.$store.dispatch("startPreloader");
-      driveRepository.rename(this.renameItemId, this.renameItemName).then(resp => {
+      driveRepository.rename(this.renameItemId, this.renameItemName).then(() => {
         this.$emit('update:get-tree');
         this.closeRenamePopup();
         this.$store.dispatch("stopPreloader");

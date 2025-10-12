@@ -193,13 +193,18 @@
             <li v-for="(file, index) in filesComputed" :key="index">
               <div class="icon">
                 <span v-if="file.status === 'idle'"><f-awesome :icon="getFileIconName(file.name)"></f-awesome></span>
-                <span v-if="file.status === 'process'"><f-awesome icon="spinner" spin></f-awesome></span>
+                <span v-if="file.status === 'process'">
+                  <f-awesome icon="spinner" spin></f-awesome>
+                </span>
                 <span v-if="file.status === 'uploaded'"><f-awesome icon="check" class="text-success"></f-awesome></span>
                 <span v-if="file.status === 'error'"><f-awesome icon="times" class="text-danger"></f-awesome></span>
               </div>
               <div class="name">
                 <div>{{ file.name }}</div>
                 <div v-if="file.status === 'error'" class="file-error text-danger text-small">{{ file.errorText }}</div>
+                <div class="progress" v-show="file.status === 'process'">
+                  <progress-line :percent="file.progress"></progress-line>
+                </div>
               </div>
               <div @click="clearFile(index)" class="delete">
                 <div class=" btn-sm-circle btn-danger">
@@ -258,11 +263,14 @@ import CategoryFields from "@/components/note/CategoryFields.vue";
 import driveRepository from "@/repositories/drive/index.js";
 import DriveOpenFile from "@/components/drive/DriveOpenFile.vue";
 import VueEasyLightbox from 'vue-easy-lightbox'
+import ProgressLine from "@/components/ProgressLine.vue";
+
+const MAX_FILE_SIZE = 63 * 1024 * 1024 // 63 МБ
 
 export default {
   name: "DriveTreeDesktop",
   emits: ["fallInside", "fallBack", "update:tree", "update:get-tree"],
-  components: {DriveOpenFile, CategoryFields, Popup, VueEasyLightbox},
+  components: {ProgressLine, DriveOpenFile, CategoryFields, Popup, VueEasyLightbox},
   data() {
     return {
       newDirectoryPopup: {
@@ -385,10 +393,12 @@ export default {
       for (let key in this.files) {
         let status = 'idle';
         let errorText = '';
+        let progress = 0;
         for (let keyStat in this.uploadFileStatus) {
           if (this.uploadFileStatus[keyStat].idx === key) {
             status = this.uploadFileStatus[keyStat].status;
             errorText = this.uploadFileStatus[keyStat].errorText;
+            progress = this.uploadFileStatus[keyStat].progress;
           }
         }
         const file = {
@@ -397,6 +407,7 @@ export default {
           lastModified: this.files[key].lastModified,
           status: status,
           errorText: errorText,
+          progress: progress,
         };
         result.push(file);
       }
@@ -590,25 +601,76 @@ export default {
         }
 
         if (needUpload) {
-          this.upsertUploadFileStatus(key, 'process', '');
+          if (this.files[key].size <= MAX_FILE_SIZE) {
+            this.upsertUploadFileStatus(key, 'process', 0, '');
 
-          driveRepository.upload(this.files[key], this.parentId).then(resp => {
-            this.upsertUploadFileStatus(key, 'uploaded', '');
-            this.$emit('update:tree', resp.data);
-          }).catch(err => {
-            this.upsertUploadFileStatus(key, 'error', err.response.data.message);
-            this.$store.dispatch("stopPreloader");
-          })
+            driveRepository.upload(this.files[key], this.parentId).then(resp => {
+              this.upsertUploadFileStatus(key, 'uploaded', 100, '');
+              this.$emit('update:tree', resp.data);
+            }).catch(err => {
+              this.upsertUploadFileStatus(key, 'error', 0, err.response.data.message);
+              this.$store.dispatch("stopPreloader");
+            })
+          } else {
+            this.uploadByChunks(this.files[key], key, this.parentId);
+          }
         }
       }
     },
-    upsertUploadFileStatus(idx, status, errorText) {
+    async uploadByChunks(file, fileKey, parentId) {
+      const CHUNK_SIZE = 45 * 1024 * 1024 // 45 МБ
+      const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
+
+      let structId = 0;
+      await driveRepository.chunkPrepare(file.name, file.size, parentId).then(resp => {
+        structId = resp.data.struct_id;
+      }).catch(err => {
+        this.upsertUploadFileStatus(fileKey, 'error', 0, err.response.data.message);
+        this.$store.dispatch("stopPreloader");
+      })
+
+      if (structId === 0) {
+        return false;
+      }
+
+      let progressPercent = 0;
+      for (let i = 0; i < totalChunks; i++) {
+        this.upsertUploadFileStatus(fileKey, 'process', progressPercent, '');
+        const start = i * CHUNK_SIZE
+        const end = Math.min(start + CHUNK_SIZE, file.size)
+        const chunk = file.slice(start, end)
+
+        let isOK = false;
+        await driveRepository.uploadChunk(chunk, structId, i).then(() => {
+          isOK = true;
+        }).catch(err => {
+          this.upsertUploadFileStatus(fileKey, 'error', 0, err.response.data.message);
+          this.$store.dispatch("stopPreloader");
+        })
+
+        if (!isOK) {
+          break;
+        }
+
+        progressPercent = ((i + 1) / totalChunks) * 100
+      }
+
+      await driveRepository.chunkEnd(structId).then(() => {
+        this.upsertUploadFileStatus(fileKey, 'uploaded', 100, '');
+        this.$emit('update:get-tree');
+      }).catch(err => {
+        this.upsertUploadFileStatus(fileKey, 'error', 0, err.response.data.message);
+        this.$store.dispatch("stopPreloader");
+      })
+    },
+    upsertUploadFileStatus(idx, status, progress, errorText) {
       let exists = false;
       for (let key in this.uploadFileStatus) {
         if (this.uploadFileStatus[key].idx === idx) {
           exists = true;
           this.uploadFileStatus[key].status = status;
           this.uploadFileStatus[key].errorText = errorText;
+          this.uploadFileStatus[key].progress = progress;
         }
       }
 
@@ -617,6 +679,7 @@ export default {
           idx: idx,
           status: status,
           errorText: errorText,
+          progress: progress
         })
       }
     },

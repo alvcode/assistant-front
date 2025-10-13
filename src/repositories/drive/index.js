@@ -9,6 +9,8 @@ import getFileRequest from "@/repositories/drive/requests/get-file-request.js";
 import chunkPrepareRequest from "@/repositories/drive/requests/chunk-prepare-request.js";
 import uploadChunkRequest from "@/repositories/drive/requests/upload-chunk-request.js";
 import chunkEndRequest from "@/repositories/drive/requests/chunk-end-request.js";
+import getChunkRequest from "@/repositories/drive/requests/get-chunk-request.js";
+import getChunksInfoRequest from "@/repositories/drive/requests/get-chunks-info-request.js";
 
 const driveRepository = {
     getSpace: getSpaceRequest,
@@ -22,6 +24,8 @@ const driveRepository = {
     chunkPrepare: chunkPrepareRequest,
     uploadChunk: uploadChunkRequest,
     chunkEnd: chunkEndRequest,
+    getChunk: getChunkRequest,
+    getChunksInfo: getChunksInfoRequest,
 };
 
 export default driveRepository;

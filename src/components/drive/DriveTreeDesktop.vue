@@ -416,6 +416,11 @@ export default {
   },
   methods: {
     downloadFile() {
+      if (this.openedFileObject.is_chunk) {
+        this.downloadChunks();
+        return;
+      }
+
       this.$store.dispatch("startPreloader");
       driveRepository.getFile(this.openedFileObject.id).then(resp => {
         this.$store.dispatch("stopPreloader");
@@ -437,6 +442,77 @@ export default {
         });
         this.$store.dispatch("stopPreloader");
       })
+    },
+    async downloadChunks() {
+      const structId = this.openedFileObject.id;
+
+      let maxChunk = 0;
+      await driveRepository.getChunksInfo(structId).then(resp => {
+        maxChunk = resp.data.end_number;
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      })
+
+      const stream = new ReadableStream({
+        async pull(controller) {
+          for (let i = 0; i <= maxChunk; i++) {
+            const response = await driveRepository.getChunk(structId, i);
+            const chunk = await response.data.arrayBuffer()
+            controller.enqueue(new Uint8Array(chunk))
+          }
+          controller.close()
+        }
+      })
+
+      const response = new Response(stream)
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+
+      const a = document.createElement('a')
+      a.href = url
+      a.download = this.openedFileObject.name
+      a.click()
+
+      URL.revokeObjectURL(url)
+
+      // ======================== попробовать заюзать для хрома
+      // const handle = await window.showSaveFilePicker({
+      //   suggestedName: this.openedFileObject.name,
+      //   types: [
+      //     {
+      //       description: 'Any file',
+      //       accept: { '*/*': ['.bin', '.dat', '.zip', '.mp4', '.pdf', '.xlsx'] },
+      //     },
+      //   ],
+      // });
+      //
+      // const writableStream = await handle.createWritable();
+      // try {
+      //   for (let i = 1; i <= totalChunks; i++) {
+      //     console.log(`🔹 Скачиваем чанк ${i}/${totalChunks}`)
+      //
+      //     // 3️⃣ Скачиваем чанк
+      //     const response = await fetch(`/api/drive/files/${fileId}/chunks/${i}`)
+      //     if (!response.ok) throw new Error(`Не удалось загрузить чанк ${i}`)
+      //
+      //     // 4️⃣ Записываем данные напрямую в файл
+      //     await writableStream.write(await response.arrayBuffer())
+      //   }
+      //
+      //   console.log('✅ Все чанки успешно записаны!')
+      // } catch (e) {
+      //   console.error('Ошибка во время скачивания:', e)
+      // } finally {
+      //   // 5️⃣ Закрываем поток (важно!)
+      //   await writableStream.close()
+      // }
+      console.log(this.openedFileObject);
+      return false;
     },
     downloadImg() {
       let blobUrl = this.lightboxImgs[this.lightboxCurrentIndex].src

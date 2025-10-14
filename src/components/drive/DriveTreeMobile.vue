@@ -443,10 +443,12 @@ export default {
       for (let key in this.files) {
         let status = 'idle';
         let errorText = '';
+        let progress = 0;
         for (let keyStat in this.uploadFileStatus) {
           if (this.uploadFileStatus[keyStat].idx === key) {
             status = this.uploadFileStatus[keyStat].status;
             errorText = this.uploadFileStatus[keyStat].errorText;
+            progress = this.uploadFileStatus[keyStat].progress;
           }
         }
         const file = {
@@ -455,6 +457,7 @@ export default {
           lastModified: this.files[key].lastModified,
           status: status,
           errorText: errorText,
+          progress: progress,
         };
         result.push(file);
       }
@@ -721,13 +724,13 @@ export default {
 
         if (needUpload) {
           if (this.files[key].size <= MAX_FILE_SIZE) {
-            this.upsertUploadFileStatus(key, 'process', '');
+            this.upsertUploadFileStatus(key, 'process', 0, '');
 
             driveRepository.upload(this.files[key], this.parentId).then(resp => {
-              this.upsertUploadFileStatus(key, 'uploaded', '');
+              this.upsertUploadFileStatus(key, 'uploaded', 100, '');
               this.$emit('update:tree', resp.data);
             }).catch(err => {
-              this.upsertUploadFileStatus(key, 'error', err.response.data.message);
+              this.upsertUploadFileStatus(key, 'error', 0, err.response.data.message);
               this.$store.dispatch("stopPreloader");
             })
           } else {
@@ -782,13 +785,14 @@ export default {
         this.$store.dispatch("stopPreloader");
       })
     },
-    upsertUploadFileStatus(idx, status, errorText) {
+    upsertUploadFileStatus(idx, status, progress, errorText) {
       let exists = false;
       for (let key in this.uploadFileStatus) {
         if (this.uploadFileStatus[key].idx === idx) {
           exists = true;
           this.uploadFileStatus[key].status = status;
           this.uploadFileStatus[key].errorText = errorText;
+          this.uploadFileStatus[key].progress = progress;
         }
       }
 
@@ -797,6 +801,7 @@ export default {
           idx: idx,
           status: status,
           errorText: errorText,
+          progress: progress
         })
       }
     },

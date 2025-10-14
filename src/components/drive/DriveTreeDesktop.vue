@@ -245,10 +245,14 @@
     >
       <template v-slot:header></template>
       <template v-slot:body>
-        <drive-open-file
-          :file="openedFileObject"
-          @download="downloadFile"
-        ></drive-open-file>
+        <div>
+          <drive-open-file
+              :file="openedFileObject"
+              :is-downloading="openedFileDownloadStatus.process"
+              :progress="openedFileDownloadStatus.progress"
+              @download="downloadFile"
+          ></drive-open-file>
+        </div>
       </template>
     </popup>
 
@@ -265,7 +269,7 @@ import DriveOpenFile from "@/components/drive/DriveOpenFile.vue";
 import VueEasyLightbox from 'vue-easy-lightbox'
 import ProgressLine from "@/components/ProgressLine.vue";
 
-const MAX_FILE_SIZE = 63 * 1024 * 1024 // 63 МБ
+const MAX_FILE_SIZE = 64 * 1024 * 1024 // 64 МБ
 
 export default {
   name: "DriveTreeDesktop",
@@ -322,6 +326,7 @@ export default {
         show: false,
       },
       openedFileObject: {id: 0, name: '', size: 0},
+      openedFileDownloadStatus: {process: false, progress: 0},
 
       lightboxVisible: false,
       lightboxIndex: 0,
@@ -415,15 +420,19 @@ export default {
     }
   },
   methods: {
+    setOpenedFileStatus(isProcess, progress) {
+      this.openedFileDownloadStatus.process = isProcess;
+      this.openedFileDownloadStatus.progress = progress;
+    },
     downloadFile() {
       if (this.openedFileObject.is_chunk) {
         this.downloadChunks();
         return;
       }
 
-      this.$store.dispatch("startPreloader");
+      this.setOpenedFileStatus(true, 10);
       driveRepository.getFile(this.openedFileObject.id).then(resp => {
-        this.$store.dispatch("stopPreloader");
+        this.setOpenedFileStatus(true, 100);
         const blobUrl = window.URL.createObjectURL(new Blob([resp.data]));
         const link = document.createElement("a");
         link.href = blobUrl;
@@ -434,13 +443,14 @@ export default {
 
         // Освободить память
         window.URL.revokeObjectURL(blobUrl);
+        this.setOpenedFileStatus(false, 0);
       }).catch(err => {
         this.$store.dispatch("addNotification", {
           text: err.response.data.message,
           time: 5,
           color: "danger"
         });
-        this.$store.dispatch("stopPreloader");
+        this.setOpenedFileStatus(false, 0);
       })
     },
     async downloadChunks() {
@@ -455,15 +465,17 @@ export default {
           time: 5,
           color: "danger"
         });
-        this.$store.dispatch("stopPreloader");
       })
 
+      this.setOpenedFileStatus(true, 2);
+      const self = this;
       const stream = new ReadableStream({
         async pull(controller) {
           for (let i = 0; i <= maxChunk; i++) {
             const response = await driveRepository.getChunk(structId, i);
             const chunk = await response.data.arrayBuffer()
             controller.enqueue(new Uint8Array(chunk))
+            self.setOpenedFileStatus(true, ((i + 1) / maxChunk) * 100);
           }
           controller.close()
         }
@@ -479,40 +491,7 @@ export default {
       a.click()
 
       URL.revokeObjectURL(url)
-
-      // ======================== попробовать заюзать для хрома
-      // const handle = await window.showSaveFilePicker({
-      //   suggestedName: this.openedFileObject.name,
-      //   types: [
-      //     {
-      //       description: 'Any file',
-      //       accept: { '*/*': ['.bin', '.dat', '.zip', '.mp4', '.pdf', '.xlsx'] },
-      //     },
-      //   ],
-      // });
-      //
-      // const writableStream = await handle.createWritable();
-      // try {
-      //   for (let i = 1; i <= totalChunks; i++) {
-      //     console.log(`🔹 Скачиваем чанк ${i}/${totalChunks}`)
-      //
-      //     // 3️⃣ Скачиваем чанк
-      //     const response = await fetch(`/api/drive/files/${fileId}/chunks/${i}`)
-      //     if (!response.ok) throw new Error(`Не удалось загрузить чанк ${i}`)
-      //
-      //     // 4️⃣ Записываем данные напрямую в файл
-      //     await writableStream.write(await response.arrayBuffer())
-      //   }
-      //
-      //   console.log('✅ Все чанки успешно записаны!')
-      // } catch (e) {
-      //   console.error('Ошибка во время скачивания:', e)
-      // } finally {
-      //   // 5️⃣ Закрываем поток (важно!)
-      //   await writableStream.close()
-      // }
-      console.log(this.openedFileObject);
-      return false;
+      this.setOpenedFileStatus(false, 0);
     },
     downloadImg() {
       let blobUrl = this.lightboxImgs[this.lightboxCurrentIndex].src
@@ -774,19 +753,22 @@ export default {
         this.deselectIfOnlySelected();
         this.$emit('fallInside', itemId);
       } else {
-        let isImg = false;
+        let isImgAndLight = false;
         for (let key in this.treeComputed) {
-          if (this.treeComputed[key].id === itemId && this.filenameIsImage(this.treeComputed[key].name)) {
-            isImg = true;
+          if (
+              this.treeComputed[key].id === itemId &&
+              this.filenameIsImage(this.treeComputed[key].name) && !this.treeComputed[key].is_chunk
+          ) {
+            isImgAndLight = true;
           }
         }
 
-        if (isImg) {
+        if (isImgAndLight) {
           let clickIdx = 0;
           let x = 0;
           this.openImagesIds = [];
           for (let key in this.treeComputed) {
-            if (this.filenameIsImage(this.treeComputed[key].name)) {
+            if (this.filenameIsImage(this.treeComputed[key].name) && !this.treeComputed[key].is_chunk) {
               this.openImagesIds.push({id: this.treeComputed[key].id});
               if (this.treeComputed[key].id === itemId) {
                 clickIdx = x;

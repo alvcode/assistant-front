@@ -6,18 +6,24 @@
     <div class="name">{{ name }}</div>
     <div class="download-icon">
       <div @click="download" class="btx btx-sm btx-info">
-        <f-awesome icon="download"></f-awesome>
+        <span v-if="!isDownloading"><f-awesome icon="download"></f-awesome></span>
+        <span v-if="isDownloading"><f-awesome icon="spinner" spin></f-awesome></span>
         {{ $t('app_download') }}
       </div>
+    </div>
+    <div class="mrg-t-20" v-show="isDownloading">
+      <progress-line :percent="progress"></progress-line>
     </div>
   </div>
 </template>
 
 <script>
 import fileIconMixin from "@/components/mixins/fileIconMixin.js";
+import ProgressLine from "@/components/ProgressLine.vue";
 
 export default {
   name: "DriveOpenFile",
+  components: {ProgressLine},
   emits: ["download"],
   mixins: [fileIconMixin],
   data() {
@@ -28,6 +34,8 @@ export default {
   },
   props: {
     file: Object,
+    isDownloading: Boolean,
+    progress: Number
   },
   watch: {
     file: function(file) {
@@ -45,7 +53,9 @@ export default {
       }
     },
     download() {
-      this.$emit('download');
+      if (!this.isDownloading) {
+        this.$emit('download');
+      }
     },
   },
 }

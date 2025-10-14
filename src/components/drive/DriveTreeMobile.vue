@@ -229,6 +229,9 @@
               <div class="name">
                 <div>{{ file.name }}</div>
                 <div v-if="file.status === 'error'" class="file-error text-danger text-small">{{ file.errorText }}</div>
+                <div class="progress" v-show="file.status === 'process'">
+                  <progress-line :percent="file.progress"></progress-line>
+                </div>
               </div>
               <div @click="clearFile(index)" class="delete">
                 <div class=" btn-sm-circle btn-danger">
@@ -271,6 +274,8 @@
       <template v-slot:body>
         <drive-open-file
           :file="openedFileObject"
+          :is-downloading="openedFileDownloadStatus.process"
+          :progress="openedFileDownloadStatus.progress"
           @download="downloadFile"
         ></drive-open-file>
       </template>
@@ -287,14 +292,17 @@ import CategoryFields from "@/components/note/CategoryFields.vue";
 import driveRepository from "@/repositories/drive/index.js";
 import DriveOpenFile from "@/components/drive/DriveOpenFile.vue";
 import VueEasyLightbox from 'vue-easy-lightbox'
+import ProgressLine from "@/components/ProgressLine.vue";
 
 const MODE_VIEW = 0;
 const MODE_SELECT = 1;
 
+const MAX_FILE_SIZE = 64 * 1024 * 1024 // 64 МБ
+
 export default {
   name: "DriveTreeMobile",
   emits: ["fallInside", "fallBack", "update:tree", "update:get-tree"],
-  components: {DriveOpenFile, CategoryFields, Popup, VueEasyLightbox},
+  components: {ProgressLine, DriveOpenFile, CategoryFields, Popup, VueEasyLightbox},
   data() {
     return {
       treeMode: 0,
@@ -353,6 +361,7 @@ export default {
         show: false,
       },
       openedFileObject: {id: 0, name: '', size: 0},
+      openedFileDownloadStatus: {process: false, progress: 0},
 
       lightboxVisible: false,
       lightboxIndex: 0,
@@ -474,12 +483,20 @@ export default {
       if (this.selectedItems.length > 0 && this.existsSelectedWithCut) {
         this.cancelCut();
       }
-      //existsSelectedWithCut
+    },
+    setOpenedFileStatus(isProcess, progress) {
+      this.openedFileDownloadStatus.process = isProcess;
+      this.openedFileDownloadStatus.progress = progress;
     },
     downloadFile() {
-      this.$store.dispatch("startPreloader");
+      if (this.openedFileObject.is_chunk) {
+        this.downloadChunks();
+        return;
+      }
+
+      this.setOpenedFileStatus(true, 10);
       driveRepository.getFile(this.openedFileObject.id).then(resp => {
-        this.$store.dispatch("stopPreloader");
+        this.setOpenedFileStatus(true, 100);
         const blobUrl = window.URL.createObjectURL(new Blob([resp.data]));
         const link = document.createElement("a");
         link.href = blobUrl;
@@ -490,14 +507,55 @@ export default {
 
         // Освободить память
         window.URL.revokeObjectURL(blobUrl);
+        this.setOpenedFileStatus(false, 0);
       }).catch(err => {
         this.$store.dispatch("addNotification", {
           text: err.response.data.message,
           time: 5,
           color: "danger"
         });
-        this.$store.dispatch("stopPreloader");
+        this.setOpenedFileStatus(false, 0);
       })
+    },
+    async downloadChunks() {
+      const structId = this.openedFileObject.id;
+
+      let maxChunk = 0;
+      await driveRepository.getChunksInfo(structId).then(resp => {
+        maxChunk = resp.data.end_number;
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+      })
+
+      this.setOpenedFileStatus(true, 2);
+      const self = this;
+      const stream = new ReadableStream({
+        async pull(controller) {
+          for (let i = 0; i <= maxChunk; i++) {
+            const response = await driveRepository.getChunk(structId, i);
+            const chunk = await response.data.arrayBuffer()
+            controller.enqueue(new Uint8Array(chunk))
+            self.setOpenedFileStatus(true, ((i + 1) / maxChunk) * 100);
+          }
+          controller.close()
+        }
+      })
+
+      const response = new Response(stream)
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+
+      const a = document.createElement('a')
+      a.href = url
+      a.download = this.openedFileObject.name
+      a.click()
+
+      URL.revokeObjectURL(url)
+      this.setOpenedFileStatus(false, 0);
     },
     downloadImg() {
       let blobUrl = this.lightboxImgs[this.lightboxCurrentIndex].src
@@ -662,17 +720,67 @@ export default {
         }
 
         if (needUpload) {
-          this.upsertUploadFileStatus(key, 'process', '');
+          if (this.files[key].size <= MAX_FILE_SIZE) {
+            this.upsertUploadFileStatus(key, 'process', '');
 
-          driveRepository.upload(this.files[key], this.parentId).then(resp => {
-            this.upsertUploadFileStatus(key, 'uploaded', '');
-            this.$emit('update:tree', resp.data);
-          }).catch(err => {
-            this.upsertUploadFileStatus(key, 'error', err.response.data.message);
-            this.$store.dispatch("stopPreloader");
-          })
+            driveRepository.upload(this.files[key], this.parentId).then(resp => {
+              this.upsertUploadFileStatus(key, 'uploaded', '');
+              this.$emit('update:tree', resp.data);
+            }).catch(err => {
+              this.upsertUploadFileStatus(key, 'error', err.response.data.message);
+              this.$store.dispatch("stopPreloader");
+            })
+          } else {
+            this.uploadByChunks(this.files[key], key, this.parentId);
+          }
         }
       }
+    },
+    async uploadByChunks(file, fileKey, parentId) {
+      const CHUNK_SIZE = 45 * 1024 * 1024 // 45 МБ
+      const totalChunks = Math.ceil(file.size / CHUNK_SIZE)
+
+      let structId = 0;
+      await driveRepository.chunkPrepare(file.name, file.size, parentId).then(resp => {
+        structId = resp.data.struct_id;
+      }).catch(err => {
+        this.upsertUploadFileStatus(fileKey, 'error', 0, err.response.data.message);
+        this.$store.dispatch("stopPreloader");
+      })
+
+      if (structId === 0) {
+        return false;
+      }
+
+      let progressPercent = 0;
+      for (let i = 0; i < totalChunks; i++) {
+        this.upsertUploadFileStatus(fileKey, 'process', progressPercent, '');
+        const start = i * CHUNK_SIZE
+        const end = Math.min(start + CHUNK_SIZE, file.size)
+        const chunk = file.slice(start, end)
+
+        let isOK = false;
+        await driveRepository.uploadChunk(chunk, structId, i).then(() => {
+          isOK = true;
+        }).catch(err => {
+          this.upsertUploadFileStatus(fileKey, 'error', 0, err.response.data.message);
+          this.$store.dispatch("stopPreloader");
+        })
+
+        if (!isOK) {
+          break;
+        }
+
+        progressPercent = ((i + 1) / totalChunks) * 100
+      }
+
+      await driveRepository.chunkEnd(structId).then(() => {
+        this.upsertUploadFileStatus(fileKey, 'uploaded', 100, '');
+        this.$emit('update:get-tree');
+      }).catch(err => {
+        this.upsertUploadFileStatus(fileKey, 'error', 0, err.response.data.message);
+        this.$store.dispatch("stopPreloader");
+      })
     },
     upsertUploadFileStatus(idx, status, errorText) {
       let exists = false;
@@ -719,19 +827,22 @@ export default {
         this.deselectIfOnlySelected();
         this.$emit('fallInside', itemId);
       } else {
-        let isImg = false;
+        let isImgAndLight = false;
         for (let key in this.treeComputed) {
-          if (this.treeComputed[key].id === itemId && this.filenameIsImage(this.treeComputed[key].name)) {
-            isImg = true;
+          if (
+              this.treeComputed[key].id === itemId &&
+              this.filenameIsImage(this.treeComputed[key].name) && !this.treeComputed[key].is_chunk
+          ) {
+            isImgAndLight = true;
           }
         }
 
-        if (isImg) {
+        if (isImgAndLight) {
           let clickIdx = 0;
           let x = 0;
           this.openImagesIds = [];
           for (let key in this.treeComputed) {
-            if (this.filenameIsImage(this.treeComputed[key].name)) {
+            if (this.filenameIsImage(this.treeComputed[key].name) && !this.treeComputed[key].is_chunk) {
               this.openImagesIds.push({id: this.treeComputed[key].id});
               if (this.treeComputed[key].id === itemId) {
                 clickIdx = x;

@@ -973,6 +973,7 @@ export default {
 
       & > div:nth-of-type(1) {
         width: 55%;
+        word-break: break-all;
       }
       & > div:nth-of-type(2) {
         width: 20%;
@@ -1070,6 +1071,7 @@ export default {
     }
     .name {
       width: 75%;
+      word-break: break-all;
     }
     .delete {
       width: 10%;

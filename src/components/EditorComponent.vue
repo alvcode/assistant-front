@@ -149,6 +149,7 @@ export default {
         holder: this.$refs.editor,
         //inlineToolbar: ['link', 'marker', 'bold', 'italic'],
         data: this.data,
+        //readOnly: true,
         tools: {
           table: Table,
           code: CodeTool,

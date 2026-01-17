@@ -185,6 +185,7 @@ export default {
   margin-top: 5px;
   font-size: 18px;
   font-weight: 500;
+  word-break: break-all;
 }
 .pop-up--modal-body {
   padding: 15px 5px;

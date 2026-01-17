@@ -1049,6 +1049,7 @@ export default {
 
       & > div:nth-of-type(1) {
         width: 80%;
+        word-break: break-all;
       }
       & > div:nth-of-type(2) {
         width: 20%;
@@ -1145,6 +1146,7 @@ export default {
     }
     .name {
       width: 75%;
+      word-break: break-all;
     }
     .delete {
       width: 10%;
@@ -1217,6 +1219,7 @@ export default {
     .name {
       padding: 20px 10px 0 10px;
       font-size: 16px;
+      word-break: break-all;
     }
   }
 }

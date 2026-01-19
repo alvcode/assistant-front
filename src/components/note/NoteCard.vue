@@ -25,6 +25,9 @@
       <div v-if="note.pinned" @click.stop="unpin(note.id)" class="unpin-note menu-block-item no-select">
         {{ $t('app_unpin') }}
       </div>
+      <div @click.stop="shareNote(note.id)" class="share-note menu-block-item no-select">
+        {{ $t('app_share') }}
+      </div>
       <div @click.stop="deleteNote(note.id)" class="delete-note menu-block-item no-select">
         {{ $t('app_delete') }}
       </div>
@@ -37,14 +40,20 @@
 
 export default {
   name: "NoteCard",
-  emits: ['action:delete', 'action:pin', 'action:unpin'],
+  emits: ['action:delete', 'action:share', 'action:pin', 'action:unpin'],
   data() {
     return {
       noteIdSubmenu: 0,
     }
   },
   props: {
-    note: Object
+    note: Object,
+    hideSubmenu: Number, // крутим счетчик, чтобы скрывать
+  },
+  watch: {
+    hideSubmenu: function() {
+      this.clearNoteSubmenu();
+    },
   },
   computed: {
 
@@ -61,6 +70,9 @@ export default {
     },
     deleteNote(noteId) {
       this.$emit('action:delete', noteId);
+    },
+    shareNote(noteId) {
+      this.$emit('action:share', noteId);
     },
     pin(noteId) {
       this.$emit('action:pin', noteId);
@@ -101,8 +113,8 @@ export default {
   z-index: 2;
 
   .menu-block-item {
-    margin: 4px 0;
-    padding: 5px 0;
+    margin: 5px 0;
+    padding: 6px 0;
   }
   .menu-block-item:hover {
     color: #7c7c7c;

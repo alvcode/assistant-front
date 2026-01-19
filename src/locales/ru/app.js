@@ -96,5 +96,10 @@ export default {
     "app_selection_mode_cancel": "Отменить режим выделения",
     "app_rename": "Переименовать",
     "app_delete_selected": "Удаление выделенных объектов",
-    "app_delete_selected_text": "Выделенные объекты будут удалены без возможности восстановления. Продолжить?"
+    "app_delete_selected_text": "Выделенные объекты будут удалены без возможности восстановления. Продолжить?",
+    "app_share": "Поделиться",
+    "app_share_the_note": "Поделиться заметкой",
+    "app_link": "Ссылка",
+    "app_copy": "Копировать",
+    "app_revoke_access": "Отозвать доступ"
 };

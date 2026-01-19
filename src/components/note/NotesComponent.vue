@@ -42,8 +42,10 @@
             <div @click="openNote(item.id)" class="note cursor-pointer shadow-card" v-for="item in computedPinnedNotes" :key="item.id">
               <note-card
                   :note="item"
+                  :hideSubmenu="hideNoteSubmenuCounter"
                   @action:delete="deleteNote"
                   @action:unpin="unpinNote"
+                  @action:share="shareNote"
               ></note-card>
             </div>
           </div>
@@ -54,8 +56,10 @@
             <div @click="openNote(item.id)" class="note cursor-pointer shadow-card" v-for="item in computedUnpinnedNotes" :key="item.id">
               <note-card
                   :note="item"
+                  :hideSubmenu="hideNoteSubmenuCounter"
                   @action:delete="deleteNote"
                   @action:pin="pinNote"
+                  @action:share="shareNote"
               ></note-card>
             </div>
           </div>
@@ -121,6 +125,30 @@
       </template>
     </popup>
 
+    <popup
+        :closeButton="shareNotePopup.closeButton"
+        :show="shareNotePopup.show"
+        @closePopup="closeShareNotePopup"
+    >
+      <template v-slot:header>{{ $t('app_share_the_note') }} "{{ shareNoteName }}"</template>
+      <template v-slot:body>
+        <div class="share-popup-container">
+          <div class="link">{{ $t('app_link') }}:
+            <a
+                class="text-link"
+                :href="shareLink" target="_blank"
+            >
+              {{ shareLink }}
+            </a>
+          </div>
+          <div class="mrg-t-20 actions">
+            <div class="btn btn-sm btn-success" @click="copyText(shareLink)">{{ $t('app_copy') }}</div>
+            <div class="btn btn-sm btn-danger">{{ $t('app_revoke_access') }}</div>
+          </div>
+        </div>
+      </template>
+    </popup>
+
   </div>
 </template>
 
@@ -131,10 +159,14 @@ import CategoryFields from "@/components/note/CategoryFields.vue";
 import EditorComponent from "@/components/EditorComponent.vue";
 import noteRepository from "@/repositories/note/index.js";
 import NoteCard from "@/components/note/NoteCard.vue";
+import shareRepository from "@/repositories/share/index.js";
+import config from "@/config.js";
+import textCopyMixin from "@/components/mixins/textCopyMixin.js";
 
 export default {
   name: "NotesComponent",
   components: {NoteCard, EditorComponent, CategoryFields, Popup},
+  mixins: [textCopyMixin],
   data() {
     return {
       isFirstLoaded: false,
@@ -167,7 +199,7 @@ export default {
         {id: 4, name: this.$t('app_sort_created_ascending')},
       ],
       selectedSortType: 0,
-      //noteIdSubmenu: 0,
+      hideNoteSubmenuCounter: 0,
 
       deletedNoteId: 0,
       deleteNotePopup: {
@@ -176,6 +208,12 @@ export default {
         actionButton: this.$t('app_continue'),
         actionClass: 'btn-success',
       },
+      shareNotePopup: {
+        show: false,
+        closeButton: this.$t('app_close'),
+      },
+      shareNoteName: '',
+      shareNoteHash: '',
     }
   },
   props: {
@@ -199,6 +237,9 @@ export default {
     }
   },
   computed: {
+    shareLink() {
+      return this.getThisDomain() + "/notes/share/" + this.shareNoteHash;
+    },
     computedUnpinnedNotes() {
       let result = [];
       for (let key in this.computedNotes) {
@@ -251,6 +292,9 @@ export default {
     }
   },
   methods: {
+    getThisDomain() {
+      return config.this_domain;
+    },
     resizeTitle() {
       const el = document.getElementsByClassName('title-area')[0];
       if (el) {
@@ -294,13 +338,59 @@ export default {
         this.$store.dispatch("stopPreloader");
       });
     },
+    showShareNotePopup() {
+      this.shareNotePopup.show = true;
+    },
+    closeShareNotePopup() {
+      this.shareNotePopup.show = false;
+    },
+    async shareNote(noteId) {
+      let needCreateShare = false;
+      for(let key in this.computedNotes) {
+        if (noteId === this.computedNotes[key].id) {
+          this.shareNoteName = this.computedNotes[key].title;
+          if (!this.computedNotes[key].shared) {
+            needCreateShare = true;
+          }
+          break;
+        }
+      }
+
+      if (needCreateShare) {
+        this.$store.dispatch("startPreloader");
+        await shareRepository.create(noteId).then(() => {
+
+        }).catch(err =>  {
+          this.$store.dispatch("addNotification", {
+            text: err.response.data.message,
+            time: 5,
+            color: "danger"
+          });
+          this.$store.dispatch("stopPreloader");
+        });
+      }
+
+      await shareRepository.getOne(noteId).then((resp) => {
+        this.shareNoteHash = resp.data.hash;
+        this.showShareNotePopup();
+        this.hideNoteSubmenuCounter++;
+        this.$store.dispatch("stopPreloader");
+      }).catch(err =>  {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
     deleteNote(noteId) {
       this.deletedNoteId = noteId;
       this.showDeleteNotePopup();
     },
     closeDeleteNotePopup() {
       this.deleteNotePopup.show = false;
-      this.noteIdSubmenu = 0;
+      this.hideNoteSubmenuCounter++;
     },
     showDeleteNotePopup() {
       this.deleteNotePopup.show = true;
@@ -308,7 +398,7 @@ export default {
     submitDeleteNotePopup() {
       this.$store.dispatch("startPreloader");
       noteRepository.delete(this.deletedNoteId).then(() => {
-        this.noteIdSubmenu = 0;
+        this.hideNoteSubmenuCounter++;
         this.loadNotes(this.categoryId);
         this.closeDeleteNotePopup();
         this.$store.dispatch("stopPreloader");
@@ -561,6 +651,11 @@ export default {
     width: 45%;
     text-align: right;
     font-size: 13px;
+  }
+}
+.share-popup-container {
+  .link {
+    word-break: break-all;
   }
 }
 @media (max-width: 1605px) {

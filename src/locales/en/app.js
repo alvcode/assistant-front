@@ -96,5 +96,10 @@ export default {
     "app_selection_mode_cancel": "Cancel selection mode",
     "app_rename": "Rename",
     "app_delete_selected": "Deleting selected objects",
-    "app_delete_selected_text": "The selected objects will be permanently deleted. Continue?"
+    "app_delete_selected_text": "The selected objects will be permanently deleted. Continue?",
+    "app_share": "Share",
+    "app_share_the_note": "Share the note",
+    "app_link": "Link",
+    "app_copy": "Copy",
+    "app_revoke_access": "Revoke access"
 };

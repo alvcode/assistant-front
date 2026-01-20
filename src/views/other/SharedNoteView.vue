@@ -75,12 +75,26 @@ export default {
     getByHash(hash) {
       shareRepository.getByHash(hash).then((resp) => {
         this.title = resp.data.title;
+        document.title = resp.data.title;
+        this.setMeta('og:title', resp.data.title, true);
+        this.setMeta('og:type', 'website', true);
         this.editorData.blocks = resp.data.note_blocks;
         this.showContent = true;
       }).catch(err => {
         this.errorText = err.response.data.message;
       });
     },
+    setMeta(nameOrProperty, content, isProperty) {
+      let selector = isProperty ? `[property="${nameOrProperty}"]` : `[name="${nameOrProperty}"]`
+      let tag = document.head.querySelector(`meta${selector}`)
+      if (!tag) {
+        tag = document.createElement('meta')
+        if (isProperty) tag.setAttribute('property', nameOrProperty)
+        else tag.setAttribute('name', nameOrProperty)
+        document.head.appendChild(tag)
+      }
+      tag.setAttribute('content', content)
+    }
   },
   beforeMount() {
     this.initTheme();
@@ -91,7 +105,6 @@ export default {
 
 <style scoped lang="less">
 .header {
-  //width: 500px;
   margin: 10px auto;
   text-align: center;
 

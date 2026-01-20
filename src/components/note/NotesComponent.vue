@@ -143,7 +143,7 @@
           </div>
           <div class="mrg-t-20 actions">
             <div class="btn btn-sm btn-success" @click="copyText(shareLink)">{{ $t('app_copy') }}</div>
-            <div class="btn btn-sm btn-danger">{{ $t('app_revoke_access') }}</div>
+            <div class="btn btn-sm btn-danger" @click="deleteShare">{{ $t('app_revoke_access') }}</div>
           </div>
         </div>
       </template>
@@ -212,6 +212,7 @@ export default {
         show: false,
         closeButton: this.$t('app_close'),
       },
+      shareNoteId: 0,
       shareNoteName: '',
       shareNoteHash: '',
     }
@@ -356,10 +357,14 @@ export default {
         }
       }
 
+      this.$store.dispatch("startPreloader");
       if (needCreateShare) {
-        this.$store.dispatch("startPreloader");
         await shareRepository.create(noteId).then(() => {
-
+          for(let key in this.notes) {
+            if (this.notes[key].id === noteId) {
+              this.notes[key].shared = true;
+            }
+          }
         }).catch(err =>  {
           this.$store.dispatch("addNotification", {
             text: err.response.data.message,
@@ -372,8 +377,28 @@ export default {
 
       await shareRepository.getOne(noteId).then((resp) => {
         this.shareNoteHash = resp.data.hash;
+        this.shareNoteId = noteId;
         this.showShareNotePopup();
         this.hideNoteSubmenuCounter++;
+        this.$store.dispatch("stopPreloader");
+      }).catch(err =>  {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      });
+    },
+    deleteShare() {
+      this.$store.dispatch("startPreloader");
+      shareRepository.delete(this.shareNoteId).then(() => {
+        for(let key in this.notes) {
+          if (this.notes[key].id === this.shareNoteId) {
+            this.notes[key].shared = false;
+          }
+        }
+        this.closeShareNotePopup();
         this.$store.dispatch("stopPreloader");
       }).catch(err =>  {
         this.$store.dispatch("addNotification", {

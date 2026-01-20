@@ -101,5 +101,6 @@ export default {
     "app_share_the_note": "Поделиться заметкой",
     "app_link": "Ссылка",
     "app_copy": "Копировать",
-    "app_revoke_access": "Отозвать доступ"
+    "app_revoke_access": "Отозвать доступ",
+    "app_access_menu": "Меню доступа"
 };

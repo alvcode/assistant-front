@@ -26,11 +26,15 @@
         {{ $t('app_unpin') }}
       </div>
       <div @click.stop="shareNote(note.id)" class="share-note menu-block-item no-select">
-        {{ $t('app_share') }}
+        <span v-if="note.shared">{{ $t('app_access_menu') }}</span>
+        <span v-if="!note.shared">{{ $t('app_share') }}</span>
       </div>
       <div @click.stop="deleteNote(note.id)" class="delete-note menu-block-item no-select">
         {{ $t('app_delete') }}
       </div>
+    </div>
+    <div class="info-icons">
+      <div v-if="note.shared" class="text-success"><f-awesome :icon="['fas', 'share-nodes']" /></div>
     </div>
   </div>
   <div v-show="noteIdSubmenu > 0" class="note-background" @click.stop="clearNoteSubmenu"></div>
@@ -89,8 +93,23 @@ export default {
 
 <style scoped lang="less">
 .note-card {
+  position: relative;
   .title {
     width: 96%;
+  }
+  .info-icons {
+    text-align: right;
+    width: 45px;
+    position: absolute;
+    bottom: -3px;
+    right: -1px;
+    //border: 1px solid red;
+
+    & > div {
+      display: inline-block;
+      font-size: 10px;
+      margin: 0 3px;
+    }
   }
 }
 .note-menu {

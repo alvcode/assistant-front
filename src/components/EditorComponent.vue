@@ -4,7 +4,7 @@
 
     <div class="additional">
       <div class="actions text-right">
-        <div class="btx btx-sm btx-outline-info" @click="showInsertTextPopup">{{ $t('app_insert_third_party_text') }}</div>
+        <div v-show="!hideTextInsert" class="btx btx-sm btx-outline-info" @click="showInsertTextPopup">{{ $t('app_insert_third_party_text') }}</div>
         <div class="btx btx-sm btx-outline-info" @click="showForCopyPopup">{{ $t('app_for_copy') }}</div>
       </div>
     </div>
@@ -109,6 +109,8 @@ export default {
       type: Function,
       default: null,
     },
+    hideTextInsert: Boolean,
+    readOnly: Boolean,
   },
   data() {
     return {
@@ -149,7 +151,7 @@ export default {
         holder: this.$refs.editor,
         //inlineToolbar: ['link', 'marker', 'bold', 'italic'],
         data: this.data,
-        //readOnly: true,
+        readOnly: this.readOnly,
         tools: {
           table: Table,
           code: CodeTool,

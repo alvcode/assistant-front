@@ -10,8 +10,9 @@
           <lang-index-component></lang-index-component>
         </div>
       </div>
-      <div class="shared-note--content text-center" v-if="showContent">
+      <div class="shared-note--content" v-if="showContent">
         <div class="shared-note--editor">
+          <div class="card-title mrg-b-10 text-center">{{ title }}</div>
           <editor-component
               :data="editorData"
               :hideTextInsert="true"
@@ -44,7 +45,8 @@ export default {
         time: Date.now(),
         blocks: [],
       },
-      errorText: ''
+      errorText: '',
+      title: '',
     }
   },
   computed: {
@@ -72,6 +74,7 @@ export default {
     },
     getByHash(hash) {
       shareRepository.getByHash(hash).then((resp) => {
+        this.title = resp.data.title;
         this.editorData.blocks = resp.data.note_blocks;
         this.showContent = true;
       }).catch(err => {

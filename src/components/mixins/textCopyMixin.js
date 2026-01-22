@@ -4,14 +4,14 @@ export default {
             navigator.clipboard.writeText(text)
                 .then(() => {
                     this.$store.dispatch("addNotification", {
-                        text: 'Текст скопирован в буфер обмена',
+                        text: this.$t('app_text_copied'),
                         time: 3,
                         color: "success"
                     });
                 })
                 .catch(() => {
                     this.$store.dispatch("addNotification", {
-                        text: 'Ваш браузер не поддерживает копирование',
+                        text: this.$t('error_copying_not_supported'),
                         time: 3,
                         color: "danger"
                     });

@@ -95,7 +95,7 @@ export default {
 .note-card {
   position: relative;
   .title {
-    width: 96%;
+    width: 92%;
   }
   .info-icons {
     text-align: right;

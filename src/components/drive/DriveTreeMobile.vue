@@ -118,19 +118,19 @@
 
       <template v-slot:toolbar="{ toolbarMethods }">
         <div class="lightbox-toolbar">
-          <button @click="toolbarMethods.zoomIn" class="btx btx-outline-info">
+          <button @click="toolbarMethods.zoomIn" class="btx btx-lg btx-outline-info">
             <f-awesome icon="magnifying-glass-plus" />
           </button>
-          <button @click="toolbarMethods.zoomOut" class="btx btx-outline-info">
+          <button @click="toolbarMethods.zoomOut" class="btx btx-lg btx-outline-info">
             <f-awesome icon="magnifying-glass-minus" />
           </button>
-          <button @click="toolbarMethods.rotateLeft" class="btx btx-outline-info">
+          <button @click="toolbarMethods.rotateLeft" class="btx btx-lg btx-outline-info">
             <f-awesome icon="rotate-left" />
           </button>
-          <button @click="toolbarMethods.rotateRight" class="btx btx-outline-info">
+          <button @click="toolbarMethods.rotateRight" class="btx btx-lg btx-outline-info">
             <f-awesome icon="rotate-right" />
           </button>
-          <button @click="downloadImg" class="btx btx-outline-info">
+          <button @click="downloadImg" class="btx btx-lg btx-outline-info">
             <f-awesome icon="download" />
           </button>
         </div>
@@ -686,6 +686,7 @@ export default {
     },
     clearFiles() {
       this.files = [];
+      this.uploadFileStatus = [];
     },
     openFileDialog() {
       this.$refs.fileInput.click();
@@ -1164,7 +1165,7 @@ export default {
 }
 .lightbox-prev-container {
   position: fixed;
-  width: 36px;
+  width: 60px;
   top: 0;
   bottom: 0;
   left: 0;
@@ -1181,7 +1182,7 @@ export default {
 }
 .lightbox-next-container {
   position: fixed;
-  width: 36px;
+  width: 60px;
   top: 0;
   bottom: 0;
   right: 0;

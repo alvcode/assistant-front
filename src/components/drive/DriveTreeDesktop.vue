@@ -89,19 +89,19 @@
     >
       <template v-slot:toolbar="{ toolbarMethods }">
         <div class="lightbox-toolbar">
-          <button @click="toolbarMethods.zoomIn" class="btx btx-sm btx-outline-info">
+          <button @click="toolbarMethods.zoomIn" class="btx btx-lg btx-outline-info">
             <f-awesome icon="magnifying-glass-plus" />
           </button>
-          <button @click="toolbarMethods.zoomOut" class="btx btx-sm btx-outline-info">
+          <button @click="toolbarMethods.zoomOut" class="btx btx-lg btx-outline-info">
             <f-awesome icon="magnifying-glass-minus" />
           </button>
-          <button @click="toolbarMethods.rotateLeft" class="btx btx-sm btx-outline-info">
+          <button @click="toolbarMethods.rotateLeft" class="btx btx-lg btx-outline-info">
             <f-awesome icon="rotate-left" />
           </button>
-          <button @click="toolbarMethods.rotateRight" class="btx btx-sm btx-outline-info">
+          <button @click="toolbarMethods.rotateRight" class="btx btx-lg btx-outline-info">
             <f-awesome icon="rotate-right" />
           </button>
-          <button @click="downloadImg" class="btx btx-sm btx-outline-info">
+          <button @click="downloadImg" class="btx btx-lg btx-outline-info">
             <f-awesome icon="download" />
           </button>
         </div>
@@ -619,6 +619,7 @@ export default {
     },
     clearFiles() {
       this.files = [];
+      this.uploadFileStatus = [];
     },
     openFileDialog() {
       this.$refs.fileInput.click();

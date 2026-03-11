@@ -247,6 +247,19 @@ export default {
             }
           }
         },
+        onReady: () => {
+          const redactor = this.editor.ui.nodes.redactor;
+
+          redactor.addEventListener('paste', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+
+            const text = e.clipboardData.getData('text/plain');
+
+            document.execCommand('insertText', false, text);
+          }, true); // capture phase
+        },
         onChange: () => {
           if (this.onChange) {
             this.editor.save().then((outputData) => {

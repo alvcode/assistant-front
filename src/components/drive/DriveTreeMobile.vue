@@ -1,5 +1,10 @@
 <template>
   <div class="drive-tree-mobile--container">
+    <div class="recycle-bin text-right">
+      <div class="btx btx-sm btx-info">
+        {{ $t('app_recycle_bin') }}
+      </div>
+    </div>
     <div class="actions">
       <div @click="fallBack" v-if="showFallback" class="btx btx-info mrg-t-10">
         <f-awesome icon="arrow-left"></f-awesome>
@@ -256,7 +261,7 @@
         @closePopup="closeRenamePopup"
         @actionPopup="submitRenamePopup"
     >
-      <template v-slot:header>Переименование</template>
+      <template v-slot:header>{{ $t('app_rename') }}</template>
       <template v-slot:body>
         <div class="input-block">
           <label>{{ $t('form_name') }}</label>
@@ -281,6 +286,19 @@
       </template>
     </popup>
 
+    <popup
+        :show="recycleBinPopup.show"
+        :closeIfClickBack="true"
+        @closePopup="closeRecycleBinPopup"
+    >
+      <template v-slot:header>{{ $t('app_recycle_bin') }}</template>
+      <template v-slot:body>
+        <div>
+          <drive-recycle-bin></drive-recycle-bin>
+        </div>
+      </template>
+    </popup>
+
   </div>
 </template>
 
@@ -293,6 +311,7 @@ import driveRepository from "@/repositories/drive/index.js";
 import DriveOpenFile from "@/components/drive/DriveOpenFile.vue";
 import VueEasyLightbox from 'vue-easy-lightbox'
 import ProgressLine from "@/components/ProgressLine.vue";
+import DriveRecycleBin from "@/components/drive/DriveRecycleBin.vue";
 
 const MODE_VIEW = 0;
 const MODE_SELECT = 1;
@@ -302,7 +321,7 @@ const MAX_FILE_SIZE = 64 * 1024 * 1024 // 64 МБ
 export default {
   name: "DriveTreeMobile",
   emits: ["fallInside", "fallBack", "update:tree", "update:get-tree"],
-  components: {ProgressLine, DriveOpenFile, CategoryFields, Popup, VueEasyLightbox},
+  components: {DriveRecycleBin, ProgressLine, DriveOpenFile, CategoryFields, Popup, VueEasyLightbox},
   data() {
     return {
       treeMode: 0,
@@ -362,6 +381,11 @@ export default {
       },
       openedFileObject: {id: 0, name: '', size: 0},
       openedFileDownloadStatus: {process: false, progress: 0},
+
+      recycleBinPopup: {
+        show: false,
+        closeButton: this.$t('app_close'),
+      },
 
       lightboxVisible: false,
       lightboxIndex: 0,

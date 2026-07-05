@@ -104,4 +104,6 @@ export default {
     "app_revoke_access": "Отозвать доступ",
     "app_access_menu": "Меню доступа",
     "app_text_copied": "Текст скопирован в буфер обмена",
+    "app_recycle_bin": "Корзина",
+
 };

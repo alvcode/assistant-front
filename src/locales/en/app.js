@@ -104,4 +104,5 @@ export default {
     "app_revoke_access": "Revoke access",
     "app_access_menu": "Access menu",
     "app_text_copied": "The text has been copied to the clipboard",
+    "app_recycle_bin": "Recycle Bin"
 };

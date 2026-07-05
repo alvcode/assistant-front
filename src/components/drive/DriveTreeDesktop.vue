@@ -172,7 +172,18 @@
         {{ $t('app_delete_selected') }}
       </template>
       <template v-slot:body>
-        {{ $t('app_delete_selected_text') }}
+        <div>
+          {{ $t('app_delete_selected_text') }}
+        </div>
+        <div class="mrg-t-15">
+          <label>
+            <input
+                type="checkbox"
+                v-model="deleteForce"
+            />
+            {{ $t('app_permanently_delete') }}
+          </label>
+        </div>
       </template>
     </popup>
 
@@ -922,11 +933,12 @@ export default {
     },
     closeDeleteSelectedPopup() {
       this.deleteSelectedPopup.show = false;
+      this.deleteForce = false;
     },
     async submitDeleteSelectedPopup() {
       this.$store.dispatch("startPreloader");
       for (let key in this.selectedItems) {
-        await driveRepository.delete(this.selectedItems[key].id).then(() => {}).catch(err => {
+        await driveRepository.delete(this.selectedItems[key].id, this.deleteForce).then(() => {}).catch(err => {
           this.$store.dispatch("addNotification", {
             text: err.response.data.message,
             time: 5,

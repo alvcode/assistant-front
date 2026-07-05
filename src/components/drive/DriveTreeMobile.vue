@@ -173,8 +173,19 @@
         <span v-if="deletedType === 1">{{ $t('app_drive_delete_file', {file: this.deleteName}) }}</span>
       </template>
       <template v-slot:body>
-        <span v-if="deletedType === 0">{{ $t('app_drive_delete_directory_text') }}</span>
-        <span v-if="deletedType === 1">{{ $t('app_drive_delete_file_text') }}</span>
+        <div>
+          <span v-if="deletedType === 0">{{ $t('app_drive_delete_directory_text') }}</span>
+          <span v-if="deletedType === 1">{{ $t('app_drive_delete_file_text') }}</span>
+        </div>
+        <div class="mrg-t-15">
+          <label>
+            <input
+                type="checkbox"
+                v-model="deleteForce"
+            />
+            {{ $t('app_permanently_delete') }}
+          </label>
+        </div>
       </template>
     </popup>
 
@@ -190,7 +201,18 @@
         {{ $t('app_delete_selected') }}
       </template>
       <template v-slot:body>
-        {{ $t('app_delete_selected_text') }}
+        <div>
+          {{ $t('app_delete_selected_text') }}
+        </div>
+        <div class="mrg-t-15">
+          <label>
+            <input
+                type="checkbox"
+                v-model="deleteForce"
+            />
+            {{ $t('app_permanently_delete') }}
+          </label>
+        </div>
       </template>
     </popup>
 
@@ -350,6 +372,7 @@ export default {
         actionClass: 'btn-success',
       },
       deletedId: 0,
+      deleteForce: false,
       deletedType: 0,
       deleteName: '',
 
@@ -960,6 +983,7 @@ export default {
 
     closeDeletePopup() {
       this.deletePopup.show = false;
+      this.deleteForce = false;
     },
     showDeletePopup() {
       this.deletedId = this.itemMenu.id;
@@ -970,7 +994,7 @@ export default {
     },
     submitDeletePopup() {
       this.$store.dispatch("startPreloader");
-      driveRepository.delete(this.deletedId).then(() => {
+      driveRepository.delete(this.deletedId, this.deleteForce).then(() => {
         this.closeDeletePopup();
         this.$emit('update:get-tree');
         this.$store.dispatch("stopPreloader");
@@ -988,11 +1012,12 @@ export default {
     },
     closeDeleteSelectedPopup() {
       this.deleteSelectedPopup.show = false;
+      this.deleteForce = false;
     },
     async submitDeleteSelectedPopup() {
       this.$store.dispatch("startPreloader");
       for (let key in this.selectedItems) {
-        await driveRepository.delete(this.selectedItems[key].id).then(() => {}).catch(err => {
+        await driveRepository.delete(this.selectedItems[key].id, this.deleteForce).then(() => {}).catch(err => {
           this.$store.dispatch("addNotification", {
             text: err.response.data.message,
             time: 5,

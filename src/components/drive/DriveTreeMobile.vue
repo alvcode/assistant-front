@@ -1,7 +1,8 @@
 <template>
   <div class="drive-tree-mobile--container">
-    <div class="recycle-bin text-right">
+    <div @click="showRecycleBinPopup" class="recycle-bin text-right">
       <div class="btx btx-sm btx-info">
+        <f-awesome icon="trash"></f-awesome>
         {{ $t('app_recycle_bin') }}
       </div>
     </div>
@@ -294,7 +295,10 @@
       <template v-slot:header>{{ $t('app_recycle_bin') }}</template>
       <template v-slot:body>
         <div>
-          <drive-recycle-bin></drive-recycle-bin>
+          <drive-recycle-bin
+              :show="recycleBinPopup.show"
+              @restored="recycleBinItemRestored"
+          ></drive-recycle-bin>
         </div>
       </template>
     </popup>
@@ -1002,6 +1006,16 @@ export default {
       this.selectionModeOff();
       this.$emit('update:get-tree');
       this.$store.dispatch("stopPreloader");
+    },
+
+    showRecycleBinPopup() {
+      this.recycleBinPopup.show = true;
+    },
+    closeRecycleBinPopup() {
+      this.recycleBinPopup.show = false;
+    },
+    recycleBinItemRestored() {
+      this.$emit('update:get-tree');
     },
   },
   created() {

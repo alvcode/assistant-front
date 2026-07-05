@@ -1,7 +1,8 @@
 <template>
   <div class="drive-tree-desktop--container">
-    <div class="recycle-bin text-right">
+    <div @click="showRecycleBinPopup" class="recycle-bin text-right">
       <div class="btx btx-sm btx-info">
+        <f-awesome icon="trash"></f-awesome>
         {{ $t('app_recycle_bin') }}
       </div>
     </div>
@@ -143,8 +144,19 @@
         <span v-if="deletedType === 1">{{ $t('app_drive_delete_file', {file: this.deleteName}) }}</span>
       </template>
       <template v-slot:body>
-        <span v-if="deletedType === 0">{{ $t('app_drive_delete_directory_text') }}</span>
-        <span v-if="deletedType === 1">{{ $t('app_drive_delete_file_text') }}</span>
+        <div>
+          <span v-if="deletedType === 0">{{ $t('app_drive_delete_directory_text') }}</span>
+          <span v-if="deletedType === 1">{{ $t('app_drive_delete_file_text') }}</span>
+        </div>
+        <div class="mrg-t-15">
+          <label>
+            <input
+                type="checkbox"
+                v-model="deleteForce"
+            />
+            {{ $t('app_permanently_delete') }}
+          </label>
+        </div>
       </template>
     </popup>
 
@@ -264,12 +276,16 @@
     <popup
         :show="recycleBinPopup.show"
         :closeIfClickBack="true"
+        :size="'lg'"
         @closePopup="closeRecycleBinPopup"
     >
       <template v-slot:header>{{ $t('app_recycle_bin') }}</template>
       <template v-slot:body>
         <div>
-          <drive-recycle-bin></drive-recycle-bin>
+          <drive-recycle-bin
+            :show="recycleBinPopup.show"
+            @restored="recycleBinItemRestored"
+          ></drive-recycle-bin>
         </div>
       </template>
     </popup>
@@ -311,6 +327,7 @@ export default {
         actionClass: 'btn-success',
       },
       deletedId: 0,
+      deleteForce: false,
       deletedType: 0,
       deleteName: '',
 
@@ -877,6 +894,7 @@ export default {
 
     closeDeletePopup() {
       this.deletePopup.show = false;
+      this.deleteForce = false;
     },
     showDeletePopup(itemId, type, itemName) {
       this.deletedId = itemId;
@@ -886,7 +904,7 @@ export default {
     },
     submitDeletePopup() {
       this.$store.dispatch("startPreloader");
-      driveRepository.delete(this.deletedId).then(() => {
+      driveRepository.delete(this.deletedId, this.deleteForce).then(() => {
         this.closeDeletePopup();
         this.$emit('update:get-tree');
         this.$store.dispatch("stopPreloader");
@@ -922,6 +940,16 @@ export default {
       this.deselectAll();
       this.$emit('update:get-tree');
       this.$store.dispatch("stopPreloader");
+    },
+
+    showRecycleBinPopup() {
+      this.recycleBinPopup.show = true;
+    },
+    closeRecycleBinPopup() {
+      this.recycleBinPopup.show = false;
+    },
+    recycleBinItemRestored() {
+      this.$emit('update:get-tree');
     },
   },
   created() {

@@ -104,5 +104,9 @@ export default {
     "app_revoke_access": "Revoke access",
     "app_access_menu": "Access menu",
     "app_text_copied": "The text has been copied to the clipboard",
-    "app_recycle_bin": "Recycle Bin"
+    "app_recycle_bin": "Recycle Bin",
+    "app_permanently_delete": "Permanently Delete",
+    "app_added": "Added",
+    "app_path": "Path",
+    "app_restore": "Restore"
 };

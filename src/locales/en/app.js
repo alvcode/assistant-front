@@ -108,5 +108,6 @@ export default {
     "app_permanently_delete": "Permanently Delete",
     "app_added": "Added",
     "app_path": "Path",
-    "app_restore": "Restore"
+    "app_restore": "Restore",
+    "app_restore_all": "Restore all",
 };

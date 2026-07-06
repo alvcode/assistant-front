@@ -30,6 +30,9 @@
         </div>
       </div>
     </div>
+    <div @click="restoreAll" class="actions mrg-t-25 text-right">
+      <div v-show="list.length > 1" class="btx btx-sm btx-success">{{ $t('app_restore_all') }}</div>
+    </div>
   </div>
 </template>
 
@@ -83,9 +86,11 @@ export default {
       })
     },
     restoreOneStruct(id) {
+      this.$store.dispatch("startPreloader");
       driveRecycleBinRepository.restoreOne(id).then(() => {
         this.showList();
         this.$emit('restored');
+        this.$store.dispatch("stopPreloader");
       }).catch(err => {
         this.$store.dispatch("addNotification", {
           text: err.response.data.message,
@@ -95,6 +100,21 @@ export default {
         this.$store.dispatch("stopPreloader");
       })
     },
+    restoreAll() {
+      this.$store.dispatch("startPreloader");
+      driveRecycleBinRepository.restoreAll().then(() => {
+        this.showList();
+        this.$emit('restored');
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      })
+    }
   },
 }
 </script>

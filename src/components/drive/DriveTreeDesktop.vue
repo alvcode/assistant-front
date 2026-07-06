@@ -694,7 +694,7 @@ export default {
     showUploadPopup() {
       this.uploadPopup.show = true;
     },
-    submitUploadPopup() {
+    async submitUploadPopup() {
       for (let key in this.files) {
         let needUpload = true;
         for (let keyStat in this.uploadFileStatus) {
@@ -712,7 +712,7 @@ export default {
           if (this.files[key].size <= MAX_FILE_SIZE) {
             this.upsertUploadFileStatus(key, 'process', 0, '');
 
-            driveRepository.upload(this.files[key], this.parentId).then(resp => {
+            await driveRepository.upload(this.files[key], this.parentId).then(resp => {
               this.upsertUploadFileStatus(key, 'uploaded', 100, '');
               this.$emit('update:tree', resp.data);
             }).catch(err => {

@@ -108,5 +108,6 @@ export default {
     "app_permanently_delete": "Удалить безвозвратно",
     "app_added": "Добавлено",
     "app_path": "Путь",
-    "app_restore": "Восстановить"
+    "app_restore": "Восстановить",
+    "app_restore_all": "Восстановить всё",
 };

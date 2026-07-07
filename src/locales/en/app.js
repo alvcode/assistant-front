@@ -83,7 +83,7 @@ export default {
     "app_drive_delete_directory": "Delete folder '{folder}'",
     "app_drive_delete_directory_text": "The folder will be deleted along with its attached files and subfolders. Continue?",
     "app_drive_delete_file": "Delete file '{file}'",
-    "app_drive_delete_file_text": "The file will be deleted without the possibility of recovery. Continue?",
+    "app_drive_delete_file_text": "The file will be deleted. Continue?",
     "app_clear_list": "Clear list",
     "app_deselect": "Deselect",
     "app_move": "Move",
@@ -110,4 +110,5 @@ export default {
     "app_path": "Path",
     "app_restore": "Restore",
     "app_restore_all": "Restore all",
+    "app_all_items_will_be_permanently_deleted": "All items will be permanently deleted",
 };

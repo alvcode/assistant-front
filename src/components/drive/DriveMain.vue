@@ -9,6 +9,8 @@
             :breadcrumbs="breadcrumbs"
             @fall-to="fallTo"
         ></drive-breadcrumbs>
+
+        <drive-archive-line></drive-archive-line>
         <drive-tree-desktop
             class="mrg-t-15"
             :tree="tree"
@@ -48,10 +50,11 @@ import driveRepository from "@/repositories/drive/index.js";
 import DriveTreeDesktop from "@/components/drive/DriveTreeDesktop.vue";
 import DriveBreadcrumbs from "@/components/drive/DriveBreadcrumbs.vue";
 import DriveTreeMobile from "@/components/drive/DriveTreeMobile.vue";
+import DriveArchiveLine from "@/components/drive/DriveArchiveLine.vue";
 
 export default {
   name: "DriveMain",
-  components: {DriveTreeMobile, DriveBreadcrumbs, DriveTreeDesktop, DriveSpace},
+  components: {DriveArchiveLine, DriveTreeMobile, DriveBreadcrumbs, DriveTreeDesktop, DriveSpace},
   data() {
     return {
       space: {total: 0, used: 0},
@@ -129,15 +132,8 @@ export default {
 </script>
 
 <style scoped lang="less">
-//.main-content {
-//  display: flex;
-//  flex-wrap: nowrap;
-//  justify-content: space-between;
-//  flex-direction: row;
-//}
 .space {
   display: flex;
-  //flex-direction: column;
   justify-content: right;
 }
 .drive-tree-desktop {
@@ -146,12 +142,6 @@ export default {
 }
 .drive-tree-mobile {
   display: none;
-}
-@media (max-width: 1380px) {
-  //.main-content {
-  //  flex-wrap: wrap;
-  //  flex-direction: column-reverse;
-  //}
 }
 @media (max-width: 980px) {
   .drive-tree-desktop {

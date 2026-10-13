@@ -1,5 +1,6 @@
 import axios from "axios";
 import Formatter from "../../components/libraries/Formatter";
+import longPollingBus from "@/services/longPollingBus.js";
 
 const formatter = new Formatter();
 
@@ -47,6 +48,7 @@ const authorization = {
             axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
             commit("auth_success", userData);
+            longPollingBus.start();
             resolve(resp);
           })
           .catch(err => {
@@ -88,6 +90,7 @@ const authorization = {
     logout({ commit }) {
       return new Promise((resolve, reject) => {
         commit("logout");
+        longPollingBus.stop();
         localStorage.removeItem("userData");
         delete axios.defaults.headers.common["Authorization"];
         if (localStorage.getItem("userData")) {

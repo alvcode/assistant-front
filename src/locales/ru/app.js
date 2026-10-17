@@ -112,4 +112,7 @@ export default {
     "app_restore_all": "Восстановить всё",
     "app_all_items_will_be_permanently_deleted": "Все записи будут удалены без возможности восстановления",
     "app_download_as_an_archive": "Скачать архивом",
+    "app_archive_added_to_queue": "Создание архива добавлено в очередь",
+    "app_archive_is_being_created": "Идет формирование архива, пожалуйста, ожидайте",
+    "app_archive_ready_for_download": "Архив готов к выгрузке",
 };

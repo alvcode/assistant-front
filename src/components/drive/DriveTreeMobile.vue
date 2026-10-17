@@ -1,7 +1,7 @@
 <template>
   <div class="drive-tree-mobile--container">
-    <div @click="showRecycleBinPopup" class="recycle-bin text-right">
-      <div class="btx btx-sm btx-info">
+    <div class="recycle-bin text-right">
+      <div @click="showRecycleBinPopup" class="btx btx-sm btx-info">
         <f-awesome icon="trash"></f-awesome>
         {{ $t('app_recycle_bin') }}
       </div>
@@ -31,6 +31,9 @@
       <div @click="showDeleteSelected" v-if="selectedItems.length > 0 && treeMode === 1 && !existsSelectedWithCut" class="btx btx-danger mrg-t-10">
         <f-awesome icon="times"></f-awesome>
         {{ $t('app_delete') }}
+      </div>
+      <div @click="downloadAsArchive" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-orange mrg-t-10">
+        {{ $t('app_download_as_an_archive') }}
       </div>
 
       <div @click="selectionModeOff" v-if="treeMode === 1" class="btx btx-outline-danger mrg-t-10">
@@ -338,6 +341,7 @@ import DriveOpenFile from "@/components/drive/DriveOpenFile.vue";
 import VueEasyLightbox from 'vue-easy-lightbox'
 import ProgressLine from "@/components/ProgressLine.vue";
 import DriveRecycleBin from "@/components/drive/DriveRecycleBin.vue";
+import driveArchiveRepository from "@/repositories/driveArchive/index.js";
 
 const MODE_VIEW = 0;
 const MODE_SELECT = 1;
@@ -516,6 +520,26 @@ export default {
     }
   },
   methods: {
+    downloadAsArchive() {
+      this.$store.dispatch("startPreloader");
+
+      let selectedIds = [];
+      for (let key in this.selectedItems) {
+        selectedIds.push(this.selectedItems[key].id);
+      }
+
+      driveArchiveRepository.create(selectedIds).then(() => {
+        this.selectionModeOff();
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      })
+    },
     showItemMenu(itemId, itemName, itemType) {
       this.itemMenu.show = true;
       this.itemMenu.id = itemId;

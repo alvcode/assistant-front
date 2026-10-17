@@ -4,13 +4,14 @@
       <div class="space mrg-t-10">
         <drive-space :space-obj="space"></drive-space>
       </div>
+      <div class="mrg-t-20">
+        <drive-archive-line></drive-archive-line>
+      </div>
       <div class="drive-tree-desktop mrg-t-20">
         <drive-breadcrumbs
             :breadcrumbs="breadcrumbs"
             @fall-to="fallTo"
         ></drive-breadcrumbs>
-
-        <drive-archive-line></drive-archive-line>
         <drive-tree-desktop
             class="mrg-t-15"
             :tree="tree"

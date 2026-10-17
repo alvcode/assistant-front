@@ -112,4 +112,7 @@ export default {
     "app_restore_all": "Restore all",
     "app_all_items_will_be_permanently_deleted": "All items will be permanently deleted",
     "app_download_as_an_archive": "Download as an archive",
+    "app_archive_added_to_queue": "Archive creation added to the queue",
+    "app_archive_is_being_created": "The archive is being created; please wait",
+    "app_archive_ready_for_download": "The archive is ready for download",
 };

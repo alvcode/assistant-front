@@ -1,7 +1,7 @@
 <template>
   <div class="drive-tree-desktop--container">
-    <div @click="showRecycleBinPopup" class="recycle-bin text-right">
-      <div class="btx btx-sm btx-info">
+    <div class="recycle-bin text-right">
+      <div @click="showRecycleBinPopup" class="btx btx-sm btx-info">
         <f-awesome icon="trash"></f-awesome>
         {{ $t('app_recycle_bin') }}
       </div>

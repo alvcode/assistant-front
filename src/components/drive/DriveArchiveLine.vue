@@ -3,24 +3,24 @@
     <div class="main-content">
       <div class="line-container mrg-t-20" v-if="isExistsArchive === true">
         <div v-if="status === 0" class="line alert alert-success">
-          <div class="status-name">Создание архива добавлено в очередь</div>
+          <div class="status-name">{{ $t('app_archive_added_to_queue') }}</div>
           <div class="action mrg-l-15">
             <f-awesome icon="spinner" spin></f-awesome>
           </div>
         </div>
         <div v-if="status === 1" class="line alert alert-success">
-          <div class="status-name">Идет формирование архива. Пожалуйста, ожидайте</div>
+          <div class="status-name">{{ $t('app_archive_is_being_created') }}</div>
           <div class="action mrg-l-15">
             <f-awesome icon="spinner" spin></f-awesome>
           </div>
         </div>
         <div v-if="status === 2" class="line alert alert-success">
-          <div class="status-name">Архив готов к выгрузке</div>
+          <div class="status-name">{{ $t('app_archive_ready_for_download') }}</div>
           <div class="action mrg-l-15">
-            <div class="text-info text-underline cursor-pointer" @click="showOpenFilePopup">Скачать</div>
+            <div class="text-info text-underline cursor-pointer" @click="showOpenFilePopup">{{ $t('app_download') }}</div>
           </div>
           <div class="action mrg-l-15">
-            <div class="text-danger text-underline cursor-pointer" @click="removeArchive">Удалить</div>
+            <div class="text-danger text-underline cursor-pointer" @click="removeArchive">{{ $t('app_delete') }}</div>
           </div>
         </div>
       </div>

@@ -52,7 +52,6 @@ import longPollingBus from "@/services/longPollingBus.js";
 import driveArchiveRepository from "@/repositories/driveArchive/index.js";
 import Popup from "@/components/Popup.vue";
 import DriveOpenFile from "@/components/drive/DriveOpenFile.vue";
-import driveRepository from "@/repositories/drive/index.js";
 
 export default {
   name: "DriveArchiveLine",

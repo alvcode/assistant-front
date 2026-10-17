@@ -111,4 +111,5 @@ export default {
     "app_restore": "Восстановить",
     "app_restore_all": "Восстановить всё",
     "app_all_items_will_be_permanently_deleted": "Все записи будут удалены без возможности восстановления",
+    "app_download_as_an_archive": "Скачать архивом",
 };

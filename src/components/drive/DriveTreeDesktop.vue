@@ -28,6 +28,9 @@
       <div @click="deselectAll" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-sm btx-outline-info">
         {{ $t('app_deselect') }}
       </div>
+      <div @click="downloadAsArchive" v-if="selectedItems.length > 0 && existsSelectedWithoutCut" class="btx btx-sm btx-orange">
+        {{ $t('app_download_as_an_archive') }}
+      </div>
       <div @click="renMov" v-if="selectedItems.length > 0 && existsSelectedWithCut" class="btx btx-sm btx-outline-info mrg-l-15">
         {{ $t('app_insert') }}
       </div>
@@ -314,6 +317,7 @@ import DriveOpenFile from "@/components/drive/DriveOpenFile.vue";
 import VueEasyLightbox from 'vue-easy-lightbox'
 import ProgressLine from "@/components/ProgressLine.vue";
 import DriveRecycleBin from "@/components/drive/DriveRecycleBin.vue";
+import driveArchiveRepository from "@/repositories/driveArchive/index.js";
 
 const MAX_FILE_SIZE = 64 * 1024 * 1024 // 64 МБ
 
@@ -472,6 +476,26 @@ export default {
     }
   },
   methods: {
+    downloadAsArchive() {
+      this.$store.dispatch("startPreloader");
+
+      let selectedIds = [];
+      for (let key in this.selectedItems) {
+        selectedIds.push(this.selectedItems[key].id);
+      }
+
+      driveArchiveRepository.create(selectedIds).then(() => {
+        this.deselectAll();
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.$store.dispatch("addNotification", {
+          text: err.response.data.message,
+          time: 5,
+          color: "danger"
+        });
+        this.$store.dispatch("stopPreloader");
+      })
+    },
     setOpenedFileStatus(isProcess, progress) {
       this.openedFileDownloadStatus.process = isProcess;
       this.openedFileDownloadStatus.progress = progress;
@@ -508,8 +532,10 @@ export default {
     async downloadChunks() {
       const structId = this.openedFileObject.id;
 
+      let minChunk = 0;
       let maxChunk = 0;
       await driveRepository.getChunksInfo(structId).then(resp => {
+        minChunk = resp.data.start_number;
         maxChunk = resp.data.end_number;
       }).catch(err => {
         this.$store.dispatch("addNotification", {
@@ -523,7 +549,7 @@ export default {
       const self = this;
       const stream = new ReadableStream({
         async pull(controller) {
-          for (let i = 0; i <= maxChunk; i++) {
+          for (let i = minChunk; i <= maxChunk; i++) {
             const response = await driveRepository.getChunk(structId, i);
             const chunk = await response.data.arrayBuffer()
             controller.enqueue(new Uint8Array(chunk))

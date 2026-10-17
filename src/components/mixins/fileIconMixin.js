@@ -4,7 +4,10 @@ export default {
             const parts = filename.split('.');
             const ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
 
+            console.log(ext)
+
             const imageExtensions = ['jpg', 'jpeg', 'png'];
+            const archiveExtensions = ['rar', 'zip', 'gz'];
             const wordExtensions = ['doc', 'docx', 'odt'];
             const excelExtensions = ['xls', 'xlsx'];
             const pdfExtensions = ['pdf'];
@@ -32,6 +35,8 @@ export default {
                 return 'file-audio'
             } else if (videoExtensions.includes(ext)) {
                 return 'file-video'
+            } else if (archiveExtensions.includes(ext)) {
+                return 'file-zipper'
             } else if (fileExtensions.includes(ext)) {
                 return 'file'
             } else {

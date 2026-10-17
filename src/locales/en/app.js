@@ -111,4 +111,5 @@ export default {
     "app_restore": "Restore",
     "app_restore_all": "Restore all",
     "app_all_items_will_be_permanently_deleted": "All items will be permanently deleted",
+    "app_download_as_an_archive": "Download as an archive",
 };

@@ -99,6 +99,8 @@ export default {
     "app_delete_selected_text": "Выделенные объекты будут удалены без возможности восстановления. Продолжить?",
     "app_share": "Поделиться",
     "app_share_the_note": "Поделиться заметкой",
+    "app_share_the_file": "Поделиться файлом",
+    "app_share_the_folder": "Поделиться папкой",
     "app_link": "Ссылка",
     "app_copy": "Копировать",
     "app_revoke_access": "Отозвать доступ",

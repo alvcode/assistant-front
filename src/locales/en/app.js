@@ -99,6 +99,8 @@ export default {
     "app_delete_selected_text": "The selected objects will be permanently deleted. Continue?",
     "app_share": "Share",
     "app_share_the_note": "Share the note",
+    "app_share_the_file": "Share the file",
+    "app_share_the_folder": "Share the folder",
     "app_link": "Link",
     "app_copy": "Copy",
     "app_revoke_access": "Revoke access",

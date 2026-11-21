@@ -77,6 +77,9 @@
             <div v-if="treeMode === 1 && item.selected === true" class="btx-sm-circle">
               <f-awesome icon="check"></f-awesome>
             </div>
+            <div v-if="item.shared" class="info-icons text-success">
+              <f-awesome :icon="['fas', 'share-nodes']" />
+            </div>
           </div>
         </div>
       </div>
@@ -87,6 +90,12 @@
         <div class="name">{{ itemMenu.name }}</div>
         <div class="actions mrg-t-30">
           <div>
+            <div @click.prevent="openSharePopup()" class="btx btx-info">
+              <f-awesome icon="share-nodes"></f-awesome>
+              {{ itemMenu.shared ? $t('app_access_menu') : $t('app_share') }}
+            </div>
+          </div>
+          <div class="mrg-t-20">
             <div @click.prevent="showRenamePopup()" class="btx btx-info">
               <f-awesome icon="pen"></f-awesome> {{ $t('app_rename') }}
             </div>
@@ -297,6 +306,32 @@
     </popup>
 
     <popup
+        :closeButton="sharePopup.closeButton"
+        :show="sharePopup.show"
+        @closePopup="closeSharePopup"
+    >
+      <template v-slot:header>
+        {{ shareItemType === 0 ? $t('app_share_the_folder') : $t('app_share_the_file') }} "{{ shareItemName }}"
+      </template>
+      <template v-slot:body>
+        <div class="share-popup-container">
+          <div class="link">{{ $t('app_link') }}:
+            <a
+                class="text-link"
+                :href="shareLink" target="_blank"
+            >
+              {{ shareLink }}
+            </a>
+          </div>
+          <div class="mrg-t-20 actions">
+            <div class="btn btn-sm btn-success" @click="copyText(shareLink)">{{ $t('app_copy') }}</div>
+            <div class="btn btn-sm btn-danger" @click="deleteShare">{{ $t('app_revoke_access') }}</div>
+          </div>
+        </div>
+      </template>
+    </popup>
+
+    <popup
         :show="openFilePopup.show"
         :closeIfClickBack="true"
         @closePopup="closeOpenFilePopup"
@@ -342,6 +377,9 @@ import VueEasyLightbox from 'vue-easy-lightbox'
 import ProgressLine from "@/components/ProgressLine.vue";
 import DriveRecycleBin from "@/components/drive/DriveRecycleBin.vue";
 import driveArchiveRepository from "@/repositories/driveArchive/index.js";
+import driveShareRepository from "@/repositories/driveShare/index.js";
+import config from "@/config.js";
+import textCopyMixin from "@/components/mixins/textCopyMixin.js";
 
 const MODE_VIEW = 0;
 const MODE_SELECT = 1;
@@ -359,7 +397,8 @@ export default {
         show: false,
         id: 0,
         name: '',
-        type: 0
+        type: 0,
+        shared: false,
       },
       newDirectoryPopup: {
         show: false,
@@ -405,6 +444,15 @@ export default {
       renameItemId: 0,
       renameItemName: '',
 
+      sharePopup: {
+        show: false,
+        closeButton: this.$t('app_close'),
+      },
+      shareItemId: 0,
+      shareItemName: '',
+      shareItemType: 0,
+      shareHash: '',
+
       selectedItems: [],
 
       openFilePopup: {
@@ -425,13 +473,16 @@ export default {
       openImagesIds: [],
     }
   },
-  mixins: [dateFormatMixin, fileIconMixin],
+  mixins: [dateFormatMixin, fileIconMixin, textCopyMixin],
   props: {
     tree: Array,
     parentId: Number,
     showFallback: Boolean,
   },
   computed: {
+    shareLink() {
+      return config.this_domain + "/drive/share/" + this.shareHash;
+    },
     showLightboxNext() {
       let result = true;
       if (this.lightboxCurrentIndex === (this.openImagesIds.length - 1)) {
@@ -541,11 +592,12 @@ export default {
       })
     },
     showItemMenu(itemId, itemName, itemType) {
+      const treeItem = this.tree.find(item => item.id === itemId);
       this.itemMenu.show = true;
       this.itemMenu.id = itemId;
       this.itemMenu.name = itemName;
       this.itemMenu.type = itemType;
-      //this.itemMenu.itemName =
+      this.itemMenu.shared = !!(treeItem && treeItem.shared);
     },
     closeItemMenu() {
       this.itemMenu.show = false;
@@ -728,6 +780,61 @@ export default {
         }
       }
       this.selectedItems.push({id: id, type: 'select'});
+    },
+    openSharePopup() {
+      this.shareItemId = this.itemMenu.id;
+      this.shareItemName = this.itemMenu.name;
+      this.shareItemType = this.itemMenu.type;
+
+      const treeItem = this.tree.find(item => item.id === this.shareItemId);
+      const isShared = !!(treeItem && treeItem.shared);
+
+      this.closeItemMenu();
+      this.$store.dispatch("startPreloader");
+      if (isShared) {
+        driveShareRepository.getOne(this.shareItemId).then(resp => {
+          this.shareHash = resp.data.hash;
+          this.sharePopup.show = true;
+          this.$store.dispatch("stopPreloader");
+        }).catch(err => {
+          this.showShareError(err);
+        });
+      } else {
+        driveShareRepository.create(this.shareItemId).then(resp => {
+          if (treeItem) {
+            treeItem.shared = true;
+          }
+          this.shareHash = resp.data.hash;
+          this.sharePopup.show = true;
+          this.$store.dispatch("stopPreloader");
+        }).catch(err => {
+          this.showShareError(err);
+        });
+      }
+    },
+    showShareError(err) {
+      this.$store.dispatch("addNotification", {
+        text: err.response.data.message,
+        time: 5,
+        color: "danger"
+      });
+      this.$store.dispatch("stopPreloader");
+    },
+    closeSharePopup() {
+      this.sharePopup.show = false;
+    },
+    deleteShare() {
+      this.$store.dispatch("startPreloader");
+      driveShareRepository.delete(this.shareItemId).then(() => {
+        const treeItem = this.tree.find(item => item.id === this.shareItemId);
+        if (treeItem) {
+          treeItem.shared = false;
+        }
+        this.closeSharePopup();
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.showShareError(err);
+      });
     },
     showRenamePopup() {
       this.renamePopup.show = true;
@@ -1189,6 +1296,10 @@ export default {
   font-size: 11px;
   color: gray;
 }
+.info-icons {
+  margin-top: 2px;
+  font-size: 11px;
+}
 .row--name {
   display: flex;
   flex-wrap: nowrap;
@@ -1240,6 +1351,11 @@ export default {
       width: 10%;
       text-align: center;
     }
+  }
+}
+.share-popup-container {
+  .link {
+    word-break: break-all;
   }
 }
 .lightbox-toolbar {

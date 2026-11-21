@@ -76,6 +76,13 @@
             <span v-if="item.type === 1">{{ getSize(item.size) }}</span>
           </div>
           <div>
+            <div
+                @click="openSharePopup(item.id, item.name, item.type)"
+                :class="item.shared ? 'btx-success' : 'btx-info'"
+                class="btx-sm-circle"
+            >
+              <f-awesome icon="share-nodes"></f-awesome>
+            </div>
             <div @click="showRenamePopup(item.id, item.name)" class="btx-sm-circle btx-info">
               <f-awesome icon="pen"></f-awesome>
             </div>
@@ -270,6 +277,32 @@
     </popup>
 
     <popup
+        :closeButton="sharePopup.closeButton"
+        :show="sharePopup.show"
+        @closePopup="closeSharePopup"
+    >
+      <template v-slot:header>
+        {{ shareItemType === 0 ? $t('app_share_the_folder') : $t('app_share_the_file') }} "{{ shareItemName }}"
+      </template>
+      <template v-slot:body>
+        <div class="share-popup-container">
+          <div class="link">{{ $t('app_link') }}:
+            <a
+                class="text-link"
+                :href="shareLink" target="_blank"
+            >
+              {{ shareLink }}
+            </a>
+          </div>
+          <div class="mrg-t-20 actions">
+            <div class="btn btn-sm btn-success" @click="copyText(shareLink)">{{ $t('app_copy') }}</div>
+            <div class="btn btn-sm btn-danger" @click="deleteShare">{{ $t('app_revoke_access') }}</div>
+          </div>
+        </div>
+      </template>
+    </popup>
+
+    <popup
         :show="openFilePopup.show"
         :closeIfClickBack="true"
         @closePopup="closeOpenFilePopup"
@@ -318,6 +351,9 @@ import VueEasyLightbox from 'vue-easy-lightbox'
 import ProgressLine from "@/components/ProgressLine.vue";
 import DriveRecycleBin from "@/components/drive/DriveRecycleBin.vue";
 import driveArchiveRepository from "@/repositories/driveArchive/index.js";
+import driveShareRepository from "@/repositories/driveShare/index.js";
+import config from "@/config.js";
+import textCopyMixin from "@/components/mixins/textCopyMixin.js";
 
 const MAX_FILE_SIZE = 64 * 1024 * 1024 // 64 МБ
 
@@ -371,6 +407,15 @@ export default {
       renameItemId: 0,
       renameItemName: '',
 
+      sharePopup: {
+        show: false,
+        closeButton: this.$t('app_close'),
+      },
+      shareItemId: 0,
+      shareItemName: '',
+      shareItemType: 0,
+      shareHash: '',
+
       selectedItems: [],
 
       openFilePopup: {
@@ -391,13 +436,16 @@ export default {
       openImagesIds: [],
     }
   },
-  mixins: [dateFormatMixin, fileIconMixin],
+  mixins: [dateFormatMixin, fileIconMixin, textCopyMixin],
   props: {
     tree: Array,
     parentId: Number,
     showFallback: Boolean,
   },
   computed: {
+    shareLink() {
+      return config.this_domain + "/drive/share/" + this.shareHash;
+    },
     existsSelectedWithoutCut() {
       let result = true;
       for (let key in this.selectedItems) {
@@ -980,6 +1028,60 @@ export default {
       this.$store.dispatch("stopPreloader");
     },
 
+    openSharePopup(itemId, itemName, itemType) {
+      this.shareItemId = itemId;
+      this.shareItemName = itemName;
+      this.shareItemType = itemType;
+
+      const treeItem = this.tree.find(item => item.id === itemId);
+
+      this.$store.dispatch("startPreloader");
+      if (treeItem && treeItem.shared) {
+        driveShareRepository.getOne(itemId).then(resp => {
+          this.shareHash = resp.data.hash;
+          this.sharePopup.show = true;
+          this.$store.dispatch("stopPreloader");
+        }).catch(err => {
+          this.showShareError(err);
+        });
+      } else {
+        driveShareRepository.create(itemId).then(resp => {
+          if (treeItem) {
+            treeItem.shared = true;
+          }
+          this.shareHash = resp.data.hash;
+          this.sharePopup.show = true;
+          this.$store.dispatch("stopPreloader");
+        }).catch(err => {
+          this.showShareError(err);
+        });
+      }
+    },
+    showShareError(err) {
+      this.$store.dispatch("addNotification", {
+        text: err.response.data.message,
+        time: 5,
+        color: "danger"
+      });
+      this.$store.dispatch("stopPreloader");
+    },
+    closeSharePopup() {
+      this.sharePopup.show = false;
+    },
+    deleteShare() {
+      this.$store.dispatch("startPreloader");
+      driveShareRepository.delete(this.shareItemId).then(() => {
+        const treeItem = this.tree.find(item => item.id === this.shareItemId);
+        if (treeItem) {
+          treeItem.shared = false;
+        }
+        this.closeSharePopup();
+        this.$store.dispatch("stopPreloader");
+      }).catch(err => {
+        this.showShareError(err);
+      });
+    },
+
     showRecycleBinPopup() {
       this.recycleBinPopup.show = true;
     },
@@ -1168,6 +1270,11 @@ export default {
       width: 10%;
       text-align: center;
     }
+  }
+}
+.share-popup-container {
+  .link {
+    word-break: break-all;
   }
 }
 .lightbox-toolbar {

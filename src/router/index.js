@@ -37,7 +37,14 @@ const router = createRouter({
     {
       path: '/notes/share/:hash',
       name: 'sharedNote',
+      meta: {public: true},
       component: () => import('../views/other/SharedNoteView.vue')
+    },
+    {
+      path: '/drive/share/:hash',
+      name: 'sharedDrive',
+      meta: {public: true},
+      component: () => import('../views/other/SharedDriveView.vue')
     }
   ]
 })

@@ -1,6 +1,9 @@
 <template>
   <div class="drive-recycle-bin--container">
-    <div class="table--container">
+    <div v-if="list.length === 0 && loaded === true" class="mrg-t-25 mrg-b-25 text-bold text-danger text-center">
+      {{ $t('app_recycle_bin_empty') }}
+    </div>
+    <div class="table--container" v-show="list.length > 0">
       <div class="table--header">
         <div>{{ $t('app_drive_table_name') }}</div>
         <div>{{ $t('app_added') }}</div>
@@ -89,6 +92,7 @@ export default {
   data() {
     return {
       list: [],
+      loaded: false,
 
       deleteOnePopup: {
         show: false,
@@ -118,6 +122,7 @@ export default {
       } else {
         setTimeout(() => {
           this.list = [];
+          this.loaded = false;
         }, 500);
       }
     }
@@ -133,6 +138,7 @@ export default {
       this.$store.dispatch("startPreloader");
       driveRecycleBinRepository.getList().then(resp => {
         this.list = resp.data;
+        this.loaded = true;
         this.$store.dispatch("stopPreloader");
       }).catch(err => {
         this.$store.dispatch("addNotification", {

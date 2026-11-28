@@ -2,9 +2,14 @@ import longPollingRepository from "@/repositories/longPolling/index.js";
 
 const subscribers = new Map();
 
+const RETRY_DELAY_MIN = 2000;
+const RETRY_DELAY_MAX = 30000;
+
 let isRunning = false;
 let currentAbortController = null;
 let lastEventId = null;
+let retryDelay = RETRY_DELAY_MIN;
+let retryTimer = null;
 
 function dispatch(event) {
     const handlers = subscribers.get(event.eventKey);
@@ -25,14 +30,21 @@ async function poll() {
         return;
     }
 
+    retryTimer = null;
     currentAbortController = new AbortController();
 
     let events = [];
+    let failed = false;
     try {
         const response = await longPollingRepository.pool({ signal: currentAbortController.signal, lastEventId });
         events = response.data || [];
+        retryDelay = RETRY_DELAY_MIN;
     } catch (error) {
-        // Соединение оборвано (таймаут/сеть/abort) — просто переподключаемся.
+        failed = !currentAbortController?.signal?.aborted;
+    }
+
+    if (!isRunning) {
+        return;
     }
 
     if (Array.isArray(events) && events.length) {
@@ -43,9 +55,17 @@ async function poll() {
         events.forEach(dispatch);
     }
 
-    if (isRunning) {
-        poll();
+    if (failed) {
+        // Сервер недоступен — ждём дольше перед следующей попыткой.
+        const delay = retryDelay;
+        retryDelay = Math.min(retryDelay * 2, RETRY_DELAY_MAX);
+        retryTimer = setTimeout(() => {
+            poll();
+        }, delay);
+        return;
     }
+
+    poll();
 }
 
 function handlePageHide() {
@@ -77,6 +97,7 @@ function start() {
         return;
     }
     isRunning = true;
+    retryDelay = RETRY_DELAY_MIN;
     window.addEventListener("pagehide", handlePageHide);
     poll();
 }
@@ -84,6 +105,10 @@ function start() {
 function stop() {
     isRunning = false;
     window.removeEventListener("pagehide", handlePageHide);
+    if (retryTimer) {
+        clearTimeout(retryTimer);
+        retryTimer = null;
+    }
     if (currentAbortController) {
         currentAbortController.abort();
         currentAbortController = null;

@@ -107,6 +107,7 @@ export default {
     "app_access_menu": "Меню доступа",
     "app_text_copied": "Текст скопирован в буфер обмена",
     "app_recycle_bin": "Корзина",
+    "app_recycle_bin_empty": "Корзина пуста",
     "app_permanently_delete": "Удалить безвозвратно",
     "app_added": "Добавлено",
     "app_path": "Путь",

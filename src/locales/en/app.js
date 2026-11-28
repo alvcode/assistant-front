@@ -107,6 +107,7 @@ export default {
     "app_access_menu": "Access menu",
     "app_text_copied": "The text has been copied to the clipboard",
     "app_recycle_bin": "Recycle Bin",
+    "app_recycle_bin_empty": "Recycle Bin is empty",
     "app_permanently_delete": "Permanently Delete",
     "app_added": "Added",
     "app_path": "Path",
